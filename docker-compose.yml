@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # 1. Βάση Δεδομένων (MariaDB)
+  db:
+    image: mariadb:11.4 # Χρησιμοποιούμε την έκδοση 11+ ή 12 που είχες πριν (αλλιώς δεν μπορεί να διαβάσει τα παλιά αρχεία)
+    container_name: bq_mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: rental_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql # Αποθήκευση των δεδομένων της βάσης
+
+  # 2. Το Backend (Node.js API)
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bq_backend
+    restart: always
+    ports:
+      - "3000:3000" # Το API σου τρέχει στην 3000
+    environment:
+      - DB_NAME=rental_db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_HOST=db # Εδώ αντί για 127.0.0.1, το Docker χρησιμοποιεί το όνομα του service ("db")
+      - PORT=3000
+    depends_on:
+      - db # Περίμενε πρώτα να σηκωθεί η MariaDB
+
+  # 3. Το Frontend (Angular + Nginx)
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bq_frontend
+    restart: always
+    ports:
+      - "4200:80" # Ο υπολογιστής σου βλέπει την 4200, ο Nginx μέσα στο container τρέχει στην 80
+    depends_on:
+      - backend
+
+# Χώρος αποθήκευσης δεδομένων
+volumes:
+  mariadb_data:
