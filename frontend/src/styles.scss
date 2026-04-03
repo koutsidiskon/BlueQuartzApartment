@@ -1,0 +1,64 @@
+/* src/styles.scss */
+@import 'glightbox/dist/css/glightbox.min.css';
+@import 'flatpickr/dist/flatpickr.min.css';
+
+// 1. Reset για να μην υπάρχουν κενά γύρω-γύρω
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden; // Απαραίτητο για το 100vw
+}
+
+/* --- Flatpickr Mobile Fix --- */
+.flatpickr-calendar {
+  box-sizing: border-box;
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 480px) {
+  .flatpickr-calendar.open {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+    width: 315px !important; /* Σταθερό πλάτος ώστε να χωράει σε όλες τις οθόνες */
+    max-width: 95vw !important;
+  }
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #333;
+  background-color: #fcfdfe;
+}
+
+// 2. Διορθώνει το κενό κάτω από εικόνες
+img {
+  display: block; 
+  max-width: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+// 3. Αφαιρούμε το margin από το container αν το χρησιμοποιείς στο app.component
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Επίσης, πρόσθεσε αυτό για να μην "κολλάει" το περιεχόμενο κάτω από το Nav */
+section, header {
+  scroll-margin-top: 90px; /* Το ύψος του navigation bar σου */
+}
+
+

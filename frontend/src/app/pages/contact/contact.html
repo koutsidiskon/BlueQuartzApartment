@@ -1,0 +1,58 @@
+<section id="contact-section" class="contact-section">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Have a Question Before Booking?</h2>
+      <p class="section-subtitle">Send us an inquiry with your preferred dates, and we'll get back to you shortly.</p>
+    </div>
+
+    <div class="contact-form-wrapper">
+      <form class="quartz-form" (submit)="onSubmit($event)">
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="fullName">Full Name*</label>
+            <input #fullName type="text" id="fullName" placeholder="Your Name" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address*</label>
+            <input #email type="email" id="email" placeholder="you@example.com" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="checkIn">Check-in*</label>
+            <div class="date-input-wrapper">
+              <input type="text" id="checkIn" autocomplete="off"  #checkInPicker  placeholder="Select Check-in date" required>
+              <span class="material-icons date-icon">calendar_today</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="checkOut">Check-out*</label>
+            <div class="date-input-wrapper">
+              <input type="text" id="checkOut" #checkOutPicker autocomplete="off" placeholder="Select Check-out date" required>
+              <span class="material-icons date-icon">calendar_today</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="message">Your Inquiry</label>
+          <textarea #message id="message" rows="4" placeholder="How can we help you? Tell us a bit about your stay..."></textarea>
+        </div>
+
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label" for="gdprConsent">
+            <input type="checkbox" id="gdprConsent" required>
+            <span>* I agree to the storage and processing of my personal data for this booking inquiry.</span>
+          </label>
+        </div>
+
+        <div class="form-submit">
+          <button type="submit" class="btn-submit">Send Inquiry <span class="material-icons">send</span></button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,393 @@
+// --- Variables ---
+$blue-quartz: #003366;
+$blue-quartz-light: #004c99; // Lightened by ~10%
+$crystal-blue: #8fcbf1;
+$cycladic-white: #FFFFFF;
+$font-header: 'Playfair Display', serif; 
+$font-body: 'Poppins', sans-serif;       
+$font-logo: 'Playfair Display', serif;
+
+// --- 1. HERO SECTION (Full Width Image) ---
+.hero-header {
+  position: relative;
+  width: 100vw; 
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  margin-top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: block;
+
+  .hero-image-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    line-height: 0;
+
+    .hero-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(75deg, rgba($blue-quartz, 0.6) 0%, rgba(0,0,0,0) 70%);
+      display: flex;
+      align-items: center;
+      padding: 0 10%;
+    }
+  }
+}
+
+.hero-content {
+  max-width: 700px;
+  color: $cycladic-white;
+  animation: slideUp 1s ease-out 0.3s both;
+
+  .hero-badge {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    color: $crystal-blue;
+    margin-bottom: 1.5rem;
+    display: block;
+    font-weight: 600;
+  }
+
+  .hero-title {
+    font-family: $font-logo;
+    font-size: clamp(3rem, 6vw, 5rem);
+    line-height: 1;
+    margin-bottom: 2rem;
+    span { font-style: italic; font-weight: 400; }
+  }
+
+  .hero-subtitle {
+    font-size: 1.15rem;
+    line-height: 1.8;
+    margin-bottom: 3rem;
+    opacity: 0.9;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1.5rem;
+    button {
+      padding: 1.2rem 2.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+    .btn-primary {
+      background: $crystal-blue;
+      border: none;
+      color: $blue-quartz;
+      border-radius: 4px;
+      white-space: nowrap; 
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid white;
+      color: white;
+      border-radius: 4px;
+      white-space: nowrap; 
+    }
+  }
+}
+
+// --- 2. WELCOME SECTION (Centered Text & Grid) ---
+.welcome-section {
+  padding: 8rem 0;
+  background: $cycladic-white;
+  display: flex;
+  justify-content: center; 
+
+  .container {
+    max-width: 1100px; 
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  .welcome-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr; 
+    gap: 5rem;
+    align-items: flex-start;
+
+    .section-title {
+      font-family: $font-logo;
+      font-size: 2.8rem;
+      color: $blue-quartz;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    p {
+      color: #5a6b7d;
+      line-height: 1.8;
+      font-size: 1.1rem;
+    }
+  }
+
+  .stat-block {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    border-left: 2px solid rgba($crystal-blue, 0.4);
+    padding-left: 3rem;
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+
+      .stat-number {
+        font-family: $font-logo;
+        font-size: 3.5rem;
+        color: $crystal-blue;
+        line-height: 1;
+        font-weight: 700;
+      }
+
+      .stat-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        color: $blue-quartz;
+        font-weight: 700;
+        margin-top: 0.5rem;
+      }
+    }
+  }
+}
+
+// --- 3. FACILITIES SECTION ---
+.facilities-section {
+  padding: 120px 0; 
+  background-color: #ffffff;
+
+  .section-header {
+    text-align: center; 
+    margin-bottom: 80px; 
+    max-width: 600px; 
+    margin-left: auto; 
+    margin-right: auto; 
+
+    .section-title {
+      font-family: 'Playfair Display', serif; 
+      font-size: 3rem; 
+      font-weight: 500; 
+      color: #003366; 
+      margin-bottom: 20px;
+      letter-spacing: -1px; 
+      line-height: 1.1; 
+    }
+
+    .section-subtitle {
+      font-family: 'Poppins', sans-serif; 
+      color: #7f8c8d; 
+      font-size: 1.15rem; 
+      font-weight: 300; 
+      letter-spacing: 2px; 
+      text-transform: uppercase; 
+      margin-top: 0;
+    }
+  }
+}
+
+.facilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+}
+
+.facility-card {
+  text-align: center;
+  padding: 40px 20px;
+  border-radius: 4px; 
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  border: 1px solid #f0f0f0;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+    border-color: #8fcbf1; 
+  }
+
+  .icon-box {
+    margin-bottom: 20px;
+    
+    .material-icons {
+      font-size: 40px;
+      color: #003366; 
+    }
+  }
+
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #003366;
+  }
+
+  p {
+    color: #666;
+    line-height: 1.6;
+    font-size: 0.95rem;
+  }
+}
+
+.discover-more-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 4rem;
+  border-radius: 4px;
+}
+
+.btn-discover {
+  background: transparent;
+  color: $blue-quartz;
+  border: 2px solid $blue-quartz;
+  border-radius: 4px;
+  padding: 1rem 2.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+
+  .material-icons {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    background: $blue-quartz;
+    color: white;
+    
+    .material-icons {
+      transform: translateX(5px); 
+    }
+  }
+}
+
+// --- Animations ---
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// ==========================================
+// --- RESPONSIVE / MOBILE FIXES ---
+// ==========================================
+@media (max-width: 768px) {
+  
+  // 1. Hero Section Fixes
+  .hero-header {
+    .hero-image-container .hero-overlay {
+      padding: 0 1.5rem; // Μικρότερο κενό δεξιά-αριστερά στο κινητό
+    }
+  }
+
+  .hero-content {
+    .hero-badge {
+      font-size: 0.7rem; // Ελαφρώς πιο διακριτικό
+    }
+    .hero-title {
+      font-size: 2.5rem; // Μικραίνει ο τίτλος για να μην κόβεται
+      margin-bottom: 1rem;
+    }
+    .hero-subtitle {
+      font-size: 1rem; // Πιο ευανάγνωστο μέγεθος παραγράφου
+      margin-bottom: 2rem;
+    }
+    
+    // Η ΣΗΜΑΝΤΙΚΗ ΑΛΛΑΓΗ ΣΤΑ ΚΟΥΜΠΙΑ: Στοίχιση σε στήλη!
+    .hero-actions {
+      flex-direction: column; 
+      gap: 1rem;
+      width: 100%;
+      
+      button {
+        width: 100%; // Τα κουμπιά πιάνουν όλο το πλάτος
+        padding: 1rem;
+      }
+    }
+  }
+
+  // 2. Welcome Section Fixes
+  .welcome-section {
+    padding: 4rem 0; // Μισό padding (από 8rem) για να μη χάνεται χώρος
+
+    .welcome-grid {
+      grid-template-columns: 1fr; // Μία στήλη
+      gap: 2.5rem; // Μικρότερο κενό ανάμεσα σε κείμενο και νούμερα
+
+      .section-title {
+        font-size: 2.2rem; // Μικρότερος τίτλος
+      }
+
+      .stat-block {
+        border-left: none;
+        border-top: 2px solid rgba($crystal-blue, 0.4);
+        padding: 2rem 0 0 0;
+        flex-direction: row; 
+        flex-wrap: wrap; // Επιτρέπει στα νούμερα να "πέσουν" αν δεν χωράνε
+        justify-content: space-between;
+        gap: 1.5rem;
+        
+        .stat-item .stat-number {
+          font-size: 2.5rem; // Πιο μαζεμένα νούμερα
+        }
+      }
+    }
+  }
+
+  // 3. Facilities Section Fixes
+  .facilities-section {
+    padding: 60px 0; // Μισό padding (από 120px)
+
+    .section-header {
+      margin-bottom: 40px;
+      padding: 0 1rem;
+
+      .section-title {
+        font-size: 2.2rem; // Πιο κομψό για κινητά
+      }
+
+      .section-subtitle {
+        font-size: 0.9rem;
+        letter-spacing: 1px; // Λιγότερο άνοιγμα για να χωράει σε μια γραμμή
+      }
+    }
+  }
+
+  // 4. Global Button Fixes (Discover More)
+  .discover-more-container {
+    margin-top: 2rem;
+    padding: 0 1rem;
+    
+    .btn-discover {
+      width: 100%; // Πιάνει όλο το πλάτος στο κινητό
+      justify-content: center; // Κεντράρει το κείμενο μέσα στο κουμπί
+    }
+  }
+}

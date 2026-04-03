@@ -1,0 +1,259 @@
+// --- Variables ---
+$blue-quartz: #003366;
+$blue-quartz-light: #004c99; // Lightened by ~10%
+$crystal-blue: #8fcbf1;
+$cycladic-white: #FFFFFF;
+$font-header: 'Playfair Display', serif; 
+$font-body: 'Poppins', sans-serif;       
+$font-logo: 'Playfair Display', serif;
+
+// --- CONTACT SECTION ---
+.contact-section {
+  padding: 100px 0;
+  background-color: #f9fbfd; // Απαλό γαλάζιο/γκρι για καθαρότητα
+
+  .section-header {
+    text-align: center; 
+    margin-bottom: 80px; 
+    max-width: 1000px; 
+    margin-left: auto; 
+    margin-right: auto; 
+    
+    .section-title {
+      font-family: 'Playfair Display', serif; 
+      font-size: 3rem; 
+      font-weight: 500; 
+      color: #003366; 
+      margin-bottom: 20px;
+      letter-spacing: -1px; 
+      line-height: 1.1; 
+    }
+
+    .section-subtitle {
+      font-family: 'Poppins', sans-serif; 
+      color: #7f8c8d; 
+      font-size: 1.15rem; 
+      font-weight: 300; 
+      letter-spacing: 2px; 
+      text-transform: uppercase; 
+      margin-top: 0;
+    }
+  }
+}
+
+.contact-form-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  background: $cycladic-white;
+  padding: 3rem;
+  border-radius: 8px;
+  box-shadow: 0 15px 35px rgba($blue-quartz, 0.05);
+
+  .quartz-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    .form-row {
+      display: flex;
+      gap: 1.5rem;
+
+      .form-group {
+        flex: 1;
+      }
+      .full-width {
+        flex: 1 1 100%;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        font-family: $font-body;
+        font-size: 0.9rem;
+        color: $blue-quartz;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      // Applied to all standard text inputs and textareas
+      input[type="text"],
+      input[type="email"],
+      textarea {
+        font-family: $font-body;
+        padding: 1rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 1rem;
+        color: #333;
+        background: #fafafa;
+        transition: all 0.3s ease;
+        height: auto;
+        box-sizing: border-box;
+        width: 100%;
+
+        &:focus {
+          outline: none;
+          border-color: $crystal-blue;
+          box-shadow: 0 0 0 3px rgba($crystal-blue, 0.1);
+        }
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+
+      .date-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+
+        /* Hide original flatpickr input if altInput is used */
+        ::ng-deep input[type="hidden"] {
+          display: none !important;
+        }
+
+        /* Force styling overrides specifically for the flatpickr dynamically created inputs */
+        ::ng-deep input[type="text"] {
+          width: 100% !important;
+          padding: 1rem !important;
+          padding-right: 45px !important; /* space for the calendar icon */
+          cursor: pointer;
+          font-family: $font-body !important;
+          border: 1px solid #e0e0e0 !important;
+          border-radius: 4px !important;
+          font-size: 1rem !important;
+          color: #333 !important;
+          background: #fafafa !important;
+          transition: all 0.3s ease;
+          height: auto !important;
+          box-sizing: border-box !important;
+          //-webkit-appearance: none; // Safari fix
+
+          &:focus {
+            outline: none !important;
+            border-color: $crystal-blue !important;
+            box-shadow: 0 0 0 3px rgba($crystal-blue, 0.1) !important;
+          }
+        }
+
+        .date-icon {
+          position: absolute;
+          right: 12px;
+          color: $crystal-blue;
+          pointer-events: none;
+          z-index: 2;
+        }
+      }
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      margin-top: 0.5rem;
+
+      .checkbox-label {
+        display: flex;
+        align-items: center;
+        font-family: $font-body;
+        font-size: 0.85rem;
+        color: #555;
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: normal;
+        margin-bottom: 0;
+        cursor: pointer;
+        gap: 0.75rem;
+
+        input[type="checkbox"] {
+          width: 1.2rem;
+          height: 1.2rem;
+          cursor: pointer;
+          accent-color: $blue-quartz;
+          margin: 0;
+        }
+
+        span {
+          line-height: 1.4;
+        }
+      }
+    }
+
+    .form-submit {
+      text-align: center;
+      margin-top: 1.5rem;
+
+      .btn-submit {
+        background-color: $blue-quartz;
+        color: $cycladic-white;
+        border: none;
+        padding: 1.2rem 3rem;
+        font-size: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+        margin: 0 auto;
+
+        &:hover {
+          background-color: $blue-quartz-light;
+          transform: translateY(-2px);
+          box-shadow: 0 10px 20px rgba($blue-quartz, 0.15);
+        }
+
+        .material-icons {
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+}
+
+// ==========================================
+// --- RESPONSIVE / MOBILE FIXES ---
+// ==========================================
+@media (max-width: 768px) {
+  // 5. Contact Section Forms
+  .contact-section {
+    padding: 60px 0; // Μισό padding για κινητά
+
+    .section-header {
+      padding: 0 1rem;
+      margin-bottom: 40px;
+
+      .section-title {
+        font-size: 2.2rem;
+      }
+    }
+  }
+
+  .contact-form-wrapper {
+    padding: 2rem 1.5rem;
+    border-radius: 0;
+
+    .quartz-form {
+      .form-row {
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .form-submit .btn-submit {
+        width: 100%;
+        padding: 1.2rem;
+      }
+    }
+  }
+}

@@ -1,0 +1,87 @@
+<div class="facilities-page">
+  
+  <header class="minimal-header">
+    <div class="container">
+      <span class="category">Exclusive Amenities</span>
+      <h1>Experience Excellence</h1>
+      <div class="divider"></div>
+    </div>
+  </header>
+
+  <section class="details-section">
+    <div class="container">
+      @if (isLoading) {
+        <p class="status-message">Loading amenities...</p>
+      }
+
+      @if (loadError) {
+        <div class="status-message">
+          <p>{{ loadError }}</p>
+          <button class="btn-book-now" type="button" (click)="retryLoadImages()">
+            <span>Try Again</span>
+            <span class="material-icons">refresh</span>
+          </button>
+        </div>
+      }
+
+      @if (!isLoading && !loadError && roomGroups.length === 0) {
+        <p class="status-message">No photos available yet. Please check back soon.</p>
+      }
+      
+      @for (room of roomGroups; track room.category; let odd = $odd) {
+        
+        <div class="detail-row" [ngClass]="{'reverse': odd}">
+          
+          <div class="detail-text">
+            <span class="category">{{ getCategoryLabel(room.category) }}</span>
+            <h2>{{ getRoomTitle(room.category) }}</h2>
+            <p>{{ getRoomDescription(room.category) }}</p>
+            
+            <ul class="feature-list">
+              @for (feat of getFeatures(room.category); track feat) {
+                <li><span class="material-icons">check</span> {{ feat }}</li>
+              }
+            </ul>
+          </div>
+
+          @if (room.images.length > 1) {
+            
+            <div class="image-grid-collage">
+              @for (photo of room.images; track photo.url; let i = $index) {
+                <a [href]="photo.url" 
+                   class="glightbox"
+                   [attr.data-gallery]="'room-' + room.category"
+                   [ngClass]="{
+                     'img-main': i === 0, 
+                     'img-sub-1': i === 1, 
+                     'img-sub-2': i === 2
+                   }"
+                   [attr.data-description]="photo.caption">
+                  <img [src]="photo.url" [alt]="photo.caption || room.category">
+                </a>
+              }
+            </div>
+
+          } @else if (room.images.length === 1) {
+            
+            <div class="single-image-layout">
+              <a [href]="room.images[0].url" class="glightbox" [attr.data-gallery]="'room-' + room.category">
+                <img [src]="room.images[0].url" [alt]="room.images[0].caption || room.category">
+              </a>
+            </div>
+
+          }
+
+        </div>
+      }
+
+      <div class="book-now-container">
+        <button class="btn-book-now" routerLink="/book">
+          <span>Book Your Getaway</span>
+          <span class="material-icons">event_available</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+</div>

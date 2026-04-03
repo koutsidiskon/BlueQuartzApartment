@@ -1,0 +1,38 @@
+<nav [class.scrolled]="isScrolled" [class.force-white]="isFacilitiesPage">
+  <a routerLink="/" fragment="home-top" class="logo">
+    <span class="brand-name">The Blue Quartz</span>
+    <span class="brand-sub">Apartment Limenas Thassos</span>
+  </a>
+
+  <div class="nav-container">
+    <div class="nav-tabs" [class.open]="menuOpen">
+        <a routerLink="/" fragment="home-top" 
+          (click)="setActive('home-top')"
+          [class.active]="currentSection === 'home-top' && !isFacilitiesPage">Home</a>
+          
+        <a [routerLink]="isFacilitiesPage ? [] : ['/']" 
+          [fragment]="isFacilitiesPage ? undefined : 'facilities-section'"
+          [class.active]="isFacilitiesPage || currentSection === 'facilities-section'"
+          [style.pointer-events]="isFacilitiesPage ? 'none' : 'auto'"
+          [style.cursor]="isFacilitiesPage ? 'default' : 'pointer'">
+          Facilities
+        </a>
+                  
+        <a routerLink="/" fragment="contact-section" 
+          (click)="setActive('contact-section')"
+          [class.active]="currentSection === 'contact-section'&& !isFacilitiesPage">Contact</a>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn-book-now" routerLink="/book">Book Now</button>
+      
+      <button class="hamburger" (click)="menuOpen = !menuOpen">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<main class="main-view">
+  <router-outlet></router-outlet>
+</main>

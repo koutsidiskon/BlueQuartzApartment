@@ -1,0 +1,363 @@
+@use '../../app.scss' as *;
+
+$deep-navy: #003366;
+
+.facilities-page {
+  background-color: #ffffff !important;
+  padding-top: 110px; 
+  min-height: 100vh;
+}
+
+// --- HEADER ---
+.minimal-header {
+  text-align: center;
+  padding: 100px 0 60px;
+  background: #ffffff;
+
+  .category {
+    color: $crystal-blue;
+    text-transform: uppercase;
+    letter-spacing: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  h1 {
+    font-family: $font-logo;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    color: $deep-navy !important;
+    margin: 0;
+    font-weight: 400;
+  }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: rgba($deep-navy, 0.3);
+    margin: 2rem auto;
+  }
+}
+
+// --- MAIN DETAILS SECTION ---
+.details-section {
+  padding: 40px 8% 120px;
+  background: #ffffff;
+
+  .detail-row {
+    display: flex;
+    flex-direction: row; 
+    flex-wrap: nowrap;   
+    align-items: center;
+    gap: 6rem;           
+    margin-bottom: 12rem; 
+
+    &.reverse {
+      flex-direction: row-reverse;
+    }
+
+    // --- ΤΟ ΚΛΑΣΙΚΟ "HERO GALLERY" GRID ---
+    .image-grid-collage {
+      flex: 0 0 50%; 
+      height: 500px; // <--- ΕΔΩ ΕΙΝΑΙ Η ΑΛΛΑΓΗ! Βάλαμε σταθερό, μικρότερο ύψος.
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); 
+      grid-template-rows: repeat(3, 1fr);    
+      gap: 15px; // <--- Μικρύναμε λίγο και το κενό για να ταιριάζει καλύτερα
+
+      a.glightbox {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border-radius: 8px; 
+        overflow: hidden; 
+        box-shadow: 0 15px 35px rgba($deep-navy, 0.08);
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+
+        &:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 25px 45px rgba($deep-navy, 0.15);
+          z-index: 2;
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover; 
+          object-position: center;
+          display: block;
+        }
+      }
+
+      // 1. Η ΜΕΓΑΛΗ ΕΙΚΟΝΑ (ΠΑΝΩ)
+      .img-main {
+        grid-column: 1 / span 2; 
+        grid-row: 1 / span 2;    
+      }
+
+      // 2. ΜΙΚΡΗ ΕΙΚΟΝΑ (ΚΑΤΩ ΑΡΙΣΤΕΡΑ)
+      .img-sub-1 {
+        grid-column: 1 / 2; 
+        grid-row: 3 / 4;    
+      }
+
+      // 3. ΜΙΚΡΗ ΕΙΚΟΝΑ (ΚΑΤΩ ΔΕΞΙΑ)
+      .img-sub-2 {
+        grid-column: 2 / 3; 
+        grid-row: 3 / 4;    
+      }
+    }
+
+    // --- SINGLE IMAGE LAYOUT (π.χ. Μπάνιο) ---
+    .single-image-layout {
+      flex: 0 0 50%; 
+      position: relative;
+
+      a.glightbox {
+        display: block;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba($deep-navy, 0.08);
+        transition: transform 0.4s ease;
+
+        &:hover {
+          transform: translateY(-5px);
+        }
+
+        img {
+          width: 100%;
+          height: auto;
+          max-height: 550px;
+          object-fit: cover;
+          display: block;
+        }
+      }
+    }
+
+    // --- ΚΕΙΜΕΝΑ ---
+    .detail-text {
+      flex: 1; 
+      
+      .category {
+        color: $crystal-blue;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
+
+      h2 {
+        font-family: $font-logo;
+        font-size: 3rem;
+        color: $deep-navy !important;
+        margin: 0 0 1.5rem;
+        line-height: 1.1;
+      }
+
+      p {
+        line-height: 1.8;
+        color: $deep-navy !important;
+        opacity: 0.8;
+        font-size: 1.1rem;
+      }
+    }
+  }
+}
+
+// --- ΛΙΣΤΑ ΠΑΡΟΧΩΝ ---
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 2.5rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+    color: $deep-navy !important;
+    font-weight: 500;
+
+    .material-icons {
+      color: $crystal-blue;
+      font-size: 1.3rem;
+    }
+  }
+}
+
+.status-message {
+  text-align: center;
+  color: $deep-navy;
+  max-width: 560px;
+  margin: 0 auto 2rem;
+
+  p {
+    margin: 0 0 1rem;
+    line-height: 1.6;
+  }
+
+  .btn-book-now {
+    margin: 0 auto;
+  }
+}
+
+/* 1. Κεντράρισμα του Container */
+.book-now-container {
+  display: flex;
+  justify-content: center; /* Οριζόντιο κεντράρισμα */
+  align-items: center;     /* Κατακόρυφο κεντράρισμα (αν έχει ύψος το div) */
+  padding: 20px;
+}
+
+/* 2. Το Κουμπί */
+.btn-book-now {
+  background: transparent;
+  color: #003366;
+  border: 2px solid #003366;
+  border-radius: 4px; /* Το κάναμε πιο στρογγυλό όπως είπαμε πριν */
+  padding: 1rem 2.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 3. Hover Effect - Εδώ γίνεται η μαγεία */
+.btn-book-now:hover {
+  background-color: #003366; /* Γίνεται μπλε */
+  color: #ffffff;            /* Τα γράμματα γίνονται άσπρα */
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 51, 102, 0.3); /* Σκιά στο ίδιο μπλε χρώμα */
+}
+
+/* 4. Το εικονίδιο (έξω από το hover rule) */
+.btn-book-now .material-icons {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+/* Animation για το εικονίδιο όταν κάνεις hover */
+.btn-book-now:hover .material-icons {
+  transform: translateX(4px); /* Το εικονίδιο κουνιέται λίγο δεξιά */
+}
+
+
+// ==========================================
+// --- MOBILE VIEW / RESPONSIVE FIXES ---
+// ==========================================
+@media (max-width: 992px) {
+  
+  // 1. Γενικά Paddings Σελίδας
+  .facilities-page {
+    
+    padding-top: 80px; // Μικρότερο κενό στην κορυφή
+  }
+
+  .minimal-header {
+    padding: 60px 0 30px; // Μαζεύουμε τον "αέρα" γύρω από τον κεντρικό τίτλο
+    
+    h1 {
+      font-size: 2.2rem; // Σιγουρεύουμε ότι ο τίτλος χωράει
+    }
+    
+    .divider {
+      margin: 1.5rem auto;
+    }
+  }
+
+  .details-section {
+    padding: 20px 5% 60px; // Πολύ μικρότερα περιθώρια δεξιά-αριστερά
+
+    // 2. Διόρθωση των Rows (Κείμενο & Εικόνες)
+    .detail-row {
+      flex-direction: column !important; // Μπαίνουν το ένα κάτω από το άλλο
+      flex-wrap: nowrap; 
+      gap: 2rem !important; // Μικρότερο κενό ανάμεσα σε εικόνα και κείμενο
+      margin-bottom: 5rem !important; // Μικρότερο κενό ανάμεσα στα διαφορετικά sections
+      
+      &.reverse { 
+        flex-direction: column !important; 
+      }
+
+      // 3. Το Collage των Εικόνων (Το προσαρμόζουμε για το κινητό)
+      .image-grid-collage {
+        flex: 1 1 100%; 
+        width: 100%;
+        height: auto; // Αφαιρούμε το σταθερό ύψος 500px
+        min-height: 350px; // Βάζουμε ένα ελάχιστο για να μη "σπάσει"
+        gap: 10px; // Μικρότερο κενό ανάμεσα στις φώτο
+
+        // Στο κινητό, η πάνω εικόνα δεν χρειάζεται να είναι 2 φορές ψηλότερη, 
+        // αλλιώς κόβεται άσχημα. Τη μαζεύουμε λίγο.
+        .img-main {
+          grid-column: 1 / span 2; 
+          grid-row: 1 / span 2;    
+        }
+      }
+
+      // 4. Η Μονή Εικόνα
+      .single-image-layout {
+        flex: 1 1 100%;
+        width: 100%;
+
+        a.glightbox img {
+          max-height: 400px; // Περιορίζουμε το ύψος για να μη πιάνει όλη την οθόνη
+        }
+      }
+
+      // 5. Τυπογραφία & Κείμενα
+      .detail-text {
+        text-align: center; // Στα κινητά φαίνεται πιο ωραία κεντραρισμένο
+        
+        .category {
+          font-size: 0.7rem;
+        }
+
+        h2 {
+          font-size: 2rem; // Μικρότερος τίτλος για το section (π.χ. The Living Room)
+          margin: 0 0 1rem;
+        }
+
+        p {
+          font-size: 1rem; // Κανονικό μέγεθος για διάβασμα
+          line-height: 1.6;
+        }
+
+        // Η Λίστα με τις παροχές (Wi-Fi, AC κλπ)
+        .feature-list {
+          margin-top: 2rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center; // Κεντράρουμε και τη λίστα
+          
+          li {
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+          }
+        }
+      }
+    }
+  }
+
+  // 6. Το Κουμπί "Book Now" στο κάτω μέρος
+  .book-now-container {
+    padding: 10px 5%; // Περισσότερος χώρος γύρω του
+    
+    .btn-book-now {
+      width: 100%; // Κάνει το κουμπί να πιάνει όλο το πλάτος
+      justify-content: center; // Κεντράρει το κείμενο μέσα στο κουμπί
+      white-space: nowrap; 
+      padding: 1rem; // Λίγο πιο "παχύ" για εύκολο tap
+    }
+  }
+}
