@@ -28,7 +28,6 @@ html, body {
 
 body {
   font-family: $font-main;
-  background-color: #fcfdfe;
 }
 
 // ==========================================
@@ -60,14 +59,29 @@ nav {
   // --- Logo Section ---
   .logo {
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
     text-decoration: none;
     cursor: pointer;
     z-index: 1001; // Να είναι πάντα πάνω από το mobile menu
 
+    .logo-mark {
+      width: 44px;
+      height: 44px;
+      display: block;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
     .brand-name {
       font-family: $font-logo;
-      font-size: 1.7rem;
+      font-size: 1.45rem;
       font-weight: 700;
       color: $blue-quartz;
       letter-spacing: 0.02em;
@@ -77,10 +91,10 @@ nav {
     }
 
     .brand-sub {
-      font-size: 0.7rem;
+      font-size: 0.62rem;
       color: $crystal-blue;
       text-transform: uppercase;
-      letter-spacing: 0.4em;
+      letter-spacing: 0.3em;
       margin-top: 4px;
       font-weight: 500;
     }
@@ -151,6 +165,10 @@ nav {
 
   // --- New Book Now Button ---
   .btn-book-now {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
     background-color: $crystal-blue;
     color: $cycladic-white;
     border: none;
@@ -253,21 +271,29 @@ nav {
     .logo {
       // ΚΕΝΤΡΟ
       position: absolute;
-      left: 40%;
+      left: 50%;
       top: 50%; // Κεντράρισμα και κάθετα
       transform: translate(-50%, -50%);
       z-index: 1002;
       
-      // 2. Στοίχιση των ίδιων των κειμένων στο κέντρο
+      // 2. Στοίχιση όπως πριν (χωρίς εικόνα logo)
       text-align: center;
-      display: flex;
-      flex-direction: column;
       align-items: center;
+      gap: 0;
 
       // 3. Περιορίζουμε το πλάτος ώστε να μην φτάσει στο κουμπί
-      width: 50%;
+      width: auto;
+      max-width: 56%;
+
+      .logo-mark {
+        display: none;
+      }
+
+      .logo-text {
+        align-items: center;
+      }
       
-      .brand-name { font-size: 1rem; text-align: center;}
+      .brand-name { font-size: 1rem; text-align: center; }
       .brand-sub { font-size: 0.5rem; letter-spacing: 0.2em; }
     }
 
@@ -282,16 +308,7 @@ nav {
     }
 
     .btn-book-now {
-      // ΔΕΞΙΑ
-      position: absolute;
-      right: 1.5rem; // 👈 ΚΑΡΦΩΜΕΝΟ ΤΕΡΜΑ ΔΕΞΙΑ
-      top: 50%;
-      transform: translateY(-50%); // Κεντράρισμα κάθετα
-      margin: 0 !important; // Μηδενίζουμε τα margins
-      padding: 0.5rem 0.8rem;
-      font-size: 0.75rem;
-      white-space: nowrap; 
-      z-index: 1001; 
+      display: none; // Δεν το εμφανίζουμε καθόλου στις οθόνες κινητών
     }
 
     // Το Mobile Menu Panel (Από αριστερά προς τα δεξιά - Παραμένει ίδιο)
@@ -340,7 +357,229 @@ nav {
   animation: fadeIn 0.8s ease-out;
 }
 
+.site-footer {
+  margin-top: 0;
+  background: linear-gradient(180deg, rgba($cycladic-white, 1) 0%, rgba($cycladic-white, 0.99) 24%, rgba($crystal-blue, 0.16) 56%, rgba($blue-quartz, 0.25) 82%, rgba($blue-quartz, 0.3) 100%);
+  color: rgba(#003366, 0.92);
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.4rem 1.5rem 1.7rem;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.footer-brand-block h3 {
+  margin: 0;
+  font-family: $font-logo;
+  font-size: 1.45rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.footer-brand-link {
+  color: #003366;
+  text-decoration: none;
+  transition: color 0.25s ease;
+
+  &:hover {
+    color: #012b55;
+  }
+}
+
+.footer-brand-block p {
+  margin: 0.45rem 0 0;
+  color: rgba(#003366, 0.72);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.footer-links,
+.footer-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.footer-external-links {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.35rem;
+}
+
+.icon-link {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(#003366, 0.08);
+  border: 1px solid rgba(#003366, 0.14);
+  transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: #003366;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    background: rgba(#003366, 0.14);
+    border-color: rgba(#003366, 0.22);
+  }
+}
+
+.booking-badge {
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+  color: #003366;
+  font-family: $font-main;
+}
+
+.footer-site-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.footer-site-links a,
+.footer-contact a {
+  color: rgba(#003366, 0.9);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.contact-link-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    fill: rgba(#003366, 0.9);
+  }
+}
+
+.footer-site-links a:hover,
+.footer-contact a:hover {
+  color: #012b55;
+  transform: translateX(3px);
+}
+
+.footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 1.3rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: rgba(#003366, 0.72);
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+  .site-footer {
+    padding-top: 0;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.45rem 1rem 0.9rem;
+  }
+
+  .footer-brand-block {
+    text-align: center;
+  }
+
+  .footer-brand-block h3 {
+    font-size: 1.2rem;
+  }
+
+  .footer-brand-block p {
+    margin-top: 0.3rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.09em;
+  }
+
+  .footer-links,
+  .footer-contact {
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .footer-external-links {
+    justify-content: center;
+    margin-bottom: 0.45rem;
+  }
+
+  .icon-link {
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid rgba(#003366, 0.16);
+  }
+
+  .footer-site-links {
+    align-items: center;
+    gap: 0.38rem;
+  }
+
+  .footer-site-links a {
+    font-size: 0.92rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .contact-link {
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .contact-link span:last-child {
+    font-size: 0.92rem;
+  }
+
+  .footer-site-links a:hover,
+  .footer-contact a:hover {
+    transform: none;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0.65rem 1rem 0.95rem;
+    gap: 0.22rem;
+    font-size: 0.74rem;
+  }
 }

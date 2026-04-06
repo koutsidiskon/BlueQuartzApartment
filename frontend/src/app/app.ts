@@ -19,6 +19,7 @@ export class App implements OnInit {
   menuOpen = false;
   currentSection = 'home-top';
   isFacilitiesPage = false;
+  currentYear = new Date().getFullYear();
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -53,7 +54,7 @@ export class App implements OnInit {
   }
 
   checkActiveSection() {
-    const sections = ['home-top', 'welcome-section', 'facilities-section', 'contact-section'];
+    const sections = ['home-top', 'welcome-section', 'facilities-section', 'check-availability-section', 'find-us-section'];
     const navHeight = 100;
     let current = 'home-top';
 

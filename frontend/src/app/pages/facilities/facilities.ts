@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import GLightbox from 'glightbox';
 import { finalize, retry, timer, timeout } from 'rxjs';
 import { ImageService, HouseImage } from '../../service/image'; 
 
@@ -13,12 +12,12 @@ import { ImageService, HouseImage } from '../../service/image';
   styleUrls: ['./facilities.scss']
 })
 export class Facilities implements OnInit {
-  private lightbox: any;
-  private lightboxRefreshTimer: ReturnType<typeof setTimeout> | null = null;
-
   roomGroups: { category: string, images: HouseImage[] }[] = [];
+  viewerImages: HouseImage[] = [];
   isLoading = false;
   loadError = '';
+  isViewerOpen = false;
+  viewerIndex = 0;
 
   constructor(
     private imageService: ImageService,
@@ -30,45 +29,12 @@ export class Facilities implements OnInit {
   }
 
   ngOnDestroy(): void {
-    if (this.lightboxRefreshTimer) {
-      clearTimeout(this.lightboxRefreshTimer);
-      this.lightboxRefreshTimer = null;
-    }
-    this.destroyLightbox();
-  }
-
-  private scheduleLightboxRefresh(): void {
-    if (this.lightboxRefreshTimer) {
-      clearTimeout(this.lightboxRefreshTimer);
-    }
-
-    // Wait for Angular template updates, then bind/reload once.
-    this.lightboxRefreshTimer = setTimeout(() => {
-      if (!this.lightbox) {
-        this.lightbox = GLightbox({
-          selector: '.facilities-page .glightbox',
-          touchNavigation: true,
-          loop: true,
-          closeButton: true
-        });
-      } else {
-        this.lightbox.reload();
-      }
-      this.lightboxRefreshTimer = null;
-    }, 0);
-  }
-
-  private destroyLightbox(): void {
-    if (this.lightbox) {
-      this.lightbox.destroy();
-      this.lightbox = null;
-    }
+    document.body.style.overflow = '';
   }
 
   loadImages(): void {
     this.isLoading = true;
     this.loadError = '';
-    this.destroyLightbox();
     this.cdr.detectChanges(); // Ensure the loader UI gets rendered immediately
 
     this.imageService.getImages().pipe(
@@ -94,6 +60,8 @@ export class Facilities implements OnInit {
           }))
           .sort((a, b) => a.sortOrder - b.sortOrder);
 
+        this.viewerImages = normalized;
+
         // 1. Ομαδοποιούμε προσωρινά
         const tempGrouped = normalized.reduce((acc, img) => {
           if (!acc[img.category]) acc[img.category] = [];
@@ -107,11 +75,7 @@ export class Facilities implements OnInit {
           images: tempGrouped[key]
         }));
 
-        this.cdr.detectChanges(); // Trigger change detection BEFORE checking length and scheduling lightbox
-
-        if (this.roomGroups.length) {
-          this.scheduleLightboxRefresh();
-        }
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.loadError = 'Unable to load images right now. Please try again in a moment.';
@@ -123,6 +87,57 @@ export class Facilities implements OnInit {
 
   retryLoadImages(): void {
     this.loadImages();
+  }
+
+  openViewerByUrl(photoUrl: string, event: Event): void {
+    event.preventDefault();
+    if (!this.viewerImages.length) return;
+
+    const idx = this.viewerImages.findIndex((img) => img.url === photoUrl);
+    this.viewerIndex = idx >= 0 ? idx : 0;
+    this.isViewerOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeViewer(): void {
+    this.isViewerOpen = false;
+    document.body.style.overflow = '';
+  }
+
+  goToSlide(index: number): void {
+    if (!this.viewerImages.length) return;
+    this.viewerIndex = index;
+  }
+
+  showPrev(): void {
+    if (!this.viewerImages.length) return;
+    this.viewerIndex = (this.viewerIndex - 1 + this.viewerImages.length) % this.viewerImages.length;
+  }
+
+  showNext(): void {
+    if (!this.viewerImages.length) return;
+    this.viewerIndex = (this.viewerIndex + 1) % this.viewerImages.length;
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleViewerKeydown(event: KeyboardEvent): void {
+    if (!this.isViewerOpen) return;
+
+    if (event.key === 'Escape') {
+      this.closeViewer();
+      return;
+    }
+
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      this.showPrev();
+      return;
+    }
+
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      this.showNext();
+    }
   }
 
 

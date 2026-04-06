@@ -6,7 +6,7 @@ export function getSuccessPopupHtml(email: string): string {
         </style>
         <div style="color: #2c3e50; text-align: center; font-size: 0.95rem; line-height: 1.5;">
             <p style="margin-bottom: 15px;">
-                Your inquiry for <b>Blue Quartz Apartment</b> has been successfully received.
+                Thank you for checking availability at <b>Blue Quartz Apartment</b>. Your inquiry has been received.
             </p>
             <p style="margin-bottom: 20px; color: #586776;">
                 A confirmation email has been sent to:<br>

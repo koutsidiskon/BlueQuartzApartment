@@ -7,6 +7,7 @@ export interface InquiryData {
   email: string;
   checkIn: string;
   checkOut: string;
+  guests?: number;
   message?: string;
 }
 

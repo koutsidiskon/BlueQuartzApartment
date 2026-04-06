@@ -1,12 +1,14 @@
-<section id="contact-section" class="contact-section">
+<section id="check-availability-section" class="check-availability-section">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">Have a Question Before Booking?</h2>
-      <p class="section-subtitle">Send us an inquiry with your preferred dates, and we'll get back to you shortly.</p>
+      <h2 class="section-title">Check Availability</h2>
+      <p class="section-subtitle">Browse our calendar and secure your dates at Blue Quartz Apartment.</p>
     </div>
 
-    <div class="contact-form-wrapper">
-      <form class="quartz-form" (submit)="onSubmit($event)">
+    <div class="availability-content-grid">
+      <!-- Left side: Existing Form -->
+      <div class="check-availability-form-wrapper">
+        <form class="quartz-form" (submit)="onSubmit($event)">
         
         <div class="form-row">
           <div class="form-group">
@@ -36,6 +38,23 @@
           </div>
         </div>
 
+        <div class="form-row">
+          <div class="form-group">
+            <label for="guests">Number of Guests*</label>
+            <div class="select-wrapper">
+              <select #guests id="guests" required>
+                <option value="1">1 Guest</option>
+                <option value="2">2 Guests</option>
+                <option value="3">3 Guests</option>
+                <option value="4">4 Guests</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <!-- Empty column to keep Guests field nicely sized -->
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="message">Your Inquiry</label>
           <textarea #message id="message" rows="4" placeholder="How can we help you? Tell us a bit about your stay..."></textarea>
@@ -54,5 +73,30 @@
 
       </form>
     </div>
+
+    <!-- Right side: Availability Calendar -->
+    <div class="availability-calendar-wrapper">
+      
+      
+      <div class="calendar-card">
+        <div class="calendar-container">
+          <!-- Container specifically for flatpickr inline to anchor to -->
+          <input type="text" #inlineCalendar id="inlineCalendar" style="display:none;">
+        </div>
+      </div>
+      
+      <div class="calendar-legend">
+        <label class="legend-item">
+          <input type="radio" disabled checked class="legend-radio available-radio">
+          <span>Available</span>
+        </label>
+        <label class="legend-item">
+          <input type="radio" disabled class="legend-radio booked-radio">
+          <span>Booked</span>
+        </label>
+      </div>
+    </div>
+    
+  </div>
   </div>
 </section>

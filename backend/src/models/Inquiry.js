@@ -20,6 +20,11 @@ export const Inquiry = sequelize.define('Inquiry', {
     type: DataTypes.DATEONLY,
     allowNull: false
   },
+  guests: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+    validate: { min: 1, max: 4 }
+  },
   message: {
     type: DataTypes.TEXT, 
     allowNull: true

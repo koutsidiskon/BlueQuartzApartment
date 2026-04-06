@@ -5,7 +5,7 @@ export class InquiryController {
   
     async createInquiry(req, res) {
         try {
-        const { fullName, email, checkIn, checkOut, message } = req.body;
+        const { fullName, email, checkIn, checkOut, message, guests } = req.body;
 
         if (!fullName || !email || !checkIn || !checkOut) {
             return res.status(400).json({ 
@@ -19,7 +19,8 @@ export class InquiryController {
             email,
             checkIn,
             checkOut,
-            message
+            message,
+            guests: guests || 1
         });
 
         return res.status(201).json({

@@ -11,7 +11,7 @@
           meets the pure white of Cycladic architecture.
         </p>
         <div class="hero-actions">
-          <button class="btn-primary" routerLink="/book">Book Your Stay</button>
+          <a class="btn-primary" href="#check-availability-section">Check Availability</a>
           <button class="btn-secondary" routerLink="/facilities">View Gallery</button>
         </div>
       </div>
@@ -85,6 +85,34 @@
       </div>
     </div>
 
+    <div class="facilities-photo-showcase">
+      <div class="showcase-header">
+        <h3 class="showcase-title">Gallery Preview</h3>
+        <p class="showcase-subtitle">Browse the apartment spaces at a glance</p>
+      </div>
+
+      @if (isGalleryLoading) {
+        <p class="gallery-state">Loading photos...</p>
+      } @else if (galleryPreview.length > 0) {
+        <div class="facilities-photo-canvas">
+          @for (photo of galleryPreview; track photo.url; let i = $index) {
+            <button
+              type="button"
+              class="canvas-card"
+              [class.hero]="i === 0"
+              [class.tall]="i === 3 || i === 6"
+              [class.wide]="i === 4"
+              [class.shift-right]="i === 2"
+              (click)="openViewer(i, $event)">
+              <img [src]="photo.url" [alt]="photo.caption || 'Blue Quartz Apartment photo'">
+            </button>
+          }
+        </div>
+      } @else {
+        <p class="gallery-state">Photos will appear here soon.</p>
+      }
+    </div>
+
     <div class="discover-more-container">
       <button class="btn-discover" routerLink="/facilities">
         More Details for Your Stay
@@ -95,4 +123,40 @@
   </div>
 </section>
 
-<app-contact></app-contact>
+@if (isViewerOpen && galleryPreview.length > 0) {
+  <div class="gallery-viewer-backdrop" (click)="closeViewer()">
+    <div class="gallery-viewer-panel" (click)="$event.stopPropagation()">
+      <button class="viewer-close" type="button" aria-label="Close gallery" (click)="closeViewer()">
+        <span class="material-icons">close</span>
+      </button>
+
+      <button class="viewer-nav prev" type="button" aria-label="Previous image" (click)="showPrev()">
+        <span class="material-icons">chevron_left</span>
+      </button>
+
+      <div class="viewer-stage">
+        <img [src]="galleryPreview[viewerIndex].url" [alt]="galleryPreview[viewerIndex].caption || getCategoryLabel(galleryPreview[viewerIndex].category)">
+      </div>
+
+      <button class="viewer-nav next" type="button" aria-label="Next image" (click)="showNext()">
+        <span class="material-icons">chevron_right</span>
+      </button>
+
+      <div class="viewer-info">
+        <span class="viewer-counter">{{ viewerIndex + 1 }} / {{ galleryPreview.length }}</span>
+      </div>
+
+      <div class="viewer-thumbs">
+        @for (photo of galleryPreview; track photo.url; let i = $index) {
+          <button class="thumb-btn" type="button" [class.active]="i === viewerIndex" (click)="goToSlide(i)" [attr.aria-label]="'Go to photo ' + (i + 1)">
+            <img [src]="photo.url" [alt]="photo.caption || getCategoryLabel(photo.category)">
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}
+
+<app-check-availability></app-check-availability>
+
+<app-contact-info></app-contact-info>
