@@ -1,14 +1,12 @@
-version: '3.8'
-
 services:
   # 1. Βάση Δεδομένων (MariaDB)
   db:
-    image: mariadb:11.4 # Χρησιμοποιούμε την έκδοση 11+ ή 12 που είχες πριν (αλλιώς δεν μπορεί να διαβάσει τα παλιά αρχεία)
+    image: mariadb:11.4 
     container_name: bq_mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: rental_db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
     ports:
       - "3306:3306"
     volumes:
@@ -24,11 +22,11 @@ services:
     ports:
       - "3000:3000" # Το API σου τρέχει στην 3000
     environment:
-      - DB_NAME=rental_db
-      - DB_USER=root
-      - DB_PASSWORD=root
-      - DB_HOST=db # Εδώ αντί για 127.0.0.1, το Docker χρησιμοποιεί το όνομα του service ("db")
-      - PORT=3000
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - PORT=${PORT}
     depends_on:
       - db # Περίμενε πρώτα να σηκωθεί η MariaDB
 

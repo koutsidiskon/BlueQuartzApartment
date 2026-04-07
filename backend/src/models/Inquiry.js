@@ -31,7 +31,7 @@ export const Inquiry = sequelize.define('Inquiry', {
   },
   isRead: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false // Για να ξέρεις αν την είδες την ερώτηση στο μέλλον
+    defaultValue: false 
   }
 });
 
