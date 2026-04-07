@@ -77,6 +77,7 @@
         <a [routerLink]="['/facilities']">Facilities</a>
         <a [routerLink]="['/']" fragment="check-availability-section">Check Availability</a>
         <a [routerLink]="['/']" fragment="find-us-section">Find Us</a>
+        <a href="/privacy-policy.html" (click)="openPrivacyPolicy($event)">Privacy Policy</a>
       </div>
     </div>
 
@@ -103,6 +104,7 @@
 
   <div class="footer-bottom">
     <span>© {{ currentYear }} Blue Quartz Apartment. All rights reserved.</span>
+    <span><a href="/privacy-policy.html" (click)="openPrivacyPolicy($event)">Privacy Policy</a></span>
     <span>Designed and developed by Konstantinos Koutsidis</span>
   </div>
 </footer>

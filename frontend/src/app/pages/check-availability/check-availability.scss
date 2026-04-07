@@ -208,6 +208,17 @@ $font-logo: 'Playfair Display', serif;
 
         span {
           line-height: 1.4;
+
+          a {
+            color: $blue-quartz;
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+
+            &:hover {
+              color: $blue-quartz-light;
+            }
+          }
         }
       }
     }

@@ -1,6 +1,7 @@
 import { Component, AfterViewInit, ViewChild, ElementRef, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InquiryService } from '../../service/inquiry';
+import { PrivacyPolicyDialogService } from '../../service/privacy-policy-dialog';
 import { getSuccessPopupHtml } from './check-availability-popup.template';
 import flatpickr from 'flatpickr';
 import Swal from 'sweetalert2';
@@ -8,12 +9,13 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-check-availability',
   standalone: true,
-  imports: [CommonModule],
+        imports: [CommonModule],
   templateUrl: './check-availability.html',
   styleUrl: './check-availability.scss'
 })
 export class CheckAvailability implements AfterViewInit {
     private inquiryService = inject(InquiryService);
+        private privacyPolicyDialog = inject(PrivacyPolicyDialogService);
 
     @ViewChild('fullName') fullNameInput!: ElementRef;
     @ViewChild('email') emailInput!: ElementRef;
@@ -169,6 +171,12 @@ export class CheckAvailability implements AfterViewInit {
         } finally {
             this.isSyncingFromInline = false;
         }
+    }
+
+    openPrivacyPolicy(event: Event): void {
+        event.preventDefault();
+        event.stopPropagation();
+        this.privacyPolicyDialog.open();
     }
 
     onSubmit(event: Event) {

@@ -494,6 +494,12 @@ nav {
   gap: 1rem;
   font-size: 0.8rem;
   color: rgba(#003366, 0.72);
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
 }
 
 @keyframes fadeIn {

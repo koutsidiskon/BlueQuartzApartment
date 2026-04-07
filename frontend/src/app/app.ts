@@ -1,6 +1,7 @@
 import { Component, HostListener, inject, OnInit,ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet, RouterLink, ActivatedRoute, Router, NavigationEnd } from '@angular/router'; // Πρόσθεσε το Router
 import { CommonModule, AsyncPipe } from '@angular/common';
+import { PrivacyPolicyDialogService } from './service/privacy-policy-dialog';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -14,6 +15,7 @@ import { filter } from 'rxjs/operators';
 export class App implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
+  private privacyPolicyDialog = inject(PrivacyPolicyDialogService);
   
   isScrolled = false;
   menuOpen = false;
@@ -54,6 +56,11 @@ export class App implements OnInit {
   setActive(section: string) {
     this.currentSection = section;
     this.menuOpen = false; 
+  }
+
+  openPrivacyPolicy(event: Event): void {
+    event.preventDefault();
+    this.privacyPolicyDialog.open();
   }
 
   // check which section is currently in view and update the active section accordingly

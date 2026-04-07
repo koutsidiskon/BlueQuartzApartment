@@ -1,6 +1,14 @@
 /* src/styles.scss */
 @import 'flatpickr/dist/flatpickr.min.css';
 
+.swal2-popup.privacy-policy-popup {
+  max-width: 1100px !important;
+}
+
+.swal2-popup.privacy-policy-popup .swal2-html-container {
+  margin: 0.75rem 0 0 !important;
+}
+
 // 1. Reset για να μην υπάρχουν κενά γύρω-γύρω
 html, body {
   margin: 0;
