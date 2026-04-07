@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize, retry, timer, timeout } from 'rxjs';
 import { ImageService, HouseImage } from '../../service/image'; 
+import { FullscreenGallery } from '../../shared/fullscreen-gallery/fullscreen-gallery';
 
 @Component({
   selector: 'app-facilities',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FullscreenGallery],
   templateUrl: './facilities.html',
   styleUrls: ['./facilities.scss']
 })
@@ -28,16 +29,13 @@ export class Facilities implements OnInit {
     this.loadImages();
   }
 
-  ngOnDestroy(): void {
-    document.body.style.overflow = '';
-  }
-
+  // Method to load and prepare images for the facilities page
   loadImages(): void {
     this.isLoading = true;
     this.loadError = '';
     this.cdr.detectChanges(); // Ensure the loader UI gets rendered immediately
 
-    this.imageService.getImages().pipe(
+    this.imageService.getPreparedImages().pipe(
       timeout(10000),
       retry({
         count: 2,
@@ -49,31 +47,9 @@ export class Facilities implements OnInit {
       })
     ).subscribe({
       next: (data) => {
-        const safeData = Array.isArray(data) ? data : [];
-
-        const normalized = safeData
-          .filter((img) => !!img?.url && !!img?.category)
-          .map((img) => ({
-            ...img,
-            url: img.url.trim(),
-            category: img.category.trim()
-          }))
-          .sort((a, b) => a.sortOrder - b.sortOrder);
-
-        this.viewerImages = normalized;
-
-        // 1. Ομαδοποιούμε προσωρινά
-        const tempGrouped = normalized.reduce((acc, img) => {
-          if (!acc[img.category]) acc[img.category] = [];
-          acc[img.category].push(img);
-          return acc;
-        }, {} as { [key: string]: HouseImage[] });
-
-        // 2. Μετατρέπουμε το λεξικό στον Ασφαλή Πίνακα (Array)
-        this.roomGroups = Object.keys(tempGrouped).map(key => ({
-          category: key,
-          images: tempGrouped[key]
-        }));
+        const categorizedImages = data.filter((img) => !!img.category);
+        this.viewerImages = categorizedImages;
+        this.roomGroups = this.imageService.groupByCategory(categorizedImages);
 
         this.cdr.detectChanges();
       },
@@ -85,10 +61,12 @@ export class Facilities implements OnInit {
 
   }
 
+  // retry loading images when user clicks retry button after a failure
   retryLoadImages(): void {
     this.loadImages();
   }
 
+  // Method to open the gallery viewer based on the clicked image URL
   openViewerByUrl(photoUrl: string, event: Event): void {
     event.preventDefault();
     if (!this.viewerImages.length) return;
@@ -96,50 +74,9 @@ export class Facilities implements OnInit {
     const idx = this.viewerImages.findIndex((img) => img.url === photoUrl);
     this.viewerIndex = idx >= 0 ? idx : 0;
     this.isViewerOpen = true;
-    document.body.style.overflow = 'hidden';
   }
 
-  closeViewer(): void {
-    this.isViewerOpen = false;
-    document.body.style.overflow = '';
-  }
-
-  goToSlide(index: number): void {
-    if (!this.viewerImages.length) return;
-    this.viewerIndex = index;
-  }
-
-  showPrev(): void {
-    if (!this.viewerImages.length) return;
-    this.viewerIndex = (this.viewerIndex - 1 + this.viewerImages.length) % this.viewerImages.length;
-  }
-
-  showNext(): void {
-    if (!this.viewerImages.length) return;
-    this.viewerIndex = (this.viewerIndex + 1) % this.viewerImages.length;
-  }
-
-  @HostListener('window:keydown', ['$event'])
-  handleViewerKeydown(event: KeyboardEvent): void {
-    if (!this.isViewerOpen) return;
-
-    if (event.key === 'Escape') {
-      this.closeViewer();
-      return;
-    }
-
-    if (event.key === 'ArrowLeft') {
-      event.preventDefault();
-      this.showPrev();
-      return;
-    }
-
-    if (event.key === 'ArrowRight') {
-      event.preventDefault();
-      this.showNext();
-    }
-  }
-
+  // Helper methods to get contents 
 
   getCategoryLabel(cat: string): string {
     const labels: any = {

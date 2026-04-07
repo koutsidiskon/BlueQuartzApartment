@@ -86,36 +86,9 @@
   </section>
 </div>
 
-@if (isViewerOpen && viewerImages.length > 0) {
-  <div class="gallery-viewer-backdrop" (click)="closeViewer()">
-    <div class="gallery-viewer-panel" (click)="$event.stopPropagation()">
-      <button class="viewer-close" type="button" aria-label="Close gallery" (click)="closeViewer()">
-        <span class="material-icons">close</span>
-      </button>
-
-      <button class="viewer-nav prev" type="button" aria-label="Previous image" (click)="showPrev()">
-        <span class="material-icons">chevron_left</span>
-      </button>
-
-      <div class="viewer-stage">
-        <img [src]="viewerImages[viewerIndex].url" [alt]="'Photo ' + (viewerIndex + 1)">
-      </div>
-
-      <button class="viewer-nav next" type="button" aria-label="Next image" (click)="showNext()">
-        <span class="material-icons">chevron_right</span>
-      </button>
-
-      <div class="viewer-info">
-        <span class="viewer-counter">{{ viewerIndex + 1 }} / {{ viewerImages.length }}</span>
-      </div>
-
-      <div class="viewer-thumbs">
-        @for (photo of viewerImages; track photo.url; let i = $index) {
-          <button class="thumb-btn" type="button" [class.active]="i === viewerIndex" (click)="goToSlide(i)" [attr.aria-label]="'Go to photo ' + (i + 1)">
-            <img [src]="photo.url" [alt]="'Thumbnail ' + (i + 1)">
-          </button>
-        }
-      </div>
-    </div>
-  </div>
-}
+<app-fullscreen-gallery
+  [images]="viewerImages"
+  [(isOpen)]="isViewerOpen"
+  [(activeIndex)]="viewerIndex"
+  altPrefix="Amenities photo">
+</app-fullscreen-gallery>

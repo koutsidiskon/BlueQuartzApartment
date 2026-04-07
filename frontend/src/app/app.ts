@@ -21,6 +21,7 @@ export class App implements OnInit {
   isFacilitiesPage = false;
   currentYear = new Date().getFullYear();
 
+  // Monitoring scroll events to update the active section and navigation bar 
   @HostListener('window:scroll', [])
   onWindowScroll() {
     this.isScrolled = window.scrollY > 50;
@@ -29,30 +30,33 @@ export class App implements OnInit {
     }
   }
 
+  // Monitoring route changes to reset the menu and update the active section
   ngOnInit() {
-    // Παρακολουθούμε τις αλλαγές στο URL
+    
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
 
-      this.menuOpen = false; // Κλείνει το mobile menu σε κάθε αλλαγή σελίδας
-      // Ελέγχουμε αν το URL περιέχει τη λέξη 'facilities'
+      this.menuOpen = false; 
+     
+
       this.isFacilitiesPage = event.urlAfterRedirects.includes('/facilities');
-      
       if (this.isFacilitiesPage) {
-        this.currentSection = 'facilities-page'; // Θέτουμε ένα ειδικό state
+        this.currentSection = 'facilities-page'; 
       } else {
-        this.checkActiveSection(); // Αν είμαστε στο home, τρέχουμε τον κανονικό έλεγχο
+        this.checkActiveSection(); 
       }
       this.cdr.detectChanges();
     });
   }
 
+  // Method to set the active section when a navigation link is clicked in mobile view
   setActive(section: string) {
     this.currentSection = section;
-    this.menuOpen = false; // Κλείνει το mobile menu αν είναι ανοιχτό
+    this.menuOpen = false; 
   }
 
+  // check which section is currently in view and update the active section accordingly
   checkActiveSection() {
     const sections = ['home-top', 'welcome-section', 'facilities-section', 'check-availability-section', 'find-us-section'];
     const navHeight = 100;
@@ -63,7 +67,7 @@ export class App implements OnInit {
       if (element) {
         const rect = element.getBoundingClientRect();
         
-        // Αν η κορυφή του section είναι κοντά στο navigation bar (με ανοχή 150px)
+        
         if (rect.top <= navHeight + 150) {
           current = sectionId;
         }

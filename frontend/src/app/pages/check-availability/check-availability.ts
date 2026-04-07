@@ -32,6 +32,7 @@ export class CheckAvailability implements AfterViewInit {
         this.initDatePickers();
     }
 
+    // Adjusts the number of months shown in the date pickers based on the window or phone for better responsiveness
     @HostListener('window:resize')
     onResize() {
         const isMobile = window.innerWidth <= 768;
@@ -46,11 +47,14 @@ export class CheckAvailability implements AfterViewInit {
         }
     }
 
+    // Initializes the flatpickr date pickers for check-in, check-out, and the inline calendar
+    // Sets up synchronization between the check-in/check-out pickers and the inline calendar
     private initDatePickers() {
         if (this.checkInPicker?.nativeElement && this.checkOutPicker?.nativeElement) {
         const isMobile = window.innerWidth <= 768;
         const months = isMobile ? 1 : 2;
 
+        // Initialize the check-out picker first to set its minDate based on check-in selection
         this.checkOutFp = flatpickr(this.checkOutPicker.nativeElement, {
             minDate: 'today',
             dateFormat: 'Y-m-d',
@@ -60,16 +64,21 @@ export class CheckAvailability implements AfterViewInit {
             altInput: true,
             altFormat: 'F j, Y',
             disableMobile: true,
-            onChange: (selectedDates) => {
-            if (this.isSyncingFromInline || !this.inlineFp || !this.checkInFp?.selectedDates?.length) return;
 
-            const startDate = this.checkInFp.selectedDates[0];
-            if (selectedDates.length > 0) {
-                this.inlineFp.setDate([startDate, selectedDates[0]], false);
-            }
+            onChange: (selectedDates) => {
+
+                if (this.isSyncingFromInline || !this.inlineFp || !this.checkInFp?.selectedDates?.length) 
+                    return;
+
+                const startDate = this.checkInFp.selectedDates[0];
+                
+                if (selectedDates.length > 0) {
+                    this.inlineFp.setDate([startDate, selectedDates[0]], false);
+                }
             }
         });
 
+        // Initialize the check-in picker and set up synchronization with the check-out picker and inline calendar
         this.checkInFp = flatpickr(this.checkInPicker.nativeElement, {
             minDate: 'today',
             dateFormat: 'Y-m-d',
@@ -79,21 +88,26 @@ export class CheckAvailability implements AfterViewInit {
             altInput: true,
             altFormat: 'F j, Y',
             disableMobile: true,
-            onChange: (selectedDates) => {
-            if (this.checkOutFp && selectedDates.length > 0) {
-                this.checkOutFp.set('minDate', selectedDates[0]);
-                if (!this.isSyncingFromInline) {
-                setTimeout(() => this.checkOutFp.open(), 100);
-                }
-            }
 
-            if (!this.isSyncingFromInline && this.inlineFp && selectedDates.length > 0) {
-                const maybeEndDate = this.checkOutFp?.selectedDates?.[0];
-                this.inlineFp.setDate(maybeEndDate ? [selectedDates[0], maybeEndDate] : [selectedDates[0]], false);
-            }
+            onChange: (selectedDates) => {
+
+                if (this.checkOutFp && selectedDates.length > 0) {
+
+                    this.checkOutFp.set('minDate', selectedDates[0]);
+
+                    if (!this.isSyncingFromInline) {
+                        setTimeout(() => this.checkOutFp.open(), 100);
+                    }
+                }
+
+                if (!this.isSyncingFromInline && this.inlineFp && selectedDates.length > 0) {
+                    const maybeEndDate = this.checkOutFp?.selectedDates?.[0];
+                    this.inlineFp.setDate(maybeEndDate ? [selectedDates[0], maybeEndDate] : [selectedDates[0]], false);
+                }
             }
         });
 
+        // Apply native validation attributes to the altInput fields of the date pickers for better mobile support
         const applyNativeValidation = (fp: any, id: string) => {
             if (fp && fp.altInput) {
             fp.altInput.required = true;
@@ -115,7 +129,7 @@ export class CheckAvailability implements AfterViewInit {
             this.inlineFp = flatpickr(this.inlineCalendar.nativeElement, {
                 inline: true,
                 minDate: 'today',
-                showMonths: 1, // Let's keep it to 1 month for the sidebar width 
+                showMonths: 1,  
                 mode: 'range',
                 dateFormat: 'Y-m-d',
                 monthSelectorType: 'static',
@@ -128,8 +142,11 @@ export class CheckAvailability implements AfterViewInit {
         }
     }
 
+    // Synchronizes the selected date range from the inline calendar to the check-in and check-out pickers
     private syncDateRangeFromInlineCalendar(selectedDates: Date[]): void {
-        if (!this.checkInFp || !this.checkOutFp) return;
+
+        if (!this.checkInFp || !this.checkOutFp) 
+            return;
 
         this.isSyncingFromInline = true;
         try {
@@ -161,7 +178,11 @@ export class CheckAvailability implements AfterViewInit {
     const hasCheckOut = this.checkOutFp?.selectedDates.length > 0;
 
     if (!hasCheckIn || !hasCheckOut) {
-        // Προαιρετικά ένα μικρό warning αν λείπουν ημερομηνίες
+        Swal.fire({
+            title: 'Please select both check-in and check-out dates.',
+            icon: 'warning',
+            confirmButtonColor: '#003366'
+        });
         return; 
     }
 
@@ -177,6 +198,8 @@ export class CheckAvailability implements AfterViewInit {
         checkOut: this.checkOutFp.formatDate(this.checkOutFp.selectedDates[0], 'Y-m-d')
     };
 
+    // Send the inquiry data to the backend and handle the response with a success or error popup
+    // Used SweetAlert2 for better styled popups and user feedback
     this.inquiryService.createInquiry(inquiryData).subscribe({
         next: (response) => {
             Swal.fire({
@@ -204,8 +227,9 @@ export class CheckAvailability implements AfterViewInit {
             console.error('Error in backend:', err);
         }
     });
-}
+    }
 
+    // Resets the form fields and clears the date pickers after a successful submission
     private resetForm(): void {
         this.fullNameInput.nativeElement.value = '';
         this.emailInput.nativeElement.value = '';

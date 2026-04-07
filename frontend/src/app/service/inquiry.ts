@@ -18,8 +18,9 @@ export class InquiryService {
 
   constructor(private http: HttpClient) {}
 
+  // Sends the inquiry data to the backend API to create a new inquiry record
   createInquiry(data: InquiryData): Observable<any> {
-    console.log(" Sending inquiry data to backend:", data);
+    // console.log(" Sending inquiry data to backend:", data);
     return this.http.post(this.apiUrl, data);
   }
   
