@@ -5,7 +5,29 @@ export class InquiryController {
   
     async createInquiry(req, res) {
         try {
-        const { fullName, email, checkIn, checkOut, message, guests, botField } = req.body;
+        const { fullName, email, checkIn, checkOut, message, guests, botField, recaptchaToken } = req.body;
+
+        const recaptchaSecret = process.env.RECAPTCHA_SECRET;
+        if (recaptchaSecret) {
+          if (!recaptchaToken) {
+            return res.status(400).json({
+              success: false,
+              message: 'reCAPTCHA token missing'
+            });
+          }
+
+          const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${encodeURIComponent(recaptchaSecret)}&response=${encodeURIComponent(recaptchaToken)}`;
+          const verifyResponse = await fetch(verifyUrl, { method: 'POST' });
+          const verifyData = await verifyResponse.json();
+          const scoreThreshold = parseFloat(process.env.RECAPTCHA_THRESHOLD || '0.5');
+
+          if (!verifyData.success || verifyData.action !== 'inquiry' || verifyData.score < scoreThreshold) {
+            return res.status(400).json({
+              success: false,
+              message: 'reCAPTCHA verification failed'
+            });
+          }
+        }
 
         // Honeypot check: real users never fill this hidden field.
         if (typeof botField === 'string' && botField.trim().length > 0) {

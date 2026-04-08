@@ -6,6 +6,19 @@ import { getSuccessPopupHtml } from './check-availability-popup.template';
 import flatpickr from 'flatpickr';
 import Swal from 'sweetalert2';
 
+declare global {
+  interface Window {
+    grecaptcha?: {
+      ready: (callback: () => void) => void;
+      execute: (siteKey: string, options: { action: string }) => Promise<string>;
+    };
+  }
+}
+
+// Replace with your Google reCAPTCHA v3 SITE key.
+// This must match the key used in frontend/src/index.html script URL.
+const RECAPTCHA_SITE_KEY: string = '6Ld6vqwsAAAAAEaQhbmrjCwTAxTNqH64GCr0qMmZ';
+
 @Component({
   selector: 'app-check-availability',
   standalone: true,
@@ -180,6 +193,27 @@ export class CheckAvailability implements AfterViewInit {
         this.privacyPolicyDialog.open();
     }
 
+    private getRecaptchaToken(): Promise<string> {
+      return new Promise((resolve, reject) => {
+                if (RECAPTCHA_SITE_KEY === 'YOUR_SITE_KEY') {
+                    reject(new Error('reCAPTCHA site key is not configured. Set RECAPTCHA_SITE_KEY in check-availability.ts and index.html.'));
+                    return;
+                }
+
+        const grecaptcha = window.grecaptcha;
+        if (!grecaptcha) {
+          reject(new Error('reCAPTCHA script not loaded'));
+          return;
+        }
+
+        grecaptcha.ready(() => {
+                    grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'inquiry' })
+            .then((token: string) => resolve(token))
+            .catch((error: any) => reject(error));
+        });
+      });
+    }
+
     onSubmit(event: Event) {
     event.preventDefault();
 
@@ -198,44 +232,53 @@ export class CheckAvailability implements AfterViewInit {
     const nameValue = this.fullNameInput?.nativeElement.value || '';
     const firstName = nameValue.split(' ')[0];
 
-    const inquiryData = {
-        fullName: nameValue,
-        email: this.emailInput?.nativeElement.value || '',
-        message: this.messageInput?.nativeElement.value || '',
-        botField: this.botFieldInput?.nativeElement.value?.trim() || '',
-        guests: this.guestsInput?.nativeElement.value ? parseInt(this.guestsInput.nativeElement.value, 10) : 1,
-        checkIn: this.checkInFp.formatDate(this.checkInFp.selectedDates[0], 'Y-m-d'),
-        checkOut: this.checkOutFp.formatDate(this.checkOutFp.selectedDates[0], 'Y-m-d')
-    };
+    this.getRecaptchaToken().then((recaptchaToken) => {
+      const inquiryData = {
+          fullName: nameValue,
+          email: this.emailInput?.nativeElement.value || '',
+          message: this.messageInput?.nativeElement.value || '',
+          botField: this.botFieldInput?.nativeElement.value?.trim() || '',
+          recaptchaToken,
+          guests: this.guestsInput?.nativeElement.value ? parseInt(this.guestsInput.nativeElement.value, 10) : 1,
+          checkIn: this.checkInFp.formatDate(this.checkInFp.selectedDates[0], 'Y-m-d'),
+          checkOut: this.checkOutFp.formatDate(this.checkOutFp.selectedDates[0], 'Y-m-d')
+      };
 
-    // Send the inquiry data to the backend and handle the response with a success or error popup
-    // Used SweetAlert2 for better styled popups and user feedback
-    this.inquiryService.createInquiry(inquiryData).subscribe({
-        next: (response) => {
-            Swal.fire({
-                title: `Hello, ${firstName}`,
-                icon: 'success',
-                iconColor: '#003366',
-                width: '600px',
-                html: getSuccessPopupHtml(inquiryData.email),
-                confirmButtonText: 'Close',
-                confirmButtonColor: '#003366',
-                background: '#ffffff',
-                showClass: {
-                    popup: 'animate__animated animate__fadeInDown'
-                }
-            });
-            this.resetForm(); 
-        },
-        error: (err) => {
-            Swal.fire({
-                title: 'Something went wrong',
-                text: 'We could not send your inquiry. Please try again later.',
-                icon: 'error',
-                confirmButtonColor: '#003366'
-            });
-            console.error('Error in backend:', err);
-        }
+      this.inquiryService.createInquiry(inquiryData).subscribe({
+          next: (response) => {
+              Swal.fire({
+                  title: `Hello, ${firstName}`,
+                  icon: 'success',
+                  iconColor: '#003366',
+                  width: '600px',
+                  html: getSuccessPopupHtml(inquiryData.email),
+                  confirmButtonText: 'Close',
+                  confirmButtonColor: '#003366',
+                  background: '#ffffff',
+                  showClass: {
+                      popup: 'animate__animated animate__fadeInDown'
+                  }
+              });
+              this.resetForm(); 
+          },
+          error: (err) => {
+              Swal.fire({
+                  title: 'Something went wrong',
+                  text: 'We could not send your inquiry. Please try again later.',
+                  icon: 'error',
+                  confirmButtonColor: '#003366'
+              });
+              console.error('Error in backend:', err);
+          }
+      });
+    }).catch((error) => {
+      Swal.fire({
+        title: 'reCAPTCHA error',
+        text: 'Could not verify reCAPTCHA. Please try again later.',
+        icon: 'error',
+        confirmButtonColor: '#003366'
+      });
+      console.error('reCAPTCHA error:', error);
     });
     }
 

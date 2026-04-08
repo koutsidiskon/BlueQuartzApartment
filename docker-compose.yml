@@ -27,6 +27,8 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=${DB_HOST}
       - PORT=${PORT}
+      - RECAPTCHA_SECRET=${RECAPTCHA_SECRET}
+      - RECAPTCHA_THRESHOLD=${RECAPTCHA_THRESHOLD}
     depends_on:
       - db # Περίμενε πρώτα να σηκωθεί η MariaDB
 

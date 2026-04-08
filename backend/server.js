@@ -14,6 +14,16 @@ app.use(express.json());
 app.use('/api/images', imageRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 
+if (!process.env.RECAPTCHA_SECRET) {
+    console.warn('⚠️ RECAPTCHA_SECRET is not set. reCAPTCHA verification is currently disabled.');
+} else {
+    console.log('✅ reCAPTCHA verification is enabled.');
+}
+
+if (process.env.RECAPTCHA_THRESHOLD && Number.isNaN(Number(process.env.RECAPTCHA_THRESHOLD))) {
+    console.warn('⚠️ RECAPTCHA_THRESHOLD is not a valid number. Fallback 0.5 will be used.');
+}
+
 
 
 sequelize.sync({ alter: true })

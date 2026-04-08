@@ -10,6 +10,7 @@ export interface InquiryData {
   guests?: number;
   message?: string;
   botField?: string;
+  recaptchaToken?: string;
 }
 
 @Injectable({ providedIn: 'root' })
