@@ -60,6 +60,19 @@
           <textarea #message id="message" rows="4" placeholder="How can we help you? Tell us a bit about your stay..."></textarea>
         </div>
 
+        <div class="honeypot-wrapper" aria-hidden="true">
+          <label for="website">Website</label>
+          <input
+            #botField
+            class="honeypot-field"
+            type="text"
+            id="website"
+            name="website"
+            tabindex="-1"
+            autocomplete="off"
+          >
+        </div>
+
         <div class="form-group checkbox-group">
           <label class="checkbox-label" for="gdprConsent">
             <input type="checkbox" id="gdprConsent" required>

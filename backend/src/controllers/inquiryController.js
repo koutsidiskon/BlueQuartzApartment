@@ -5,7 +5,15 @@ export class InquiryController {
   
     async createInquiry(req, res) {
         try {
-        const { fullName, email, checkIn, checkOut, message, guests } = req.body;
+        const { fullName, email, checkIn, checkOut, message, guests, botField } = req.body;
+
+        // Honeypot check: real users never fill this hidden field.
+        if (typeof botField === 'string' && botField.trim().length > 0) {
+            return res.status(400).json({
+            success: false,
+            message: 'Invalid request'
+            });
+        }
 
         if (!fullName || !email || !checkIn || !checkOut) {
             return res.status(400).json({ 

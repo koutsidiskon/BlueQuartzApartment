@@ -20,6 +20,7 @@ export class CheckAvailability implements AfterViewInit {
     @ViewChild('fullName') fullNameInput!: ElementRef;
     @ViewChild('email') emailInput!: ElementRef;
     @ViewChild('message') messageInput!: ElementRef;
+    @ViewChild('botField') botFieldInput!: ElementRef;
     @ViewChild('checkInPicker') checkInPicker!: ElementRef;
     @ViewChild('checkOutPicker') checkOutPicker!: ElementRef;
     @ViewChild('guests') guestsInput!: ElementRef;
@@ -201,6 +202,7 @@ export class CheckAvailability implements AfterViewInit {
         fullName: nameValue,
         email: this.emailInput?.nativeElement.value || '',
         message: this.messageInput?.nativeElement.value || '',
+        botField: this.botFieldInput?.nativeElement.value?.trim() || '',
         guests: this.guestsInput?.nativeElement.value ? parseInt(this.guestsInput.nativeElement.value, 10) : 1,
         checkIn: this.checkInFp.formatDate(this.checkInFp.selectedDates[0], 'Y-m-d'),
         checkOut: this.checkOutFp.formatDate(this.checkOutFp.selectedDates[0], 'Y-m-d')
@@ -242,6 +244,7 @@ export class CheckAvailability implements AfterViewInit {
         this.fullNameInput.nativeElement.value = '';
         this.emailInput.nativeElement.value = '';
         this.messageInput.nativeElement.value = '';
+        if (this.botFieldInput?.nativeElement) this.botFieldInput.nativeElement.value = '';
         if (this.guestsInput?.nativeElement) this.guestsInput.nativeElement.value = '1';
         if (this.checkInFp) this.checkInFp.clear();
         if (this.checkOutFp) this.checkOutFp.clear();

@@ -9,6 +9,7 @@ export interface InquiryData {
   checkOut: string;
   guests?: number;
   message?: string;
+  botField?: string;
 }
 
 @Injectable({ providedIn: 'root' })

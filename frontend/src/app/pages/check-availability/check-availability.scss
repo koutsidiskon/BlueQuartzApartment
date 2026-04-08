@@ -179,6 +179,15 @@ $font-logo: 'Playfair Display', serif;
       }
     }
 
+    .honeypot-wrapper {
+      position: absolute;
+      left: -9999px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
     .checkbox-group {
       display: flex;
       flex-direction: row;
