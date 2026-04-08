@@ -515,6 +515,16 @@ $font-logo: 'Playfair Display', serif;
   color: #6f8195;
 }
 
+.gallery-state-shell {
+  min-height: 560px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 1460px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
 .discover-more-container {
   display: flex;
   justify-content: center;
@@ -669,6 +679,11 @@ $font-logo: 'Playfair Display', serif;
     .showcase-header {
       padding: 0 1rem;
     }
+  }
+
+  .gallery-state-shell {
+    min-height: 320px;
+    padding: 0 1rem;
   }
 
   .facilities-photo-canvas {

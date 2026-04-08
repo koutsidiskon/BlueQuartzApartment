@@ -92,7 +92,9 @@
       </div>
 
       @if (isGalleryLoading) {
-        <p class="gallery-state">Loading photos...</p>
+        <div class="gallery-state-shell" aria-live="polite">
+          <p class="gallery-state">Loading photos...</p>
+        </div>
       } @else if (galleryPreview.length > 0) {
         <div class="facilities-photo-canvas">
           @for (photo of galleryPreview; track photo.url; let i = $index) {
@@ -109,7 +111,9 @@
           }
         </div>
       } @else {
-        <p class="gallery-state">Photos will appear here soon.</p>
+        <div class="gallery-state-shell">
+          <p class="gallery-state">Photos will appear here soon.</p>
+        </div>
       }
     </div>
 

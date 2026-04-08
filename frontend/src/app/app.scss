@@ -126,7 +126,7 @@ nav {
     gap: 3rem;
     align-items: center;
 
-    a {
+    > a {
       display: inline-block;
       text-decoration: none;
       color: rgba($blue-quartz, 0.7); // Το χρώμα όταν είναι διάφανο το nav
@@ -163,30 +163,36 @@ nav {
     }
   }
 
-  // --- New Book Now Button ---
-  .btn-book-now {
+  .nav-mobile-icons {
+    display: none;
+  }
+
+  .nav-external-links {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    background-color: $crystal-blue;
-    color: $cycladic-white;
-    border: none;
-    padding: 0.8rem 1.8rem;
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-left: 2rem; // Απόσταση από τα tabs
+    gap: 0.55rem;
+    margin-left: 1.3rem;
 
-    &:hover {
-      background-color: $cycladic-white;
-      color: $blue-quartz;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    .icon-link {
+      width: 36px;
+      height: 36px;
+      background: rgba($blue-quartz, 0.12);
+      border: 1px solid rgba($blue-quartz, 0.3);
+
+      svg {
+        fill: $blue-quartz;
+      }
+
+      .booking-badge {
+        color: $blue-quartz;
+        font-size: 1.02rem;
+      }
+
+      &:hover {
+        transform: translateY(-1px);
+        background: rgba($blue-quartz, 0.2);
+        border-color: rgba($blue-quartz, 0.45);
+      }
     }
   }
   
@@ -205,7 +211,7 @@ nav {
 
     .logo .brand-name { color: #003366; }
 
-    .nav-tabs a {
+    .nav-tabs > a {
       color: rgba(#003366, 0.6) !important; // Χρώμα γραμμάτων στο λευκό nav
 
       &:hover, &.active {
@@ -218,14 +224,40 @@ nav {
         
       }
     }
-    // --- ΝΕΟ: Αλλαγή του κουμπιού Book Now στο Scroll ---
-    .btn-book-now {
-      background-color: #012b55; // Σκούρο μπλε φόντο
-      color: $cycladic-white;    // Λευκά γράμματα
+
+    .nav-external-links .icon-link {
+      background: rgba(#003366, 0.08);
+      border-color: rgba(#003366, 0.22);
+
+      svg {
+        fill: #003366;
+      }
+
+      .booking-badge {
+        color: #003366;
+      }
 
       &:hover {
-        background-color: #002a53; // Πιο ανοιχτό μπλε στο hover
-        color: $cycladic-white;
+        background: rgba(#003366, 0.14);
+        border-color: rgba(#003366, 0.3);
+      }
+    }
+
+    .nav-tabs .nav-mobile-icons .icon-link {
+      background: rgba(#003366, 0.06);
+      border-color: rgba(#003366, 0.2);
+
+      svg {
+        fill: #003366;
+      }
+
+      .booking-badge {
+        color: #003366;
+      }
+
+      &:hover {
+        background: rgba(#003366, 0.12);
+        border-color: rgba(#003366, 0.28);
       }
     }
 
@@ -245,11 +277,32 @@ nav {
     
     .brand-name { color: #003366 !important; }
     .brand-sub { color: $crystal-blue !important; }
-    .nav-tabs a { color: #003366 !important; }
-    
-    .btn-book-now {
-      background-color: #003366 !important;
-      color: white !important;
+    .nav-tabs > a { color: #003366 !important; }
+
+    .nav-external-links .icon-link {
+      background: rgba(#003366, 0.08);
+      border-color: rgba(#003366, 0.22);
+
+      svg {
+        fill: #003366;
+      }
+
+      .booking-badge {
+        color: #003366;
+      }
+    }
+
+    .nav-tabs .nav-mobile-icons .icon-link {
+      background: rgba(#003366, 0.06);
+      border-color: rgba(#003366, 0.2);
+
+      svg {
+        fill: #003366;
+      }
+
+      .booking-badge {
+        color: #003366;
+      }
     }
 
     .hamburger span {
@@ -307,8 +360,8 @@ nav {
       z-index: 1002;
     }
 
-    .btn-book-now {
-      display: none; // Δεν το εμφανίζουμε καθόλου στις οθόνες κινητών
+    .nav-external-links {
+      display: none;
     }
 
     // Το Mobile Menu Panel (Από αριστερά προς τα δεξιά - Παραμένει ίδιο)
@@ -332,7 +385,7 @@ nav {
         transform: translateX(0); 
       }
 
-      a {
+      > a {
         font-size: 1.1rem;
         width: 100%;
         text-align: center;
@@ -341,6 +394,30 @@ nav {
 
         &::after, &.active::before {
           display: none; 
+        }
+      }
+
+      .nav-mobile-icons {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.9rem;
+        margin-top: 0.8rem;
+
+        .icon-link {
+          width: 42px;
+          height: 42px;
+          background: rgba($blue-quartz, 0.1);
+          border: 1px solid rgba($blue-quartz, 0.32);
+
+          svg {
+            fill: rgba($blue-quartz, 0.7);
+          }
+
+          .booking-badge {
+            color: rgba($blue-quartz, 0.7);
+            font-size: 1.06rem;
+          }
         }
       }
     }
@@ -416,6 +493,7 @@ nav {
 .icon-link {
   width: 38px;
   height: 38px;
+  text-decoration: none;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -499,6 +577,10 @@ nav {
     color: inherit;
     text-decoration: underline;
     text-underline-offset: 2px;
+  }
+
+  .footer-credit-link {
+    text-decoration: none;
   }
 }
 

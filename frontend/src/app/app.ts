@@ -1,6 +1,6 @@
 import { Component, HostListener, inject, OnInit,ChangeDetectorRef } from '@angular/core';
-import { RouterOutlet, RouterLink, ActivatedRoute, Router, NavigationEnd } from '@angular/router'; // Πρόσθεσε το Router
-import { CommonModule, AsyncPipe } from '@angular/common';
+import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { PrivacyPolicyDialogService } from './service/privacy-policy-dialog';
 import { filter } from 'rxjs/operators';
 
@@ -22,6 +22,7 @@ export class App implements OnInit {
   currentSection = 'home-top';
   isFacilitiesPage = false;
   currentYear = new Date().getFullYear();
+  private previousUrl = '';
 
   // Monitoring scroll events to update the active section and navigation bar 
   @HostListener('window:scroll', [])
@@ -38,18 +39,47 @@ export class App implements OnInit {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
+      const nextUrl = event.urlAfterRedirects as string;
+      const fromFacilities = this.previousUrl.includes('/facilities');
+      const fragment = this.router.parseUrl(nextUrl).fragment;
 
       this.menuOpen = false; 
      
-
-      this.isFacilitiesPage = event.urlAfterRedirects.includes('/facilities');
+      this.isFacilitiesPage = nextUrl.includes('/facilities');
       if (this.isFacilitiesPage) {
         this.currentSection = 'facilities-page'; 
+
+        // Ensure route transitions like Discover More always start at page top.
+        window.scrollTo({ top: 0, behavior: 'auto' });
       } else {
         this.checkActiveSection(); 
+
+        // When coming from /facilities, re-assert anchor after layout settles.
+        if (fromFacilities && fragment) {
+          this.ensureFragmentVisibility(fragment);
+        }
       }
+
+      this.previousUrl = nextUrl;
       this.cdr.detectChanges();
     });
+  }
+
+  private ensureFragmentVisibility(fragment: string): void {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const firstBehavior: ScrollBehavior = prefersReducedMotion ? 'auto' : 'smooth';
+
+    const alignToFragment = (behavior: ScrollBehavior) => {
+      const target = document.getElementById(fragment);
+      if (!target) return;
+
+      target.scrollIntoView({ behavior, block: 'start' });
+      this.currentSection = fragment;
+    };
+
+    alignToFragment(firstBehavior);
+    setTimeout(() => alignToFragment('auto'), 320);
+    setTimeout(() => alignToFragment('auto'), 850);
   }
 
   // Method to set the active section when a navigation link is clicked in mobile view
