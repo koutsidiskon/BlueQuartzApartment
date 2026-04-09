@@ -1,0 +1,284 @@
+{
+  "meta": {
+    "title": "Blue Quartz Apartment"
+  },
+  "common": {
+    "close": "Zatvori",
+    "home": "Početna",
+    "facilities": "Sadržaji",
+    "checkAvailability": "Proveri dostupnost",
+    "findUs": "Pronađi nas",
+    "privacyPolicy": "Politika privatnosti",
+    "termsOfService": "Uslovi korišćenja",
+    "instagram": "Instagram",
+    "booking": "Booking",
+    "directions": "Uputstva",
+    "available": "Dostupno",
+    "booked": "Rezervisano",
+    "tryAgain": "Pokušaj ponovo"
+  },
+  "nav": {
+    "home": "Početna",
+    "facilities": "Sadržaji",
+    "checkAvailability": "Dostupnost",
+    "findUs": "Lokacija"
+  },
+  "language": {
+    "switcherAria": "Izbor jezika"
+  },
+  "app": {
+    "logoAlt": "Blue Quartz Apartment logo",
+    "brandName": "The Blue Quartz",
+    "brandSub": "Apartment Limenas Thassos",
+    "quickLinksAria": "Brzi linkovi",
+    "externalLinksAria": "Spoljni linkovi",
+    "footer": {
+      "brand": "Blue Quartz Apartment",
+      "location": "Limenas Thassos, Grčka",
+      "rights": "Copyright {{year}} Blue Quartz Apartment. Sva prava zadržana.",
+      "creditPrefix": "Dizajn i razvoj"
+    }
+  },
+  "home": {
+    "hero": {
+      "alt": "The Blue Quartz master apartman",
+      "badge": "Ekskluzivan kikladski stil",
+      "titleLine1": "Kristalno more,",
+      "titleLine2": "Večna spokojnost.",
+      "subtitle": "Doživite vrhunski egejski beg. Tamo gde se duboko plavetnilo mora spaja sa čistom belinom kikladske arhitekture.",
+      "checkAvailability": "Proveri dostupnost",
+      "viewGallery": "Pogledaj galeriju"
+    },
+    "philosophy": {
+      "title": "Filozofija Blue Quartz",
+      "description": "Inspirisan jasnoćom kvarcnih kristala i prefinjenom estetikom vrhunskog luksuza, naš apartman je utočište mira. Svaki detalj je pažljivo osmišljen da pruži atmosferu otmene elegancije.",
+      "masterSuite": "Master apartman",
+      "seaView": "Pogled na more"
+    },
+    "facilities": {
+      "title": "Premium sadržaji",
+      "subtitle": "Sve što vam je potrebno za nezaboravan boravak",
+      "cards": {
+        "bedroom": {
+          "title": "Glavna spavaća soba",
+          "description": "King-size krevet sa premium anatomskim dušekom za savršen san."
+        },
+        "climate": {
+          "title": "Kontrola klime",
+          "description": "Potpuna klimatizacija i grejanje za komfor tokom cele godine."
+        },
+        "entertainment": {
+          "title": "Zabava",
+          "description": "Smart TV sa streaming servisima i brz Wi-Fi."
+        },
+        "balcony": {
+          "title": "Pogled na more",
+          "description": "Privatni balkon sa širokim pogledom na Egejsko more i nezaboravne zalaske sunca."
+        },
+        "kitchen": {
+          "title": "Kompletna kuhinja",
+          "description": "Opremljena savremenim uređajima za pripremu omiljenih obroka."
+        }
+      },
+      "showcase": {
+        "title": "Pregled galerije",
+        "subtitle": "Brzo pogledajte prostor apartmana",
+        "loading": "Učitavanje fotografija...",
+        "empty": "Fotografije će uskoro biti dostupne."
+      },
+      "discoverMore": "Više detalja za vaš boravak",
+      "photoAltFallback": "Fotografija Blue Quartz Apartment",
+      "viewerAltPrefix": "Blue Quartz fotografija"
+    }
+  },
+  "facilitiesPage": {
+    "header": {
+      "category": "Ekskluzivni sadržaji",
+      "title": "Doživite izvrsnost"
+    },
+    "status": {
+      "loading": "Učitavanje sadržaja...",
+      "empty": "Fotografije još nisu dostupne. Molimo proverite ponovo uskoro.",
+      "loadError": "Trenutno nije moguće učitati slike. Pokušajte ponovo za nekoliko trenutaka."
+    },
+    "amenityTitle": "Šta ovaj prostor nudi",
+    "houseRules": {
+      "ariaLabel": "Kućni red",
+      "category": "Kućni red",
+      "title": "Važno pre dolaska",
+      "description": "Ova jednostavna pravila pomažu da apartman ostane čist, miran i spreman za svakog gosta."
+    },
+    "bookNow": "Rezervišite odmor",
+    "viewerAltPrefix": "Fotografija sadržaja",
+    "categories": {
+      "bedroom": "Spavanje i odmor",
+      "living-room": "Opuštanje",
+      "kitchen": "Gastronomija",
+      "bathroom": "Wellness",
+      "veranda": "Pogledi",
+      "default": "Ekskluzivni sadržaji"
+    },
+    "titles": {
+      "bedroom": "Master apartman",
+      "living-room": "Dnevni boravak",
+      "kitchen": "Gurmanska kuhinja",
+      "bathroom": "Quartz kupatilo",
+      "veranda": "Veranda sa pogledom na more",
+      "default": "Luksuzan prostor"
+    },
+    "descriptions": {
+      "bedroom": "Uronite u mirnu master sobu osmišljenu za dubok odmor i potpun komfor. Mekane teksture, pažljivo odabrana posteljina i blackout zavese stvaraju spokojnu atmosferu, dok promišljeni detalji čine svaku noć prijatnom, a svako jutro osvežavajućim.",
+      "living-room": "Naš prostrani dnevni boravak poziva vas na opuštanje sa stilom, uz veliku ugaonu sofu, toplu ambijentalnu rasvetu i elegantan otvoreni raspored koji spaja udobnost i sofisticiranost. Idealan je za lagana jutra, porodične trenutke i mirne večeri posle plaže.",
+      "kitchen": "Gurmanska kuhinja kombinuje moderan izgled i praktičnu funkcionalnost, potpuno opremljena za sve, od brzog doručka do kompletne domaće večere. Premium uređaji, kvalitetno posuđe i čist dizajn obezbeđuju lako i prijatno kuvanje.",
+      "bathroom": "Zakoračite u profinjeno kupatilsko iskustvo gde se minimalistički dizajn susreće sa svakodnevnim luksuzom. Walk-in kišni tuš, kvalitetni sadržaji i umirujuća atmosfera osmišljeni su da vam pomognu da se opustite, obnovite energiju i uživate u osećaju potpunog blagostanja.",
+      "veranda": "Veranda sa pogledom na more je vaše privatno mesto u prvom redu za prirodne lepote Tasosa. Uživajte u jutarnjoj kafi na izlasku sunca, zlatnim večernjim trenucima i mirnim noćima uz blag morski povetarac i otvoren pogled koji svaki trenutak čini posebnim.",
+      "default": "Doživite potpunu udobnost u našem prostoru."
+    },
+    "features": {
+      "bedroom": [
+        "Glavna spavaća soba sa premium dušekom",
+        "Blackout zavese za miran san",
+        "Pegla i daska za peglanje",
+        "Mašina za veš na zadnjem balkonu",
+        "Dodatni jastuci, ćebad i sveža posteljina"
+      ],
+      "living-room": [
+        "Velika ugaona sofa za udobno opuštanje",
+        "Rasklopiva sofa za dodatni prostor za spavanje",
+        "Smart TV sa streaming servisima, uključujući Netflix",
+        "Brz Wi-Fi u celoj nekretnini"
+      ],
+      "kitchen": [
+        "Potpuno opremljena kuhinja sa kompletnim posuđem",
+        "Šerpe, tiganji, plehovi i osnovni pribor",
+        "Čaše za vodu i vino uz kompletan set posuđa",
+        "Aparat za espreso, kuvalo i filteri za kafu",
+        "Mašina za sudove za brzo i lako čišćenje"
+      ],
+      "bathroom": [
+        "Šampon, regenerator i gel za tuširanje",
+        "Sapun za ruke i svež toalet papir",
+        "Fen za kosu za svakodnevnu upotrebu",
+        "Sredstva za čišćenje dostupna po potrebi"
+      ],
+      "veranda": [
+        "Spoljni sto sa udobnim stolicama za ručavanje i opuštanje",
+        "Otvoren pogled na more i prelepi zalasci sunca",
+        "Svež morski povetarac za mirna jutra i spokojne noći"
+      ],
+      "default": [
+        "Premium sadržaji sa pažljivo odabranim detaljima"
+      ]
+    },
+    "rules": {
+      "noSmoking": {
+        "title": "Zabranjeno pušenje u zatvorenom",
+        "description": "Pušenje je strogo zabranjeno u apartmanu. Spoljašnje površine možete koristiti odgovorno."
+      },
+      "noParties": {
+        "title": "Bez žurki i događaja",
+        "description": "Žurke i glasna okupljanja nisu dozvoljeni radi zaštite prostora i poštovanja komšiluka."
+      },
+      "quietHours": {
+        "title": "Poštujte vreme odmora",
+        "description": "Molimo vas da tokom lokalnog vremena odmora držite buku na minimumu i budete obzirni prema komšijama."
+      },
+      "checkIn": {
+        "title": "Prijava posle 15:00",
+        "description": "Dolazak je moguć nakon 15:00 kako bi apartman bio potpuno očišćen i spreman."
+      },
+      "checkOut": {
+        "title": "Odjava pre 10:00",
+        "description": "Odlazak je pre 10:00 kako bi ostalo dovoljno vremena za čišćenje pre sledećih gostiju."
+      },
+      "damage": {
+        "title": "Prijavite svako oštećenje",
+        "description": "Molimo vas da odmah obavestite domaćine o bilo kakvom oštećenju. Veća šteta može zahtevati nadoknadu."
+      },
+      "registeredGuests": {
+        "title": "Samo prijavljeni gosti",
+        "description": "Samo gosti navedeni u rezervaciji mogu prenoćiti u objektu."
+      },
+      "secureHome": {
+        "title": "Čuvajte apartman bezbednim",
+        "description": "Zaključajte vrata i isključite klimu i uređaje kada napuštate apartman."
+      }
+    }
+  },
+  "checkAvailability": {
+    "title": "Proveri dostupnost",
+    "subtitle": "Pregledajte kalendar i rezervišite svoje datume u Blue Quartz Apartment.",
+    "form": {
+      "fullName": "Puno ime*",
+      "fullNamePlaceholder": "Vaše ime",
+      "email": "Email adresa*",
+      "emailPlaceholder": "you@example.com",
+      "checkIn": "Prijava*",
+      "checkInPlaceholder": "Izaberite datum prijave",
+      "checkOut": "Odjava*",
+      "checkOutPlaceholder": "Izaberite datum odjave",
+      "guests": "Broj gostiju*",
+      "guests1": "1 gost",
+      "guests2": "2 gosta",
+      "guests3": "3 gosta",
+      "guests4": "4 gosta",
+      "inquiry": "Vaš upit",
+      "inquiryPlaceholder": "Kako možemo da vam pomognemo? Recite nam nešto o svom boravku...",
+      "honeypot": "Website",
+      "gdprPrefix": "* Saglasan/saglasna sam sa čuvanjem i obradom mojih ličnih podataka za ovaj upit za rezervaciju u skladu sa",
+      "gdprSuffix": ".",
+      "submit": "Pošalji upit",
+      "recaptchaPrefix": "Ovaj sajt je zaštićen reCAPTCHA sistemom i važe Google",
+      "recaptchaAnd": "i",
+      "recaptchaApply": "."
+    },
+    "calendar": {
+      "available": "Dostupno",
+      "booked": "Rezervisano"
+    },
+    "alerts": {
+      "missingDates": {
+        "title": "Molimo izaberite i datum prijave i datum odjave."
+      },
+      "submissionError": {
+        "title": "Došlo je do greške",
+        "text": "Nismo mogli da pošaljemo vaš upit. Pokušajte ponovo kasnije."
+      },
+      "recaptchaError": {
+        "title": "reCAPTCHA greška",
+        "text": "Nije moguće verifikovati reCAPTCHA. Pokušajte ponovo kasnije."
+      },
+      "recaptchaConfigError": "reCAPTCHA ključ nije podešen. Podesite RECAPTCHA_SITE_KEY u check-availability.ts i index.html.",
+      "recaptchaScriptMissing": "reCAPTCHA skripta nije učitana"
+    },
+    "popup": {
+      "greeting": "Zdravo, {{firstName}}",
+      "thankYou": "Hvala vam što ste proverili dostupnost u",
+      "apartmentName": "Blue Quartz Apartment",
+      "inquiryReceived": "Vaš upit je primljen.",
+      "emailSent": "Email potvrde je poslat na:",
+      "followUp": "Naš tim će pregledati vaš zahtev i odgovoriti što je pre moguće.",
+      "spamHint": "Molimo proverite i Spam folder ako ne dobijete naš odgovor.",
+      "team": "Tim Blue Quartz Apartment"
+    }
+  },
+  "contactInfo": {
+    "title": "Pronađi nas",
+    "subtitle": "Uvek smo dostupni da vam pomognemo da isplanirate savršen boravak na Tasosu.",
+    "location": "Lokacija",
+    "phone": "Telefon",
+    "email": "Email",
+    "addressLine1": "Miaouli 28, Limenas Thassos",
+    "addressLine2": "640 04, Grčka"
+  },
+  "gallery": {
+    "closeAria": "Zatvori galeriju",
+    "previousAria": "Prethodna slika",
+    "nextAria": "Sledeća slika",
+    "goToPhotoAria": "Idi na fotografiju {{index}}"
+  },
+  "privacyDialog": {
+    "title": "Politika privatnosti",
+    "iframeTitle": "Politika privatnosti"
+  }
+}

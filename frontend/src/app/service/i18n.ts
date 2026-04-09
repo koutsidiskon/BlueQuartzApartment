@@ -18,6 +18,8 @@ export class I18nService {
 
   private translations: TranslationMap = {};
   private activeLanguage = I18nService.DEFAULT_LANGUAGE;
+  private translationCache: Record<string, TranslationMap> = {};
+  private readonly requestVersion = Date.now().toString();
 
   // Load the saved language or default on service initialization
   async initialize(): Promise<void> {
@@ -27,20 +29,19 @@ export class I18nService {
 
   // Change the active language and load corresponding translations
   async setLanguage(language: string): Promise<void> {
-    this.activeLanguage = language;
+    const normalizedLanguage = this.normalizeLanguageCode(language);
+    this.activeLanguage = normalizedLanguage;
 
     try {
-      const data = await firstValueFrom(
-        this.http.get<TranslationMap>(`/i18n/${language}.json`)
-      );
+      const data = await this.loadTranslations(normalizedLanguage);
 
-      this.translations = data || {};
-      localStorage.setItem(I18nService.LANGUAGE_STORAGE_KEY, language);
+      this.translations = data;
+      localStorage.setItem(I18nService.LANGUAGE_STORAGE_KEY, normalizedLanguage);
       this.syncDocumentTitle();
     } catch (error) {
-      console.error(`Failed to load translations for language: ${language}`, error);
+      console.error(`Failed to load translations for language: ${normalizedLanguage}`, error);
 
-      if (language !== I18nService.DEFAULT_LANGUAGE) {
+      if (normalizedLanguage !== I18nService.DEFAULT_LANGUAGE) {
         await this.setLanguage(I18nService.DEFAULT_LANGUAGE);
       }
     }
@@ -48,6 +49,22 @@ export class I18nService {
 
   getLanguage(): string {
     return this.activeLanguage;
+  }
+
+  async preloadLanguages(languages: string[]): Promise<void> {
+    const uniqueLanguages = Array.from(
+      new Set(languages.filter(Boolean).map((language) => this.normalizeLanguageCode(language)))
+    );
+
+    await Promise.all(
+      uniqueLanguages.map(async (language) => {
+        try {
+          await this.loadTranslations(language);
+        } catch {
+          // Intentionally ignore preload errors; setLanguage handles fallback.
+        }
+      })
+    );
   }
 
   t(key: string, params?: Record<string, string | number>, fallback?: string): string {
@@ -75,6 +92,35 @@ export class I18nService {
 
       return (current as TranslationMap)[segment];
     }, this.translations);
+  }
+
+  private normalizeLanguageCode(language: string | null | undefined): string {
+    const normalizedInput = (language || '').trim().toLowerCase();
+    if (!normalizedInput) return I18nService.DEFAULT_LANGUAGE;
+
+    // Keep only canonical language codes in app state/storage.
+    if (normalizedInput.startsWith('el') || normalizedInput === 'gr') return 'el';
+    if (normalizedInput.startsWith('en')) return 'en';
+    if (normalizedInput.startsWith('ro')) return 'ro';
+    if (normalizedInput.startsWith('sr')) return 'sr';
+    if (normalizedInput.startsWith('bg')) return 'bg';
+    if (normalizedInput.startsWith('tr')) return 'tr';
+    return I18nService.DEFAULT_LANGUAGE;
+  }
+
+  private async loadTranslations(language: string): Promise<TranslationMap> {
+    const cachedTranslations = this.translationCache[language];
+    if (cachedTranslations) {
+      return cachedTranslations;
+    }
+
+    const data = await firstValueFrom(
+      this.http.get<TranslationMap>(`/i18n/${language}.json?v=${this.requestVersion}`)
+    );
+
+    const normalizedData = data || {};
+    this.translationCache[language] = normalizedData;
+    return normalizedData;
   }
 
   private interpolate(template: string, params?: Record<string, string | number>): string {

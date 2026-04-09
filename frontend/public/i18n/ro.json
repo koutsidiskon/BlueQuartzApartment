@@ -1,0 +1,284 @@
+{
+  "meta": {
+    "title": "Blue Quartz Apartment"
+  },
+  "common": {
+    "close": "Închide",
+    "home": "Acasă",
+    "facilities": "Facilități",
+    "checkAvailability": "Verifică disponibilitatea",
+    "findUs": "Ne găsești",
+    "privacyPolicy": "Politica de confidențialitate",
+    "termsOfService": "Termeni și condiții",
+    "instagram": "Instagram",
+    "booking": "Booking",
+    "directions": "Indicații",
+    "available": "Disponibil",
+    "booked": "Rezervat",
+    "tryAgain": "Încearcă din nou"
+  },
+  "nav": {
+    "home": "Acasă",
+    "facilities": "Facilități",
+    "checkAvailability": "Disponibilitate",
+    "findUs": "Locație"
+  },
+  "language": {
+    "switcherAria": "Selector limbă"
+  },
+  "app": {
+    "logoAlt": "Logo Blue Quartz Apartment",
+    "brandName": "The Blue Quartz",
+    "brandSub": "Apartment Limenas Thassos",
+    "quickLinksAria": "Linkuri rapide",
+    "externalLinksAria": "Linkuri externe",
+    "footer": {
+      "brand": "Blue Quartz Apartment",
+      "location": "Limenas Thassos, Grecia",
+      "rights": "Copyright {{year}} Blue Quartz Apartment. Toate drepturile rezervate.",
+      "creditPrefix": "Design și dezvoltare de"
+    }
+  },
+  "home": {
+    "hero": {
+      "alt": "Suita principală Blue Quartz",
+      "badge": "Stil cicladic exclusiv",
+      "titleLine1": "Ape cristaline,",
+      "titleLine2": "Serenitate eternă.",
+      "subtitle": "Descoperă refugiul suprem din Marea Egee. Acolo unde albastrul profund al mării întâlnește albul pur al arhitecturii cicladice.",
+      "checkAvailability": "Verifică disponibilitatea",
+      "viewGallery": "Vezi galeria"
+    },
+    "philosophy": {
+      "title": "Filosofia Blue Quartz",
+      "description": "Inspirată de claritatea cristalelor de cuarț și de estetica rafinată a luxului autentic, suita noastră oferă un spațiu de liniște. Fiecare detaliu este gândit pentru eleganță și confort.",
+      "masterSuite": "Suită principală",
+      "seaView": "Vedere la mare"
+    },
+    "facilities": {
+      "title": "Facilități premium",
+      "subtitle": "Tot ce ai nevoie pentru un sejur memorabil",
+      "cards": {
+        "bedroom": {
+          "title": "Dormitor principal",
+          "description": "Pat king-size cu saltea anatomică premium pentru un somn perfect."
+        },
+        "climate": {
+          "title": "Control climatic",
+          "description": "Aer condiționat și încălzire completă pentru confort pe tot parcursul anului."
+        },
+        "entertainment": {
+          "title": "Divertisment",
+          "description": "Smart TV cu servicii de streaming și Wi-Fi de mare viteză."
+        },
+        "balcony": {
+          "title": "Vedere la mare",
+          "description": "Balcon privat cu panoramă spectaculoasă spre Marea Egee și apusuri de neuitat."
+        },
+        "kitchen": {
+          "title": "Bucătărie completă",
+          "description": "Echipată cu aparatură modernă pentru prepararea meselor preferate."
+        }
+      },
+      "showcase": {
+        "title": "Previzualizare galerie",
+        "subtitle": "Explorează rapid spațiile apartamentului",
+        "loading": "Se încarcă fotografiile...",
+        "empty": "Fotografiile vor apărea aici în curând."
+      },
+      "discoverMore": "Mai multe detalii despre sejur",
+      "photoAltFallback": "Fotografie Blue Quartz Apartment",
+      "viewerAltPrefix": "Fotografie Blue Quartz"
+    }
+  },
+  "facilitiesPage": {
+    "header": {
+      "category": "Dotări exclusive",
+      "title": "Experiență de excepție"
+    },
+    "status": {
+      "loading": "Se încarcă dotările...",
+      "empty": "Încă nu sunt disponibile fotografii. Revino în curând.",
+      "loadError": "Nu am putut încărca imaginile acum. Te rugăm să încerci din nou în câteva momente."
+    },
+    "amenityTitle": "Ce oferă acest spațiu",
+    "houseRules": {
+      "ariaLabel": "Regulile casei",
+      "category": "Regulile casei",
+      "title": "Bine de știut înainte de sosire",
+      "description": "Aceste reguli simple ne ajută să păstrăm apartamentul curat, liniștit și pregătit pentru fiecare oaspete."
+    },
+    "bookNow": "Rezervă-ți escapada",
+    "viewerAltPrefix": "Fotografie facilități",
+    "categories": {
+      "bedroom": "Somn și odihnă",
+      "living-room": "Relaxare",
+      "kitchen": "Gastronomie",
+      "bathroom": "Wellness",
+      "veranda": "Priveliști",
+      "default": "Dotări exclusive"
+    },
+    "titles": {
+      "bedroom": "Suita principală",
+      "living-room": "Zona de living",
+      "kitchen": "Bucătărie gourmet",
+      "bathroom": "Baia Quartz",
+      "veranda": "Verandă cu vedere la mare",
+      "default": "Spațiu de lux"
+    },
+    "descriptions": {
+      "bedroom": "Relaxează-te într-o suită principală liniștită, creată pentru odihnă profundă și confort fără efort. Texturile fine, lenjeriile atent alese și draperiile blackout creează o atmosferă calmă, ideală pentru seri liniștite și dimineți revigorante.",
+      "living-room": "Zona noastră de living spațioasă te invită să te relaxezi cu stil, având o canapea mare de colț, lumină ambientală caldă și un layout elegant care îmbină confortul cu rafinamentul. Este cadrul perfect pentru dimineți lente, momente în familie sau seri liniștite după plajă.",
+      "kitchen": "Bucătăria gourmet combină estetica modernă cu funcționalitatea practică, fiind complet echipată pentru orice, de la mic dejun rapid la cine gătite acasă. Electrocasnicele premium, vasele de calitate și designul curat oferă o experiență de gătit plăcută și eficientă.",
+      "bathroom": "Pășește într-o baie rafinată unde designul minimalist întâlnește luxul de zi cu zi. Dușul walk-in tip ploaie, produsele de calitate și atmosfera calmă sunt create pentru a te ajuta să te reîncarci și să te bucuri de o stare autentică de bine pe tot parcursul sejurului.",
+      "veranda": "Veranda cu vedere la mare este locul tău privilegiat către frumusețea naturală a insulei Thassos. Bucură-te de cafeaua de la răsărit, de momentele aurii ale serii și de liniștea brizei marine care transformă fiecare clipă într-una memorabilă.",
+      "default": "Bucură-te de confort absolut în spațiul nostru."
+    },
+    "features": {
+      "bedroom": [
+        "Dormitor principal cu saltea premium",
+        "Draperii blackout pentru somn odihnitor",
+        "Fier și masă de călcat",
+        "Mașină de spălat pe balconul din spate",
+        "Perne, pături și lenjerii suplimentare"
+      ],
+      "living-room": [
+        "Canapea mare de colț pentru relaxare confortabilă",
+        "Canapea extensibilă pentru locuri suplimentare de dormit",
+        "Smart TV cu streaming, inclusiv Netflix",
+        "Wi-Fi de mare viteză în întreaga proprietate"
+      ],
+      "kitchen": [
+        "Bucătărie complet echipată cu toate ustensilele necesare",
+        "Oale, tigăi, tăvi de cuptor și ustensile esențiale",
+        "Pahare pentru apă și vin, plus set complet de veselă",
+        "Espressor, fierbător și filtre pentru cafea",
+        "Mașină de spălat vase pentru curățare rapidă"
+      ],
+      "bathroom": [
+        "Șampon, balsam și gel de duș",
+        "Săpun de mâini și hârtie igienică proaspătă",
+        "Uscător de păr pentru utilizare zilnică",
+        "Produse de curățenie disponibile la nevoie"
+      ],
+      "veranda": [
+        "Masă exterioară cu scaune confortabile pentru luat masa și relaxare",
+        "Vedere deschisă la mare cu apusuri superbe",
+        "Briză de coastă pentru dimineți calme și seri liniștite"
+      ],
+      "default": [
+        "Dotări premium, alese cu atenție"
+      ]
+    },
+    "rules": {
+      "noSmoking": {
+        "title": "Fără fumat în interior",
+        "description": "Fumatul este strict interzis în interiorul apartamentului. Zonele exterioare pot fi folosite responsabil."
+      },
+      "noParties": {
+        "title": "Fără petreceri sau evenimente",
+        "description": "Petrecerile și întâlnirile zgomotoase nu sunt permise pentru protejarea spațiului și respectarea vecinătății."
+      },
+      "quietHours": {
+        "title": "Respectă orele de liniște",
+        "description": "Te rugăm să păstrezi un nivel redus de zgomot în orele de liniște locale și să fii atent la confortul vecinilor."
+      },
+      "checkIn": {
+        "title": "Check-in după 15:00",
+        "description": "Sosirea este posibilă după ora 15:00, pentru ca apartamentul să fie complet curățat și pregătit."
+      },
+      "checkOut": {
+        "title": "Check-out înainte de 10:00",
+        "description": "Plecare până la ora 10:00, pentru a permite curățenia înainte de sosirea următorilor oaspeți."
+      },
+      "damage": {
+        "title": "Raportează orice daună",
+        "description": "Te rugăm să anunți imediat gazdele dacă apar daune. Daunele semnificative pot necesita despăgubire."
+      },
+      "registeredGuests": {
+        "title": "Doar oaspeți înregistrați",
+        "description": "Doar persoanele incluse în rezervare pot rămâne peste noapte în proprietate."
+      },
+      "secureHome": {
+        "title": "Menține locuința în siguranță",
+        "description": "Încuie ușile și oprește aerul condiționat și electrocasnicele când părăsești apartamentul."
+      }
+    }
+  },
+  "checkAvailability": {
+    "title": "Verifică disponibilitatea",
+    "subtitle": "Consultă calendarul și rezervă datele dorite la Blue Quartz Apartment.",
+    "form": {
+      "fullName": "Nume complet*",
+      "fullNamePlaceholder": "Numele tău",
+      "email": "Adresă de email*",
+      "emailPlaceholder": "you@example.com",
+      "checkIn": "Check-in*",
+      "checkInPlaceholder": "Selectează data de check-in",
+      "checkOut": "Check-out*",
+      "checkOutPlaceholder": "Selectează data de check-out",
+      "guests": "Număr de oaspeți*",
+      "guests1": "1 oaspete",
+      "guests2": "2 oaspeți",
+      "guests3": "3 oaspeți",
+      "guests4": "4 oaspeți",
+      "inquiry": "Mesajul tău",
+      "inquiryPlaceholder": "Cum te putem ajuta? Spune-ne câteva detalii despre sejurul tău...",
+      "honeypot": "Website",
+      "gdprPrefix": "* Sunt de acord cu stocarea și prelucrarea datelor mele personale pentru această solicitare de rezervare, conform",
+      "gdprSuffix": ".",
+      "submit": "Trimite solicitarea",
+      "recaptchaPrefix": "Acest site este protejat de reCAPTCHA, iar",
+      "recaptchaAnd": "și",
+      "recaptchaApply": "se aplică."
+    },
+    "calendar": {
+      "available": "Disponibil",
+      "booked": "Rezervat"
+    },
+    "alerts": {
+      "missingDates": {
+        "title": "Te rugăm să selectezi atât data de check-in, cât și data de check-out."
+      },
+      "submissionError": {
+        "title": "A apărut o problemă",
+        "text": "Nu am putut trimite solicitarea ta. Te rugăm să încerci din nou mai târziu."
+      },
+      "recaptchaError": {
+        "title": "Eroare reCAPTCHA",
+        "text": "Nu am putut verifica reCAPTCHA. Te rugăm să încerci din nou mai târziu."
+      },
+      "recaptchaConfigError": "Cheia reCAPTCHA nu este configurată. Setează RECAPTCHA_SITE_KEY în check-availability.ts și index.html.",
+      "recaptchaScriptMissing": "Scriptul reCAPTCHA nu este încărcat"
+    },
+    "popup": {
+      "greeting": "Salut, {{firstName}}",
+      "thankYou": "Îți mulțumim că ai verificat disponibilitatea la",
+      "apartmentName": "Blue Quartz Apartment",
+      "inquiryReceived": "Solicitarea ta a fost primită.",
+      "emailSent": "Un email de confirmare a fost trimis la:",
+      "followUp": "Echipa noastră va analiza cererea ta și îți va răspunde cât mai curând posibil.",
+      "spamHint": "Te rugăm să verifici și folderul Spam dacă nu primești răspunsul nostru.",
+      "team": "Echipa Blue Quartz Apartment"
+    }
+  },
+  "contactInfo": {
+    "title": "Ne găsești aici",
+    "subtitle": "Suntem mereu disponibili să te ajutăm să îți planifici sejurul ideal în Thassos.",
+    "location": "Locație",
+    "phone": "Telefon",
+    "email": "Email",
+    "addressLine1": "Miaouli 28, Limenas Thassos",
+    "addressLine2": "640 04, Grecia"
+  },
+  "gallery": {
+    "closeAria": "Închide galeria",
+    "previousAria": "Imaginea anterioară",
+    "nextAria": "Imaginea următoare",
+    "goToPhotoAria": "Mergi la fotografia {{index}}"
+  },
+  "privacyDialog": {
+    "title": "Politica de confidențialitate",
+    "iframeTitle": "Politica de confidențialitate"
+  }
+}

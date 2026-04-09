@@ -167,6 +167,10 @@ nav {
     display: none;
   }
 
+  .nav-mobile-language {
+    display: none;
+  }
+
   .nav-external-links {
     display: inline-flex;
     align-items: center;
@@ -192,6 +196,154 @@ nav {
         transform: translateY(-1px);
         background: rgba($blue-quartz, 0.2);
         border-color: rgba($blue-quartz, 0.45);
+      }
+    }
+  }
+
+  .nav-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .lang-switcher {
+    display: inline-flex;
+    align-items: center;
+
+    &.desktop {
+      margin-left: 0.15rem;
+    }
+
+    .lang-dropdown {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-width: 78px;
+      border: 1px solid rgba($blue-quartz, 0.36);
+      border-radius: 999px;
+      background: transparent;
+      padding: 0;
+      transition: all 0.22s ease;
+
+      .lang-chevron {
+        position: absolute;
+        right: 0.4rem;
+        font-size: 1.08rem;
+        color: rgba($blue-quartz, 0.85);
+        pointer-events: none;
+        transition: transform 0.2s ease, color 0.2s ease;
+      }
+
+      &.open .lang-chevron {
+        transform: rotate(180deg);
+      }
+
+      &.custom {
+        overflow: visible;
+
+        .lang-select-btn {
+          width: 100%;
+          min-width: 78px;
+          height: 36px;
+          border: 0;
+          border-radius: 999px;
+          background: transparent;
+          color: inherit;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.4rem 1.8rem 0.4rem 0.8rem;
+          cursor: pointer;
+
+          .flag {
+            font-size: 1.04rem;
+            line-height: 1;
+          }
+
+          &:focus {
+            outline: none;
+          }
+        }
+
+        .lang-menu {
+          position: absolute;
+          top: calc(100% + 0.42rem);
+          left: 50%;
+          transform: translateX(-50%);
+          min-width: 78px;
+          padding: 0.4rem;
+          border-radius: 14px;
+          border: 1px solid rgba($blue-quartz, 0.3);
+          background: rgba($cycladic-white, 0.98);
+          box-shadow: 0 10px 22px rgba(0, 51, 102, 0.16);
+          display: flex;
+          flex-direction: column;
+          gap: 0.3rem;
+          z-index: 1200;
+        }
+
+        .lang-menu-item {
+          width: 100%;
+          border: 0;
+          border-radius: 10px;
+          background: transparent;
+          padding: 0.34rem 0.45rem;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          color: inherit;
+          cursor: pointer;
+
+          .flag {
+            font-size: 1.02rem;
+            line-height: 1;
+          }
+
+          &.active {
+            background: rgba($blue-quartz, 0.16);
+          }
+        }
+      }
+
+      .lang-select {
+        width: 100%;
+        border: 0;
+        border-radius: 999px;
+        appearance: none;
+        -webkit-appearance: none;
+        background: transparent;
+        color: rgba($blue-quartz, 0.95);
+        font-size: 1.08rem;
+        font-weight: 600;
+        line-height: 1;
+        text-align: center;
+        text-align-last: center;
+        padding: 0.42rem 1.7rem 0.42rem 0.6rem;
+        cursor: pointer;
+
+        &:focus {
+          outline: none;
+        }
+
+        option {
+          font-size: 1rem;
+        }
+      }
+
+      &:hover {
+        background: transparent;
+        border-color: rgba($blue-quartz, 0.55);
+      }
+
+      &:focus-within {
+        background: transparent;
+        border-color: rgba($blue-quartz, 0.95);
+        box-shadow: none;
+
+        .lang-select,
+        .lang-chevron {
+          color: rgba($blue-quartz, 0.95);
+        }
       }
     }
   }
@@ -261,6 +413,43 @@ nav {
       }
     }
 
+    .lang-switcher .lang-dropdown {
+      border-color: rgba(#003366, 0.34);
+      background: transparent;
+
+      .lang-chevron,
+      .lang-select {
+        color: rgba(#003366, 0.9);
+      }
+
+      &:hover {
+        background: transparent;
+        border-color: rgba(#003366, 0.5);
+      }
+
+      &:focus-within {
+        background: transparent;
+        border-color: rgba(#003366, 0.95);
+
+        .lang-chevron,
+        .lang-select {
+          color: rgba(#003366, 0.95);
+        }
+      }
+
+      &.custom {
+        .lang-menu {
+          border-color: rgba(#003366, 0.3);
+          background: rgba($cycladic-white, 0.99);
+          box-shadow: 0 10px 22px rgba(0, 51, 102, 0.16);
+        }
+
+        .lang-menu-item.active {
+          background: rgba(#003366, 0.14);
+        }
+      }
+    }
+
     .hamburger span {
       background: #003366; 
     }
@@ -307,6 +496,42 @@ nav {
 
     .hamburger span {
       background: #003366; 
+    }
+
+    .lang-switcher .lang-dropdown {
+      border-color: rgba(#003366, 0.34);
+      background: transparent;
+
+      .lang-chevron,
+      .lang-select {
+        color: rgba(#003366, 0.9);
+      }
+
+      &:hover {
+        background: transparent;
+      }
+
+      &:focus-within {
+        background: transparent;
+        border-color: rgba(#003366, 0.95);
+
+        .lang-chevron,
+        .lang-select {
+          color: rgba(#003366, 0.95);
+        }
+      }
+
+      &.custom {
+        .lang-menu {
+          border-color: rgba(#003366, 0.3);
+          background: rgba($cycladic-white, 0.99);
+          box-shadow: 0 10px 22px rgba(0, 51, 102, 0.16);
+        }
+
+        .lang-menu-item.active {
+          background: rgba(#003366, 0.14);
+        }
+      }
     }
   }
 
@@ -364,6 +589,10 @@ nav {
       display: none;
     }
 
+    .lang-switcher.desktop {
+      display: none;
+    }
+
     // Το Mobile Menu Panel (Από αριστερά προς τα δεξιά - Παραμένει ίδιο)
     .nav-tabs {
       position: absolute;
@@ -382,7 +611,8 @@ nav {
       transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 
       &.open {
-        transform: translateX(0); 
+        // Native select popups can be misplaced on mobile when ancestor keeps transform.
+        transform: none;
       }
 
       > a {
@@ -417,6 +647,150 @@ nav {
           .booking-badge {
             color: rgba($blue-quartz, 0.7);
             font-size: 1.06rem;
+          }
+        }
+      }
+
+      .nav-mobile-language {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.55rem;
+        width: 100%;
+        margin-top: 0.6rem;
+
+        .lang-switcher {
+          width: auto;
+
+          .lang-dropdown {
+            width: auto;
+            min-width: 78px;
+            border-radius: 999px;
+            border-color: rgba($blue-quartz, 0.34);
+            background: transparent;
+            color: rgba($blue-quartz, 0.86);
+
+            &.custom {
+              overflow: visible;
+
+              .lang-select-btn {
+                width: 100%;
+                min-width: 78px;
+                height: 36px;
+                border: 0;
+                border-radius: 999px;
+                background: transparent;
+                color: inherit;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.4rem 1.8rem 0.4rem 0.8rem;
+                cursor: pointer;
+
+                .flag {
+                  font-size: 1.04rem;
+                  line-height: 1;
+                }
+
+                &:focus {
+                  outline: none;
+                }
+              }
+
+              .lang-menu {
+                position: absolute;
+                top: calc(100% + 0.42rem);
+                left: 50%;
+                transform: translateX(-50%);
+                min-width: 78px;
+                padding: 0.4rem;
+                border-radius: 14px;
+                border: 1px solid rgba($blue-quartz, 0.3);
+                background: rgba($cycladic-white, 0.98);
+                box-shadow: 0 10px 22px rgba(0, 51, 102, 0.16);
+                display: flex;
+                flex-direction: column;
+                gap: 0.3rem;
+                z-index: 1200;
+              }
+
+              .lang-menu-item {
+                width: 100%;
+                border: 0;
+                border-radius: 10px;
+                background: transparent;
+                padding: 0.34rem 0.45rem;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                color: inherit;
+                cursor: pointer;
+
+                .flag {
+                  font-size: 1.02rem;
+                  line-height: 1;
+                }
+
+                &.active {
+                  background: rgba($blue-quartz, 0.16);
+                }
+              }
+            }
+
+            .lang-chevron {
+              right: 0.4rem;
+            }
+
+            .lang-select {
+              border-radius: 999px;
+              font-size: 1rem;
+              padding: 0.42rem 1.7rem 0.42rem 0.6rem;
+            }
+
+            &:focus-within {
+              color: #003366;
+              background: transparent;
+            }
+          }
+        }
+      }
+    }
+
+    &.scrolled,
+    &.force-white {
+      .nav-tabs .nav-mobile-language .lang-switcher .lang-dropdown {
+        border-color: rgba(#003366, 0.34);
+        background: transparent;
+
+        .lang-chevron,
+        .lang-select {
+          color: rgba(#003366, 0.9);
+        }
+
+        &:hover {
+          background: transparent;
+          border-color: rgba(#003366, 0.5);
+        }
+
+        &:focus-within {
+          background: transparent;
+          border-color: rgba(#003366, 0.95);
+
+          .lang-chevron,
+          .lang-select {
+            color: rgba(#003366, 0.95);
+          }
+        }
+
+        &.custom {
+          .lang-menu {
+            border-color: rgba(#003366, 0.3);
+            background: rgba($cycladic-white, 0.99);
+            box-shadow: 0 10px 22px rgba(0, 51, 102, 0.16);
+          }
+
+          .lang-menu-item.active {
+            background: rgba(#003366, 0.14);
           }
         }
       }

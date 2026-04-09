@@ -1,9 +1,10 @@
-import { Component, HostListener, inject, OnInit,ChangeDetectorRef } from '@angular/core';
+import { Component, HostListener, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PrivacyPolicyDialogService } from './service/privacy-policy-dialog';
 import { filter } from 'rxjs/operators';
 import { TranslatePipe } from './pipes/translate.pipe';
+import { LanguageFacadeService } from './service/language-option';
 
 @Component({
   selector: 'app-root',
@@ -20,12 +21,18 @@ export class App implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
   private privacyPolicyDialog = inject(PrivacyPolicyDialogService);
+  private languageFacade = inject(LanguageFacadeService);
+
+  readonly languageOptions = this.languageFacade.languageOptions;
   
   isScrolled = false;
   menuOpen = false;
   currentSection = 'home-top';
   isFacilitiesPage = false;
   currentYear = new Date().getFullYear();
+  currentLanguage = 'en';
+  mobileLanguageMenuOpen = false;
+  desktopLanguageMenuOpen = false;
   private previousUrl = '';
   private hasAppliedReloadSectionRestore = false;
 
@@ -38,8 +45,19 @@ export class App implements OnInit {
     }
   }
 
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement | null;
+    if (!target?.closest('.lang-switcher')) {
+      this.mobileLanguageMenuOpen = false;
+      this.desktopLanguageMenuOpen = false;
+    }
+  }
+
   // Monitoring route changes to reset the menu and update the active section
   ngOnInit() {
+    this.currentLanguage = this.languageFacade.getCurrentLanguage();
+    void this.languageFacade.preloadAllLanguages();
     
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -48,7 +66,7 @@ export class App implements OnInit {
       const fromFacilities = this.previousUrl.includes('/facilities');
       const fragment = this.router.parseUrl(nextUrl).fragment;
 
-      this.menuOpen = false; 
+      this.closeAllMenus();
      
       this.isFacilitiesPage = nextUrl.includes('/facilities');
       if (this.isFacilitiesPage) {
@@ -75,6 +93,59 @@ export class App implements OnInit {
     });
   }
 
+  async changeLanguage(language: string): Promise<void> {
+    const activeLanguage = this.languageFacade.getCurrentLanguage();
+    if (activeLanguage === language) {
+      this.currentLanguage = activeLanguage;
+      this.closeLanguageMenus();
+      return;
+    }
+
+    // Reflect language selection immediately while translations are being applied.
+    this.currentLanguage = language;
+    this.closeLanguageMenus();
+    this.cdr.detectChanges();
+
+    this.currentLanguage = await this.languageFacade.setLanguage(language);
+    this.cdr.detectChanges();
+  }
+
+  toggleMobileLanguageMenu(event: Event): void {
+    event.stopPropagation();
+    this.desktopLanguageMenuOpen = false;
+    this.mobileLanguageMenuOpen = !this.mobileLanguageMenuOpen;
+  }
+
+  async selectMobileLanguage(language: string, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    await this.changeLanguage(language);
+  }
+
+  toggleDesktopLanguageMenu(event: Event): void {
+    event.stopPropagation();
+    this.mobileLanguageMenuOpen = false;
+    this.desktopLanguageMenuOpen = !this.desktopLanguageMenuOpen;
+  }
+
+  async selectDesktopLanguage(language: string, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    await this.changeLanguage(language);
+  }
+
+  getLanguageFlag(languageCode: string): string {
+    return this.languageFacade.getFlag(languageCode);
+  }
+
+  private closeLanguageMenus(): void {
+    this.mobileLanguageMenuOpen = false;
+    this.desktopLanguageMenuOpen = false;
+  }
+
+  private closeAllMenus(): void {
+    this.menuOpen = false;
+    this.closeLanguageMenus();
+  }
+
   private ensureFragmentVisibility(fragment: string): void {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const firstBehavior: ScrollBehavior = prefersReducedMotion ? 'auto' : 'smooth';
@@ -97,7 +168,7 @@ export class App implements OnInit {
   setActive(section: string) {
     this.currentSection = section;
     this.rememberHomeSection(section);
-    this.menuOpen = false; 
+    this.closeAllMenus();
   }
 
   private restoreSectionAfterReload(): void {

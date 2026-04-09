@@ -1,0 +1,284 @@
+{
+  "meta": {
+    "title": "Blue Quartz Apartment"
+  },
+  "common": {
+    "close": "Kapat",
+    "home": "Ana Sayfa",
+    "facilities": "Olanaklar",
+    "checkAvailability": "Müsaitlik Kontrolü",
+    "findUs": "Bize Ulaşın",
+    "privacyPolicy": "Gizlilik Politikası",
+    "termsOfService": "Kullanım Şartları",
+    "instagram": "Instagram",
+    "booking": "Booking",
+    "directions": "Yol Tarifi",
+    "available": "Müsait",
+    "booked": "Dolu",
+    "tryAgain": "Tekrar Dene"
+  },
+  "nav": {
+    "home": "Ana Sayfa",
+    "facilities": "Olanaklar",
+    "checkAvailability": "Müsaitlik",
+    "findUs": "Konum"
+  },
+  "language": {
+    "switcherAria": "Dil seçici"
+  },
+  "app": {
+    "logoAlt": "Blue Quartz Apartment logosu",
+    "brandName": "The Blue Quartz",
+    "brandSub": "Apartment Limenas Thassos",
+    "quickLinksAria": "Hızlı bağlantılar",
+    "externalLinksAria": "Harici bağlantılar",
+    "footer": {
+      "brand": "Blue Quartz Apartment",
+      "location": "Limenas Thassos, Yunanistan",
+      "rights": "Copyright {{year}} Blue Quartz Apartment. Tüm hakları saklıdır.",
+      "creditPrefix": "Tasarım ve geliştirme"
+    }
+  },
+  "home": {
+    "hero": {
+      "alt": "The Blue Quartz Master Suite",
+      "badge": "Özel Kiklad Yaşamı",
+      "titleLine1": "Kristal Sular,",
+      "titleLine2": "Ebedi Huzur.",
+      "subtitle": "Ege'nin en özel kaçamağını yaşayın. Denizin derin mavisinin Kiklad mimarisinin saf beyazıyla buluştuğu yerde.",
+      "checkAvailability": "Müsaitliği Kontrol Et",
+      "viewGallery": "Galeriyi Gör"
+    },
+    "philosophy": {
+      "title": "Blue Quartz Felsefesi",
+      "description": "Kuvars kristallerinin berraklığından ve dünya standartlarında lüks estetiğinden ilham alan süitimiz, huzurlu bir sığınak sunar. Her ayrıntı, rafine bir zarafet atmosferi yaratmak için özenle düşünülmüştür.",
+      "masterSuite": "Master Süit",
+      "seaView": "Deniz Manzarası"
+    },
+    "facilities": {
+      "title": "Üst Düzey Olanaklar",
+      "subtitle": "Unutulmaz bir konaklama için ihtiyacınız olan her şey",
+      "cards": {
+        "bedroom": {
+          "title": "Master Yatak Odası",
+          "description": "Mükemmel uyku için premium anatomik yataklı king-size yatak."
+        },
+        "climate": {
+          "title": "İklim Kontrolü",
+          "description": "Yıl boyu konfor için tam klima ve ısıtma sistemi."
+        },
+        "entertainment": {
+          "title": "Eğlence",
+          "description": "Yayın platformları ve yüksek hızlı Wi-Fi içeren Smart TV."
+        },
+        "balcony": {
+          "title": "Deniz Manzarası",
+          "description": "Ege Denizi'ne geniş manzaralar ve unutulmaz gün batımları sunan özel balkon."
+        },
+        "kitchen": {
+          "title": "Tam Donanımlı Mutfak",
+          "description": "En sevdiğiniz yemekleri hazırlamak için modern cihazlarla donatılmıştır."
+        }
+      },
+      "showcase": {
+        "title": "Galeri Önizlemesi",
+        "subtitle": "Daire alanlarını hızlıca gözden geçirin",
+        "loading": "Fotoğraflar yükleniyor...",
+        "empty": "Fotoğraflar yakında burada görünecek."
+      },
+      "discoverMore": "Konaklamanız İçin Daha Fazla Detay",
+      "photoAltFallback": "Blue Quartz Apartment fotoğrafı",
+      "viewerAltPrefix": "Blue Quartz fotoğrafı"
+    }
+  },
+  "facilitiesPage": {
+    "header": {
+      "category": "Özel Olanaklar",
+      "title": "Mükemmelliği Deneyimleyin"
+    },
+    "status": {
+      "loading": "Olanaklar yükleniyor...",
+      "empty": "Henüz fotoğraf mevcut değil. Lütfen yakında tekrar kontrol edin.",
+      "loadError": "Görseller şu anda yüklenemiyor. Lütfen biraz sonra tekrar deneyin."
+    },
+    "amenityTitle": "Bu alanın sundukları",
+    "houseRules": {
+      "ariaLabel": "Ev kuralları",
+      "category": "Ev Kuralları",
+      "title": "Gelmeden Önce Bilmeniz Gerekenler",
+      "description": "Bu basit kurallar dairenin temiz, huzurlu ve her misafir için hazır kalmasına yardımcı olur."
+    },
+    "bookNow": "Tatilinizi Hemen Rezerve Edin",
+    "viewerAltPrefix": "Olanak fotoğrafı",
+    "categories": {
+      "bedroom": "Uyku ve Dinlenme",
+      "living-room": "Rahatlama",
+      "kitchen": "Gastronomi",
+      "bathroom": "Wellness",
+      "veranda": "Manzaralar",
+      "default": "Özel Olanaklar"
+    },
+    "titles": {
+      "bedroom": "Master Süit",
+      "living-room": "Yaşam Alanı",
+      "kitchen": "Gurme Mutfak",
+      "bathroom": "Quartz Banyo",
+      "veranda": "Deniz Manzaralı Veranda",
+      "default": "Lüks Alan"
+    },
+    "descriptions": {
+      "bedroom": "Derin dinlenme ve zahmetsiz konfor için tasarlanmış huzurlu bir master süitte kendinizi yenileyin. Yumuşak dokular, özenle seçilmiş nevresimler ve karartma perdeleri sakin bir atmosfer sunarken, düşünülmüş detaylar her akşamı huzurlu, her sabahı ferah kılar.",
+      "living-room": "Geniş yaşam alanımız, büyük köşe koltuk, sıcak ambiyans aydınlatması ve konforu zarafetle buluşturan açık plan düzeniyle sizi şık bir rahatlığa davet eder. Yavaş sabahlar, aile anları veya plaj sonrası sakin akşamlar için ideal bir ortamdır.",
+      "kitchen": "Gurme mutfak, modern estetiği pratik işlevsellikle birleştirir; hızlı kahvaltılardan tam ev yemeklerine kadar her şey için eksiksiz donatılmıştır. Premium cihazlar, kaliteli mutfak ekipmanları ve sade tasarım keyifli bir pişirme deneyimi sağlar.",
+      "bathroom": "Minimalist tasarımın günlük lüksle buluştuğu rafine bir banyo deneyimine adım atın. Walk-in yağmur duşu, kaliteli banyo ürünleri ve huzur veren atmosfer, konaklamanız boyunca yenilenmeniz ve iyi hissetmeniz için tasarlanmıştır.",
+      "veranda": "Deniz manzaralı veranda, Thassos'un doğal güzelliğine karşı size ayrılmış özel bir ön sıra noktasıdır. Gün doğumunda kahvenizi yudumlayın, altın saatlerin tadını çıkarın ve hafif esinti eşliğinde sakin akşamlar yaşayın.",
+      "default": "Mekanımızda mutlak konforu deneyimleyin."
+    },
+    "features": {
+      "bedroom": [
+        "Premium yataklı master yatak odası",
+        "Rahat uyku için karartma perdeleri",
+        "Ütü ve ütü masası",
+        "Arka balkonda çamaşır makinesi",
+        "Ek yastıklar, battaniyeler ve temiz nevresimler"
+      ],
+      "living-room": [
+        "Konforlu dinlenme için büyük köşe koltuk",
+        "Ek yatak alanı sağlayan açılır kanepe",
+        "Netflix dahil yayın servisli Smart TV",
+        "Tüm mülkte yüksek hızlı Wi-Fi"
+      ],
+      "kitchen": [
+        "Tam ekipmanlı mutfak ve eksiksiz pişirme araçları",
+        "Tencereler, tavalar, fırın tepsileri ve temel gereçler",
+        "Su ve şarap bardaklarıyla tam sofra takımı",
+        "Espresso makinesi, kettle ve kahve filtreleri",
+        "Hızlı ve zahmetsiz temizlik için bulaşık makinesi"
+      ],
+      "bathroom": [
+        "Şampuan, saç kremi ve duş jeli",
+        "El sabunu ve temiz tuvalet kağıdı",
+        "Günlük kullanım için saç kurutma makinesi",
+        "Gerektiğinde temizlik ürünleri"
+      ],
+      "veranda": [
+        "Yemek ve dinlenme için konforlu sandalyeli dış mekan masası",
+        "Güzel gün batımlarıyla açık deniz manzarası",
+        "Sakin sabahlar ve huzurlu geceler için taze kıyı esintisi"
+      ],
+      "default": [
+        "Özenle seçilmiş detaylara sahip premium olanaklar"
+      ]
+    },
+    "rules": {
+      "noSmoking": {
+        "title": "İç Mekanda Sigara Yasaktır",
+        "description": "Daire içinde sigara içmek kesinlikle yasaktır. Dış alanları sorumlu şekilde kullanabilirsiniz."
+      },
+      "noParties": {
+        "title": "Parti ve Etkinlik Yok",
+        "description": "Alanı korumak ve mahalleye saygı göstermek için parti ve yüksek sesli toplantılara izin verilmez."
+      },
+      "quietHours": {
+        "title": "Sessizlik Saatlerine Uyun",
+        "description": "Lütfen yerel sessizlik saatlerinde gürültüyü düşük tutun ve yakın çevrede yaşayanlara karşı duyarlı olun."
+      },
+      "checkIn": {
+        "title": "Giriş 15:00 Sonrası",
+        "description": "Dairenin tamamen temizlenip hazırlanabilmesi için giriş 15:00'ten sonra yapılabilir."
+      },
+      "checkOut": {
+        "title": "Çıkış 10:00 Öncesi",
+        "description": "Sonraki misafirler öncesi temizlik için yeterli zaman kalması adına çıkış 10:00'dan öncedir."
+      },
+      "damage": {
+        "title": "Herhangi Bir Hasarı Bildirin",
+        "description": "Lütfen herhangi bir hasarı derhal ev sahiplerine bildirin. Büyük hasarlar için tazminat gerekebilir."
+      },
+      "registeredGuests": {
+        "title": "Yalnızca Kayıtlı Misafirler",
+        "description": "Mülkte yalnızca rezervasyonda belirtilen misafirler konaklayabilir."
+      },
+      "secureHome": {
+        "title": "Evi Güvende Tutun",
+        "description": "Daireden ayrılırken kapıları kilitleyin, klimayı ve elektrikli cihazları kapatın."
+      }
+    }
+  },
+  "checkAvailability": {
+    "title": "Müsaitlik Kontrolü",
+    "subtitle": "Takvimimizi inceleyin ve Blue Quartz Apartment için tarihlerinizi ayırtın.",
+    "form": {
+      "fullName": "Ad Soyad*",
+      "fullNamePlaceholder": "Adınız",
+      "email": "E-posta Adresi*",
+      "emailPlaceholder": "you@example.com",
+      "checkIn": "Giriş*",
+      "checkInPlaceholder": "Giriş tarihini seçin",
+      "checkOut": "Çıkış*",
+      "checkOutPlaceholder": "Çıkış tarihini seçin",
+      "guests": "Misafir Sayısı*",
+      "guests1": "1 Misafir",
+      "guests2": "2 Misafir",
+      "guests3": "3 Misafir",
+      "guests4": "4 Misafir",
+      "inquiry": "Mesajınız",
+      "inquiryPlaceholder": "Size nasıl yardımcı olabiliriz? Konaklamanız hakkında biraz bilgi verin...",
+      "honeypot": "Website",
+      "gdprPrefix": "* Bu rezervasyon talebi için kişisel verilerimin",
+      "gdprSuffix": "kapsamında saklanmasını ve işlenmesini kabul ediyorum.",
+      "submit": "Talep Gönder",
+      "recaptchaPrefix": "Bu site reCAPTCHA ile korunmaktadır ve Google",
+      "recaptchaAnd": "ile",
+      "recaptchaApply": "geçerlidir."
+    },
+    "calendar": {
+      "available": "Müsait",
+      "booked": "Dolu"
+    },
+    "alerts": {
+      "missingDates": {
+        "title": "Lütfen hem giriş hem de çıkış tarihini seçin."
+      },
+      "submissionError": {
+        "title": "Bir hata oluştu",
+        "text": "Talebinizi gönderemedik. Lütfen daha sonra tekrar deneyin."
+      },
+      "recaptchaError": {
+        "title": "reCAPTCHA hatası",
+        "text": "reCAPTCHA doğrulanamadı. Lütfen daha sonra tekrar deneyin."
+      },
+      "recaptchaConfigError": "reCAPTCHA site anahtarı yapılandırılmamış. check-availability.ts ve index.html içinde RECAPTCHA_SITE_KEY değerini ayarlayın.",
+      "recaptchaScriptMissing": "reCAPTCHA scripti yüklenmedi"
+    },
+    "popup": {
+      "greeting": "Merhaba, {{firstName}}",
+      "thankYou": "Blue Quartz Apartment için müsaitliği kontrol ettiğiniz için teşekkür ederiz",
+      "apartmentName": "Blue Quartz Apartment",
+      "inquiryReceived": "Talebiniz alınmıştır.",
+      "emailSent": "Onay e-postası şu adrese gönderildi:",
+      "followUp": "Ekibimiz talebinizi inceleyip en kısa sürede size dönüş yapacaktır.",
+      "spamHint": "Yanıtımızı göremezseniz lütfen Spam klasörünü de kontrol edin.",
+      "team": "Blue Quartz Apartment Ekibi"
+    }
+  },
+  "contactInfo": {
+    "title": "Bize Ulaşın",
+    "subtitle": "Thassos'ta mükemmel konaklamanızı planlamanıza yardımcı olmak için her zaman buradayız.",
+    "location": "Konum",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "addressLine1": "Miaouli 28, Limenas Thassos",
+    "addressLine2": "640 04, Yunanistan"
+  },
+  "gallery": {
+    "closeAria": "Galeriyi kapat",
+    "previousAria": "Önceki görsel",
+    "nextAria": "Sonraki görsel",
+    "goToPhotoAria": "{{index}} numaralı fotoğrafa git"
+  },
+  "privacyDialog": {
+    "title": "Gizlilik Politikası",
+    "iframeTitle": "Gizlilik Politikası"
+  }
+}

@@ -17,6 +17,15 @@
     "booked": "Booked",
     "tryAgain": "Try Again"
   },
+  "nav": {
+    "home": "Home",
+    "facilities": "Facilities",
+    "checkAvailability": "Check Availability",
+    "findUs": "Find Us"
+  },
+  "language": {
+    "switcherAria": "Language switcher"
+  },
   "app": {
     "logoAlt": "Blue Quartz Apartment logo",
     "brandName": "The Blue Quartz",
