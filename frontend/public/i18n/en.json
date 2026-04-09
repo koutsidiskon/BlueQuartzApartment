@@ -1,0 +1,275 @@
+{
+  "meta": {
+    "title": "Blue Quartz Apartment"
+  },
+  "common": {
+    "close": "Close",
+    "home": "Home",
+    "facilities": "Facilities",
+    "checkAvailability": "Check Availability",
+    "findUs": "Find Us",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "instagram": "Instagram",
+    "booking": "Booking",
+    "directions": "Directions",
+    "available": "Available",
+    "booked": "Booked",
+    "tryAgain": "Try Again"
+  },
+  "app": {
+    "logoAlt": "Blue Quartz Apartment logo",
+    "brandName": "The Blue Quartz",
+    "brandSub": "Apartment Limenas Thassos",
+    "quickLinksAria": "Quick links",
+    "externalLinksAria": "External links",
+    "footer": {
+      "brand": "Blue Quartz Apartment",
+      "location": "Limenas Thassos, Greece",
+      "rights": "Copyright {{year}} Blue Quartz Apartment. All rights reserved.",
+      "creditPrefix": "Designed and developed by"
+    }
+  },
+  "home": {
+    "hero": {
+      "alt": "The Blue Quartz Master Suite",
+      "badge": "Exclusive Cycladic Living",
+      "titleLine1": "Crystal Waters,",
+      "titleLine2": "Eternal Serenity.",
+      "subtitle": "Immerse yourself in the ultimate Aegean escape. Where the deep blue of the sea meets the pure white of Cycladic architecture.",
+      "checkAvailability": "Check Availability",
+      "viewGallery": "View Gallery"
+    },
+    "philosophy": {
+      "title": "The Blue Quartz Philosophy",
+      "description": "Inspired by the clarity of quartz crystals and the majestic aesthetics of world-class luxury, our suite offers a sanctuary of peace. Every detail has been curated to provide an atmosphere of refined elegance.",
+      "masterSuite": "Master Suite",
+      "seaView": "Sea View"
+    },
+    "facilities": {
+      "title": "Superior Facilities",
+      "subtitle": "Everything you need for an unforgettable stay",
+      "cards": {
+        "bedroom": {
+          "title": "Master Bedroom",
+          "description": "King-size bed with premium anatomic mattress for perfect sleep."
+        },
+        "climate": {
+          "title": "Climate Control",
+          "description": "Full air-conditioning and heating for year-round comfort."
+        },
+        "entertainment": {
+          "title": "Entertainment",
+          "description": "Smart TV with streaming services and high-speed Wi-Fi."
+        },
+        "balcony": {
+          "title": "Sea View ",
+          "description": "Private balcony offering sweeping views of the Aegean Sea and unforgettable sunset skies."
+        },
+        "kitchen": {
+          "title": "Full Kitchen",
+          "description": "Equipped with modern appliances to prepare your favorite meals."
+        }
+      },
+      "showcase": {
+        "title": "Gallery Preview",
+        "subtitle": "Browse the apartment spaces at a glance",
+        "loading": "Loading photos...",
+        "empty": "Photos will appear here soon."
+      },
+      "discoverMore": "More Details for Your Stay",
+      "photoAltFallback": "Blue Quartz Apartment photo",
+      "viewerAltPrefix": "Blue Quartz photo"
+    }
+  },
+  "facilitiesPage": {
+    "header": {
+      "category": "Exclusive Amenities",
+      "title": "Experience Excellence"
+    },
+    "status": {
+      "loading": "Loading amenities...",
+      "empty": "No photos available yet. Please check back soon.",
+      "loadError": "Unable to load images right now. Please try again in a moment."
+    },
+    "amenityTitle": "What this space offers",
+    "houseRules": {
+      "ariaLabel": "House rules",
+      "category": "House Rules",
+      "title": "Good to Know Before You Arrive",
+      "description": "These simple rules help us keep the apartment clean, peaceful, and ready for every guest."
+    },
+    "bookNow": "Book Your Getaway",
+    "viewerAltPrefix": "Amenities photo",
+    "categories": {
+      "bedroom": "Sleep and Rest",
+      "living-room": "Relaxation",
+      "kitchen": "Gastronomy",
+      "bathroom": "Wellness",
+      "veranda": "Vistas",
+      "default": "Exclusive Amenities"
+    },
+    "titles": {
+      "bedroom": "The Master Suite",
+      "living-room": "The Living Space",
+      "kitchen": "Gourmet Kitchen",
+      "bathroom": "The Quartz Bathroom",
+      "veranda": "Sea-view Veranda",
+      "default": "Luxury Space"
+    },
+    "descriptions": {
+      "bedroom": "Immerse yourself in a serene master suite designed for deep rest and effortless comfort. Soft textures, carefully selected linens, and blackout curtains create a calm atmosphere, while thoughtful details make every evening feel peaceful and every morning feel refreshing.",
+      "living-room": "Our spacious living area invites you to unwind in style, with a generous corner sofa, warm ambient lighting, and an elegant open layout that connects comfort with sophistication. It is the ideal setting for slow mornings, family moments, or relaxed evenings after the beach.",
+      "kitchen": "The gourmet kitchen combines modern aesthetics with practical functionality, fully equipped for everything from quick breakfasts to complete home-cooked dinners. Premium appliances, quality cookware, and a clean design ensure a smooth and enjoyable cooking experience.",
+      "bathroom": "Step into a refined bathroom experience where minimalist design meets everyday luxury. The walk-in rainfall shower, quality amenities, and soothing atmosphere are crafted to help you reset, recharge, and enjoy a true sense of wellness throughout your stay.",
+      "veranda": "The sea-view veranda is your private front-row seat to the natural beauty of Thassos. Enjoy sunrise coffee, golden-hour relaxation, and peaceful evenings with a gentle breeze, surrounded by open views that make every moment feel memorable.",
+      "default": "Experience absolute comfort in our premises."
+    },
+    "features": {
+      "bedroom": [
+        "Master bedroom with premium mattress",
+        "Blackout curtains for restful sleep",
+        "Iron and ironing board",
+        "Washing machine on the back balcony",
+        "Extra pillows, blankets, and fresh linens"
+      ],
+      "living-room": [
+        "Large corner sofa for comfortable lounging",
+        "Convertible sofa for extra sleeping space",
+        "Smart TV with streaming, including Netflix",
+        "High-speed Wi-Fi throughout the entire property"
+      ],
+      "kitchen": [
+        "Fully equipped kitchen with complete cookware",
+        "Pots, pans, oven trays, and essential utensils",
+        "Water and wine glasses with full tableware set",
+        "Espresso machine, kettle, and coffee filters",
+        "Dishwasher for quick and effortless cleanup"
+      ],
+      "bathroom": [
+        "Shampoo, conditioner, and body wash",
+        "Hand soap and fresh toilet paper",
+        "Hair dryer available for daily use",
+        "Cleaning products available if needed"
+      ],
+      "veranda": [
+        "Outdoor table with comfortable chairs for dining and relaxing",
+        "Open sea view with beautiful sunset moments",
+        "Fresh coastal breeze for calm mornings and peaceful nights"
+      ],
+      "default": [
+        "Premium amenities with carefully selected details"
+      ]
+    },
+    "rules": {
+      "noSmoking": {
+        "title": "No Smoking Indoors",
+        "description": "Smoking is strictly prohibited inside the apartment. You may use outdoor areas responsibly."
+      },
+      "noParties": {
+        "title": "No Parties or Events",
+        "description": "Parties and loud gatherings are not allowed to protect the space and respect the neighborhood."
+      },
+      "quietHours": {
+        "title": "Respect Quiet Hours",
+        "description": "Please keep noise low during local quiet hours and be considerate of nearby residents."
+      },
+      "checkIn": {
+        "title": "Check-In After 15:00",
+        "description": "Arrival is available after 3:00 PM so the apartment can be fully cleaned and prepared."
+      },
+      "checkOut": {
+        "title": "Check-Out Before 10:00",
+        "description": "Departure is before 10:00 AM to allow enough time for cleaning before the next guests."
+      },
+      "damage": {
+        "title": "Report Any Damage",
+        "description": "Please inform the hosts immediately about any damage. Extensive damage may require compensation."
+      },
+      "registeredGuests": {
+        "title": "Registered Guests Only",
+        "description": "Only guests included in the reservation are allowed to stay overnight in the property."
+      },
+      "secureHome": {
+        "title": "Keep the Home Secure",
+        "description": "Lock doors and switch off air conditioning and appliances when leaving the apartment."
+      }
+    }
+  },
+  "checkAvailability": {
+    "title": "Check Availability",
+    "subtitle": "Browse our calendar and secure your dates at Blue Quartz Apartment.",
+    "form": {
+      "fullName": "Full Name*",
+      "fullNamePlaceholder": "Your Name",
+      "email": "Email Address*",
+      "emailPlaceholder": "you@example.com",
+      "checkIn": "Check-in*",
+      "checkInPlaceholder": "Select Check-in date",
+      "checkOut": "Check-out*",
+      "checkOutPlaceholder": "Select Check-out date",
+      "guests": "Number of Guests*",
+      "guests1": "1 Guest",
+      "guests2": "2 Guests",
+      "guests3": "3 Guests",
+      "guests4": "4 Guests",
+      "inquiry": "Your Inquiry",
+      "inquiryPlaceholder": "How can we help you? Tell us a bit about your stay...",
+      "honeypot": "Website",
+      "gdprPrefix": "* I agree to the storage and processing of my personal data for this booking inquiry according to the",
+      "gdprSuffix": ".",
+      "submit": "Send Inquiry",
+      "recaptchaPrefix": "This site is protected by reCAPTCHA and the Google",
+      "recaptchaAnd": "and",
+      "recaptchaApply": "apply."
+    },
+    "calendar": {
+      "available": "Available",
+      "booked": "Booked"
+    },
+    "alerts": {
+      "missingDates": {
+        "title": "Please select both check-in and check-out dates."
+      },
+      "submissionError": {
+        "title": "Something went wrong",
+        "text": "We could not send your inquiry. Please try again later."
+      },
+      "recaptchaError": {
+        "title": "reCAPTCHA error",
+        "text": "Could not verify reCAPTCHA. Please try again later."
+      },
+      "recaptchaConfigError": "reCAPTCHA site key is not configured. Set RECAPTCHA_SITE_KEY in check-availability.ts and index.html.",
+      "recaptchaScriptMissing": "reCAPTCHA script not loaded"
+    },
+    "popup": {
+      "greeting": "Hello, {{firstName}}",
+      "thankYou": "Thank you for checking availability at",
+      "apartmentName": "Blue Quartz Apartment",
+      "inquiryReceived": "Your inquiry has been received.",
+      "emailSent": "A confirmation email has been sent to:",
+      "followUp": "Our team will review your request and respond as soon as possible.",
+      "spamHint": "Please check your Spam folder if you do not receive our reply.",
+      "team": "Blue Quartz Apartment Team"
+    }
+  },
+  "contactInfo": {
+    "title": "Find Us",
+    "subtitle": "We are always available to help you plan your perfect stay in Thassos.",
+    "location": "Location",
+    "phone": "Phone",
+    "email": "Email",
+    "addressLine1": "Miaouli 28, Limenas Thassos",
+    "addressLine2": "640 04, Greece"
+  },
+  "gallery": {
+    "closeAria": "Close gallery",
+    "previousAria": "Previous image",
+    "nextAria": "Next image",
+    "goToPhotoAria": "Go to photo {{index}}"
+  },
+  "privacyDialog": {
+    "title": "Privacy Policy",
+    "iframeTitle": "Privacy Policy"
+  }
+}

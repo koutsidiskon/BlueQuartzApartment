@@ -1,8 +1,8 @@
 <section id="find-us-section" class="find-us-section">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">Find Us</h2>
-      <p class="section-subtitle">We are always available to help you plan your perfect stay in Thassos.</p>
+      <h2 class="section-title">{{ 'contactInfo.title' | t }}</h2>
+      <p class="section-subtitle">{{ 'contactInfo.subtitle' | t }}</p>
     </div>
 
     <div class="content-grid">
@@ -12,11 +12,11 @@
             <span class="material-icons">location_on</span>
           </div>
           <div class="card-content">
-            <h3>Location</h3>
+            <h3>{{ 'contactInfo.location' | t }}</h3>
             <a href="https://www.google.com/maps/search/?api=1&query=Miaouli+28+Limenas+Thassos+64004+Greece" 
               target="_blank" 
               style="text-decoration: none; color: inherit;">
-              <p>Miaouli 28, Limenas Thassos<br>640 04, Greece</p>
+              <p>{{ 'contactInfo.addressLine1' | t }}<br>{{ 'contactInfo.addressLine2' | t }}</p>
             </a>
           </div>
         </div>
@@ -26,7 +26,7 @@
             <span class="material-icons">phone</span>
           </div>
           <div class="card-content">
-            <h3>Phone</h3>
+            <h3>{{ 'contactInfo.phone' | t }}</h3>
             <p>
               <a href="tel:+306936007024">+30 693 600 7024</a>
             </p>
@@ -38,7 +38,7 @@
             <span class="material-icons">email</span>
           </div>
           <div class="card-content">
-            <h3>Email</h3>
+            <h3>{{ 'contactInfo.email' | t }}</h3>
             <p><a href="mailto:bluequartzmain@gmail.com">bluequartzmain@gmail.com</a></p>
           </div>
         </div>

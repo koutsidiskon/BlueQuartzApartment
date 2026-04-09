@@ -4,10 +4,11 @@ import { ImageService, HouseImage } from '../../service/image';
 import { CheckAvailability } from '../check-availability/check-availability';
 import { ContactInfo } from '../contact-info/contact-info';
 import { FullscreenGallery } from '../../shared/fullscreen-gallery/fullscreen-gallery';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, CheckAvailability, ContactInfo, FullscreenGallery],
+  imports: [RouterLink, CheckAvailability, ContactInfo, FullscreenGallery, TranslatePipe],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })

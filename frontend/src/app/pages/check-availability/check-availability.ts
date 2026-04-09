@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { InquiryService } from '../../service/inquiry';
 import { PrivacyPolicyDialogService } from '../../service/privacy-policy-dialog';
 import { getSuccessPopupHtml } from './check-availability-popup.template';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { I18nService } from '../../service/i18n';
 import flatpickr from 'flatpickr';
 import Swal from 'sweetalert2';
 
@@ -22,13 +24,14 @@ const RECAPTCHA_SITE_KEY: string = '6Ld6vqwsAAAAAEaQhbmrjCwTAxTNqH64GCr0qMmZ';
 @Component({
   selector: 'app-check-availability',
   standalone: true,
-        imports: [CommonModule],
+                imports: [CommonModule, TranslatePipe],
   templateUrl: './check-availability.html',
   styleUrl: './check-availability.scss'
 })
 export class CheckAvailability implements AfterViewInit {
     private inquiryService = inject(InquiryService);
-        private privacyPolicyDialog = inject(PrivacyPolicyDialogService);
+                private privacyPolicyDialog = inject(PrivacyPolicyDialogService);
+                private i18n = inject(I18nService);
 
     @ViewChild('fullName') fullNameInput!: ElementRef;
     @ViewChild('email') emailInput!: ElementRef;
@@ -195,13 +198,13 @@ export class CheckAvailability implements AfterViewInit {
     private getRecaptchaToken(): Promise<string> {
       return new Promise((resolve, reject) => {
                 if (RECAPTCHA_SITE_KEY === 'YOUR_SITE_KEY') {
-                    reject(new Error('reCAPTCHA site key is not configured. Set RECAPTCHA_SITE_KEY in check-availability.ts and index.html.'));
+                                        reject(new Error(this.i18n.t('checkAvailability.alerts.recaptchaConfigError')));
                     return;
                 }
 
         const grecaptcha = window.grecaptcha;
         if (!grecaptcha) {
-          reject(new Error('reCAPTCHA script not loaded'));
+                    reject(new Error(this.i18n.t('checkAvailability.alerts.recaptchaScriptMissing')));
           return;
         }
 
@@ -221,7 +224,7 @@ export class CheckAvailability implements AfterViewInit {
 
     if (!hasCheckIn || !hasCheckOut) {
         Swal.fire({
-            title: 'Please select both check-in and check-out dates.',
+            title: this.i18n.t('checkAvailability.alerts.missingDates.title'),
             icon: 'warning',
             confirmButtonColor: '#003366'
         });
@@ -246,12 +249,20 @@ export class CheckAvailability implements AfterViewInit {
       this.inquiryService.createInquiry(inquiryData).subscribe({
           next: (response) => {
               Swal.fire({
-                  title: `Hello, ${firstName}`,
+                  title: this.i18n.t('checkAvailability.popup.greeting', { firstName }),
                   icon: 'success',
                   iconColor: '#003366',
                   width: '600px',
-                  html: getSuccessPopupHtml(inquiryData.email),
-                  confirmButtonText: 'Close',
+                  html: getSuccessPopupHtml(inquiryData.email, {
+                      thankYou: this.i18n.t('checkAvailability.popup.thankYou'),
+                      apartmentName: this.i18n.t('checkAvailability.popup.apartmentName'),
+                      inquiryReceived: this.i18n.t('checkAvailability.popup.inquiryReceived'),
+                      emailSent: this.i18n.t('checkAvailability.popup.emailSent'),
+                      followUp: this.i18n.t('checkAvailability.popup.followUp'),
+                      spamHint: this.i18n.t('checkAvailability.popup.spamHint'),
+                      team: this.i18n.t('checkAvailability.popup.team')
+                  }),
+                  confirmButtonText: this.i18n.t('common.close'),
                   confirmButtonColor: '#003366',
                   background: '#ffffff',
                   showClass: {
@@ -262,8 +273,8 @@ export class CheckAvailability implements AfterViewInit {
           },
           error: (err) => {
               Swal.fire({
-                  title: 'Something went wrong',
-                  text: 'We could not send your inquiry. Please try again later.',
+                  title: this.i18n.t('checkAvailability.alerts.submissionError.title'),
+                  text: this.i18n.t('checkAvailability.alerts.submissionError.text'),
                   icon: 'error',
                   confirmButtonColor: '#003366'
               });
@@ -272,8 +283,8 @@ export class CheckAvailability implements AfterViewInit {
       });
     }).catch((error) => {
       Swal.fire({
-        title: 'reCAPTCHA error',
-        text: 'Could not verify reCAPTCHA. Please try again later.',
+                title: this.i18n.t('checkAvailability.alerts.recaptchaError.title'),
+                text: this.i18n.t('checkAvailability.alerts.recaptchaError.text'),
         icon: 'error',
         confirmButtonColor: '#003366'
       });

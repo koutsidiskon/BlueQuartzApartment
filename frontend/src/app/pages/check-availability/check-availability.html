@@ -1,8 +1,8 @@
 <section id="check-availability-section" class="check-availability-section">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">Check Availability</h2>
-      <p class="section-subtitle">Browse our calendar and secure your dates at Blue Quartz Apartment.</p>
+      <h2 class="section-title">{{ 'checkAvailability.title' | t }}</h2>
+      <p class="section-subtitle">{{ 'checkAvailability.subtitle' | t }}</p>
     </div>
 
     <div class="availability-content-grid">
@@ -12,41 +12,41 @@
         
         <div class="form-row">
           <div class="form-group">
-            <label for="fullName">Full Name*</label>
-            <input #fullName type="text" id="fullName" placeholder="Your Name" required>
+            <label for="fullName">{{ 'checkAvailability.form.fullName' | t }}</label>
+            <input #fullName type="text" id="fullName" [attr.placeholder]="'checkAvailability.form.fullNamePlaceholder' | t" required>
           </div>
           <div class="form-group">
-            <label for="email">Email Address*</label>
-            <input #email type="email" id="email" placeholder="you@example.com" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label for="checkIn">Check-in*</label>
-            <div class="date-input-wrapper">
-              <input type="text" id="checkIn" autocomplete="off"  #checkInPicker  placeholder="Select Check-in date" required>
-              <span class="material-icons date-icon">calendar_today</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="checkOut">Check-out*</label>
-            <div class="date-input-wrapper">
-              <input type="text" id="checkOut" #checkOutPicker autocomplete="off" placeholder="Select Check-out date" required>
-              <span class="material-icons date-icon">calendar_today</span>
-            </div>
+            <label for="email">{{ 'checkAvailability.form.email' | t }}</label>
+            <input #email type="email" id="email" [attr.placeholder]="'checkAvailability.form.emailPlaceholder' | t" required>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="guests">Number of Guests*</label>
+            <label for="checkIn">{{ 'checkAvailability.form.checkIn' | t }}</label>
+            <div class="date-input-wrapper">
+              <input type="text" id="checkIn" autocomplete="off"  #checkInPicker [attr.placeholder]="'checkAvailability.form.checkInPlaceholder' | t" required>
+              <span class="material-icons date-icon">calendar_today</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="checkOut">{{ 'checkAvailability.form.checkOut' | t }}</label>
+            <div class="date-input-wrapper">
+              <input type="text" id="checkOut" #checkOutPicker autocomplete="off" [attr.placeholder]="'checkAvailability.form.checkOutPlaceholder' | t" required>
+              <span class="material-icons date-icon">calendar_today</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="guests">{{ 'checkAvailability.form.guests' | t }}</label>
             <div class="select-wrapper">
               <select #guests id="guests" required>
-                <option value="1">1 Guest</option>
-                <option value="2">2 Guests</option>
-                <option value="3">3 Guests</option>
-                <option value="4">4 Guests</option>
+                <option value="1">{{ 'checkAvailability.form.guests1' | t }}</option>
+                <option value="2">{{ 'checkAvailability.form.guests2' | t }}</option>
+                <option value="3">{{ 'checkAvailability.form.guests3' | t }}</option>
+                <option value="4">{{ 'checkAvailability.form.guests4' | t }}</option>
               </select>
             </div>
           </div>
@@ -56,12 +56,12 @@
         </div>
 
         <div class="form-group">
-          <label for="message">Your Inquiry</label>
-          <textarea #message id="message" rows="4" placeholder="How can we help you? Tell us a bit about your stay..."></textarea>
+          <label for="message">{{ 'checkAvailability.form.inquiry' | t }}</label>
+          <textarea #message id="message" rows="4" [attr.placeholder]="'checkAvailability.form.inquiryPlaceholder' | t"></textarea>
         </div>
 
         <div class="honeypot-wrapper" aria-hidden="true">
-          <label for="website">Website</label>
+          <label for="website">{{ 'checkAvailability.form.honeypot' | t }}</label>
           <input
             #botField
             class="honeypot-field"
@@ -77,22 +77,22 @@
           <label class="checkbox-label" for="gdprConsent">
             <input type="checkbox" id="gdprConsent" required>
             <span>
-              * I agree to the storage and processing of my personal data for this booking inquiry according to the
-              <a href="/privacy-policy.html" (click)="openPrivacyPolicy($event)">Privacy Policy</a>.
+              {{ 'checkAvailability.form.gdprPrefix' | t }}
+              <a href="/privacy-policy.html" (click)="openPrivacyPolicy($event)">{{ 'common.privacyPolicy' | t }}</a>{{ 'checkAvailability.form.gdprSuffix' | t }}
             </span>
           </label>
         </div>
 
         <div class="form-submit">
-          <button type="submit" class="btn-submit">Send Inquiry <span class="material-icons">send</span></button>
+          <button type="submit" class="btn-submit">{{ 'checkAvailability.form.submit' | t }} <span class="material-icons">send</span></button>
         </div>
 
         <p class="recaptcha-notice">
-          This site is protected by reCAPTCHA and the Google
-          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-          and
-          <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>
-          apply.
+          {{ 'checkAvailability.form.recaptchaPrefix' | t }}
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">{{ 'common.privacyPolicy' | t }}</a>
+          {{ 'checkAvailability.form.recaptchaAnd' | t }}
+          <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">{{ 'common.termsOfService' | t }}</a>
+          {{ 'checkAvailability.form.recaptchaApply' | t }}
         </p>
 
       </form>
@@ -112,11 +112,11 @@
       <div class="calendar-legend">
         <label class="legend-item">
           <input type="radio" disabled checked class="legend-radio available-radio">
-          <span>Available</span>
+          <span>{{ 'checkAvailability.calendar.available' | t }}</span>
         </label>
         <label class="legend-item">
           <input type="radio" disabled class="legend-radio booked-radio">
-          <span>Booked</span>
+          <span>{{ 'checkAvailability.calendar.booked' | t }}</span>
         </label>
       </div>
     </div>

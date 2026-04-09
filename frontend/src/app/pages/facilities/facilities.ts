@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { finalize, retry, timer, timeout } from 'rxjs';
 import { ImageService, HouseImage } from '../../service/image'; 
 import { FullscreenGallery } from '../../shared/fullscreen-gallery/fullscreen-gallery';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { I18nService } from '../../service/i18n';
 
 interface AmenityFeature {
   icon: string;
@@ -12,14 +14,13 @@ interface AmenityFeature {
 
 interface HouseRule {
   icon: string;
-  title: string;
-  description: string;
+  key: string;
 }
 
 @Component({
   selector: 'app-facilities',
   standalone: true,
-  imports: [CommonModule, RouterLink, FullscreenGallery],
+  imports: [CommonModule, RouterLink, FullscreenGallery, TranslatePipe],
   templateUrl: './facilities.html',
   styleUrls: ['./facilities.scss']
 })
@@ -33,49 +34,42 @@ export class Facilities implements OnInit {
   houseRules: HouseRule[] = [
     {
       icon: 'smoke_free',
-      title: 'No Smoking Indoors',
-      description: 'Smoking is strictly prohibited inside the apartment. You may use outdoor areas responsibly.'
+      key: 'noSmoking'
     },
     {
       icon: 'celebration',
-      title: 'No Parties or Events',
-      description: 'Parties and loud gatherings are not allowed to protect the space and respect the neighborhood.'
+      key: 'noParties'
     },
     {
       icon: 'nightlight',
-      title: 'Respect Quiet Hours',
-      description: 'Please keep noise low during local quiet hours and be considerate of nearby residents.'
+      key: 'quietHours'
     },
     {
       icon: 'login',
-      title: 'Check-In After 15:00',
-      description: 'Arrival is available after 3:00 PM so the apartment can be fully cleaned and prepared.'
+      key: 'checkIn'
     },
     {
       icon: 'logout',
-      title: 'Check-Out Before 10:00',
-      description: 'Departure is before 10:00 AM to allow enough time for cleaning before the next guests.'
+      key: 'checkOut'
     },
     {
       icon: 'build_circle',
-      title: 'Report Any Damage',
-      description: 'Please inform the hosts immediately about any damage. Extensive damage may require compensation.'
+      key: 'damage'
     },
     {
       icon: 'group',
-      title: 'Registered Guests Only',
-      description: 'Only guests included in the reservation are allowed to stay overnight in the property.'
+      key: 'registeredGuests'
     },
     {
       icon: 'lock',
-      title: 'Keep the Home Secure',
-      description: 'Lock doors and switch off air conditioning and appliances when leaving the apartment.'
+      key: 'secureHome'
     }
   ];
 
   constructor(
     private imageService: ImageService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private i18n: I18nService
   ) {}
 
   ngOnInit(): void {
@@ -107,7 +101,7 @@ export class Facilities implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.loadError = 'Unable to load images right now. Please try again in a moment.';
+        this.loadError = this.i18n.t('facilitiesPage.status.loadError');
         console.error('Failed to load images from API.', err);
       }
     });
@@ -132,75 +126,46 @@ export class Facilities implements OnInit {
   // Helper methods to get contents 
 
   getCategoryLabel(cat: string): string {
-    const labels: any = {
-      'bedroom': 'Sleep & Rest',
-      'living-room': 'Relaxation',
-      'kitchen': 'Gastronomy',
-      'bathroom': 'Wellness',
-      'veranda': 'Vistas'
-    };
-    return labels[cat] || 'Exclusive Amenities';
+    return this.i18n.t(
+      `facilitiesPage.categories.${cat}`,
+      undefined,
+      this.i18n.t('facilitiesPage.categories.default')
+    );
   }
 
   getRoomTitle(cat: string): string {
-    const titles: any = {
-      'bedroom': 'The Master Suite',
-      'living-room': 'The Living Space',
-      'kitchen': 'Gourmet Kitchen',
-      'bathroom': 'The Quartz Bathroom',
-      'veranda': 'Sea-view Veranda'
-    };
-    return titles[cat] || 'Luxury Space';
+    return this.i18n.t(
+      `facilitiesPage.titles.${cat}`,
+      undefined,
+      this.i18n.t('facilitiesPage.titles.default')
+    );
   }
 
   getRoomDescription(cat: string): string {
-    const descriptions: any = {
-      'bedroom': 'Immerse yourself in a serene master suite designed for deep rest and effortless comfort. Soft textures, carefully selected linens, and blackout curtains create a calm atmosphere, while thoughtful details make every evening feel peaceful and every morning feel refreshing.',
-      'living-room': 'Our spacious living area invites you to unwind in style, with a generous corner sofa, warm ambient lighting, and an elegant open layout that connects comfort with sophistication. It is the ideal setting for slow mornings, family moments, or relaxed evenings after the beach.',
-      'kitchen': 'The gourmet kitchen combines modern aesthetics with practical functionality, fully equipped for everything from quick breakfasts to complete home-cooked dinners. Premium appliances, quality cookware, and a clean design ensure a smooth and enjoyable cooking experience.',
-      'bathroom': 'Step into a refined bathroom experience where minimalist design meets everyday luxury. The walk-in rainfall shower, quality amenities, and soothing atmosphere are crafted to help you reset, recharge, and enjoy a true sense of wellness throughout your stay.',
-      'veranda': 'The sea-view veranda is your private front-row seat to the natural beauty of Thassos. Enjoy sunrise coffee, golden-hour relaxation, and peaceful evenings with a gentle breeze, surrounded by open views that make every moment feel memorable.'
-    };
-    return descriptions[cat] || 'Experience absolute comfort in our premises.';
+    return this.i18n.t(
+      `facilitiesPage.descriptions.${cat}`,
+      undefined,
+      this.i18n.t('facilitiesPage.descriptions.default')
+    );
   }
 
   getFeatures(cat: string): AmenityFeature[] {
-    const features: Record<string, AmenityFeature[]> = {
-      'bedroom': [
-        { icon: 'king_bed', label: 'Master bedroom with premium mattress' },
-        { icon: 'curtains', label: 'Blackout curtains for restful sleep' },
-        { icon: 'checkroom', label: 'Iron and ironing board' },
-        { icon: 'local_laundry_service', label: 'Washing machine on the back balcony' },
-        { icon: 'bed', label: 'Extra pillows, blankets, and fresh linens' }
-      ],
-      'living-room': [
-        { icon: 'weekend', label: 'Large corner sofa for comfortable lounging' },
-        { icon: 'bed', label: 'Convertible sofa for extra sleeping space' },
-        { icon: 'tv', label: 'Smart TV with streaming, including Netflix' },
-        { icon: 'wifi', label: 'High-speed Wi-Fi throughout the entire property' }
-      ],
-      'kitchen': [
-        { icon: 'kitchen', label: 'Fully equipped kitchen with complete cookware' },
-        { icon: 'soup_kitchen', label: 'Pots, pans, oven trays, and essential utensils' },
-        { icon: 'wine_bar', label: 'Water and wine glasses with full tableware set' },
-        { icon: 'coffee_maker', label: 'Espresso machine, kettle, and coffee filters' },
-        { icon: 'local_dining', label: 'Dishwasher for quick and effortless cleanup' }
-      ],
-      'bathroom': [
-        { icon: 'shower', label: 'Shampoo, conditioner, and body wash' },
-        { icon: 'soap', label: 'Hand soap and fresh toilet paper' },
-        { icon: 'mode_fan', label: 'Hair dryer available for daily use' },
-        { icon: 'cleaning_services', label: 'Cleaning products available if needed' }
-      ],
-      'veranda': [
-        { icon: 'table_restaurant', label: 'Outdoor table with comfortable chairs for dining and relaxing' },
-        { icon: 'wb_twilight', label: 'Open sea view with beautiful sunset moments' },
-        { icon: 'air', label: 'Fresh coastal breeze for calm mornings and peaceful nights' }
-      ]
+    const featureIcons: Record<string, string[]> = {
+      'bedroom': ['king_bed', 'curtains', 'checkroom', 'local_laundry_service', 'bed'],
+      'living-room': ['weekend', 'bed', 'tv', 'wifi'],
+      'kitchen': ['kitchen', 'soup_kitchen', 'wine_bar', 'coffee_maker', 'local_dining'],
+      'bathroom': ['shower', 'soap', 'mode_fan', 'cleaning_services'],
+      'veranda': ['table_restaurant', 'wb_twilight', 'air']
     };
 
-    return features[cat] || [
-      { icon: 'star', label: 'Premium amenities with carefully selected details' }
-    ];
+    const labels = this.i18n.tArray(`facilitiesPage.features.${cat}`);
+    const fallbackLabels = this.i18n.tArray('facilitiesPage.features.default');
+    const resolvedLabels = labels.length ? labels : fallbackLabels;
+    const icons = featureIcons[cat] || ['star'];
+
+    return resolvedLabels.map((label, index) => ({
+      icon: icons[index] || icons[icons.length - 1] || 'star',
+      label
+    }));
   }
 }

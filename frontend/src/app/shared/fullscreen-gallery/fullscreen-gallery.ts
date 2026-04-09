@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import {Component,EventEmitter,HostListener,Input,OnChanges,OnDestroy,Output,SimpleChanges} from '@angular/core';
 import { HouseImage } from '../../service/image';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-fullscreen-gallery',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './fullscreen-gallery.html',
   styleUrl: './fullscreen-gallery.scss',
 })

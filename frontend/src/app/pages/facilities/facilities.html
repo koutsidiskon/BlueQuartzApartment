@@ -1,9 +1,9 @@
 <div class="facilities-page">
-  
+
   <header class="minimal-header">
     <div class="container">
-      <span class="category">Exclusive Amenities</span>
-      <h1>Experience Excellence</h1>
+      <span class="category">{{ 'facilitiesPage.header.category' | t }}</span>
+      <h1>{{ 'facilitiesPage.header.title' | t }}</h1>
       <div class="divider"></div>
     </div>
   </header>
@@ -11,34 +11,34 @@
   <section class="details-section">
     <div class="container">
       @if (isLoading) {
-        <p class="status-message">Loading amenities...</p>
+        <p class="status-message">{{ 'facilitiesPage.status.loading' | t }}</p>
       }
 
       @if (loadError) {
         <div class="status-message">
           <p>{{ loadError }}</p>
           <button class="btn-book-now" type="button" (click)="retryLoadImages()">
-            <span>Try Again</span>
+            <span>{{ 'common.tryAgain' | t }}</span>
             <span class="material-icons">refresh</span>
           </button>
         </div>
       }
 
       @if (!isLoading && !loadError && roomGroups.length === 0) {
-        <p class="status-message">No photos available yet. Please check back soon.</p>
+        <p class="status-message">{{ 'facilitiesPage.status.empty' | t }}</p>
       }
-      
+
       @for (room of roomGroups; track room.category; let odd = $odd) {
-        
+
         <div class="detail-row" [ngClass]="{'reverse': odd}">
-          
+
           <div class="detail-text">
             <span class="category">{{ getCategoryLabel(room.category) }}</span>
             <h2>{{ getRoomTitle(room.category) }}</h2>
             <p>{{ getRoomDescription(room.category) }}</p>
 
             <div class="amenity-block">
-              <h3 class="amenity-title">What this space offers</h3>
+              <h3 class="amenity-title">{{ 'facilitiesPage.amenityTitle' | t }}</h3>
               <ul class="feature-list">
                 @for (feat of getFeatures(room.category); track feat.label) {
                   <li class="feature-item">
@@ -51,15 +51,15 @@
           </div>
 
           @if (room.images.length > 1) {
-            
+
             <div class="image-grid-collage">
               @for (photo of room.images; track photo.url; let i = $index) {
                 <button
                   type="button"
                   class="gallery-photo-trigger"
                   [ngClass]="{
-                    'img-main': i === 0, 
-                    'img-sub-1': i === 1, 
+                    'img-main': i === 0,
+                    'img-sub-1': i === 1,
                     'img-sub-2': i === 2
                   }"
                   (click)="openViewerByUrl(photo.url, $event)">
@@ -69,7 +69,7 @@
             </div>
 
           } @else if (room.images.length === 1) {
-            
+
             <div class="single-image-layout">
               <button type="button" class="gallery-photo-trigger" (click)="openViewerByUrl(room.images[0].url, $event)">
                 <img [src]="room.images[0].url" [alt]="room.images[0].caption || room.category">
@@ -81,21 +81,21 @@
         </div>
       }
 
-      <section class="house-rules" aria-label="House rules">
+      <section class="house-rules" [attr.aria-label]="'facilitiesPage.houseRules.ariaLabel' | t">
         <div class="rules-header">
-          <span class="category">House Rules</span>
-          <h2>Good to Know Before You Arrive</h2>
+          <span class="category">{{ 'facilitiesPage.houseRules.category' | t }}</span>
+          <h2>{{ 'facilitiesPage.houseRules.title' | t }}</h2>
           <p>
-            These simple rules help us keep the apartment clean, peaceful, and ready for every guest.
+            {{ 'facilitiesPage.houseRules.description' | t }}
           </p>
         </div>
 
         <div class="rules-grid">
-          @for (rule of houseRules; track rule.title) {
+          @for (rule of houseRules; track rule.key) {
             <article class="rule-card">
               <span class="material-icons">{{ rule.icon }}</span>
-              <h3>{{ rule.title }}</h3>
-              <p>{{ rule.description }}</p>
+              <h3>{{ ('facilitiesPage.rules.' + rule.key + '.title') | t }}</h3>
+              <p>{{ ('facilitiesPage.rules.' + rule.key + '.description') | t }}</p>
             </article>
           }
         </div>
@@ -103,7 +103,7 @@
 
       <div class="book-now-container">
         <a class="btn-book-now" routerLink="/" fragment="check-availability-section">
-          <span>Book Your Getaway</span>
+          <span>{{ 'facilitiesPage.bookNow' | t }}</span>
           <span class="material-icons">event_available</span>
         </a>
       </div>
@@ -116,5 +116,5 @@
   [images]="viewerImages"
   [(isOpen)]="isViewerOpen"
   [(activeIndex)]="viewerIndex"
-  altPrefix="Amenities photo">
+  [altPrefix]="'facilitiesPage.viewerAltPrefix' | t">
 </app-fullscreen-gallery>

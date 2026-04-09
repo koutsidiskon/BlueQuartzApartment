@@ -1,9 +1,9 @@
 <nav [class.scrolled]="isScrolled" [class.force-white]="isFacilitiesPage">
   <a routerLink="/" fragment="home-top" class="logo">
-    <img src="logo.png" alt="Blue Quartz Apartment logo" class="logo-mark">
+    <img src="logo.png" [attr.alt]="'app.logoAlt' | t" class="logo-mark">
     <span class="logo-text">
-      <span class="brand-name">The Blue Quartz</span>
-      <span class="brand-sub">Apartment Limenas Thassos</span>
+      <span class="brand-name">{{ 'app.brandName' | t }}</span>
+      <span class="brand-sub">{{ 'app.brandSub' | t }}</span>
     </span>
   </a>
 
@@ -11,36 +11,36 @@
     <div class="nav-tabs" [class.open]="menuOpen">
         <a routerLink="/" fragment="home-top" 
           (click)="setActive('home-top')"
-          [class.active]="currentSection === 'home-top' && !isFacilitiesPage">Home</a>
+          [class.active]="currentSection === 'home-top' && !isFacilitiesPage">{{ 'common.home' | t }}</a>
           
         <a [routerLink]="isFacilitiesPage ? [] : ['/']" 
           [fragment]="isFacilitiesPage ? undefined : 'facilities-section'"
           [class.active]="isFacilitiesPage || currentSection === 'facilities-section'"
           [style.pointer-events]="isFacilitiesPage ? 'none' : 'auto'"
           [style.cursor]="isFacilitiesPage ? 'default' : 'pointer'">
-          Facilities
+          {{ 'common.facilities' | t }}
         </a>
                   
         <a routerLink="/" fragment="check-availability-section" 
           (click)="setActive('check-availability-section')"
-          [class.active]="currentSection === 'check-availability-section'&& !isFacilitiesPage">Check Availability</a>
+          [class.active]="currentSection === 'check-availability-section'&& !isFacilitiesPage">{{ 'common.checkAvailability' | t }}</a>
 
         <a routerLink="/" fragment="find-us-section" 
           (click)="setActive('find-us-section')"
-          [class.active]="currentSection === 'find-us-section'&& !isFacilitiesPage">Find Us</a>
+          [class.active]="currentSection === 'find-us-section'&& !isFacilitiesPage">{{ 'common.findUs' | t }}</a>
 
-        <div class="nav-mobile-icons" aria-label="Quick links">
-          <a class="icon-link" href="https://www.instagram.com/bluequartzapartment/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+        <div class="nav-mobile-icons" [attr.aria-label]="'app.quickLinksAria' | t">
+          <a class="icon-link" href="https://www.instagram.com/bluequartzapartment/" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'common.instagram' | t">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2zm0 1.8A3.95 3.95 0 0 0 3.8 7.75v8.5a3.95 3.95 0 0 0 3.95 3.95h8.5a3.95 3.95 0 0 0 3.95-3.95v-8.5a3.95 3.95 0 0 0-3.95-3.95h-8.5zm8.92 1.34a1.18 1.18 0 1 1-1.18 1.18 1.18 1.18 0 0 1 1.18-1.18zM12 7a5 5 0 1 1-5 5 5 5 0 0 1 5-5zm0 1.8A3.2 3.2 0 1 0 15.2 12 3.2 3.2 0 0 0 12 8.8z"/>
             </svg>
           </a>
 
-          <a class="icon-link" href="https://www.booking.com/hotel/gr/the-blue-quartz-limenas-thassos-limenas-thasou.el.html?aid=1610694&label=dubai-Scfkx0pXrZ1LOid9XRfjEgS502703446269%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-127603305%3Alp20368%3Ali%3Adec%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YfqnDqqG8nt1JmEaiQKil3Y&sid=2edc40887d710187a126966fcde23ab7&all_sr_blocks=895165501_360021975_4_0_0&checkin=2026-09-09&checkout=2026-09-16&dest_id=8951655&dest_type=hotel&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=895165501_360021975_4_0_0&hpos=1&matching_block_id=895165501_360021975_4_0_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=895165501_360021975_4_0_0__99572&srepoch=1775478554&srpvid=269e57cbd16c05e9&type=total&ucfs=1&" target="_blank" rel="noopener noreferrer" aria-label="Booking">
+          <a class="icon-link" href="https://www.booking.com/hotel/gr/the-blue-quartz-limenas-thassos-limenas-thasou.el.html?aid=1610694&label=dubai-Scfkx0pXrZ1LOid9XRfjEgS502703446269%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-127603305%3Alp20368%3Ali%3Adec%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YfqnDqqG8nt1JmEaiQKil3Y&sid=2edc40887d710187a126966fcde23ab7&all_sr_blocks=895165501_360021975_4_0_0&checkin=2026-09-09&checkout=2026-09-16&dest_id=8951655&dest_type=hotel&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=895165501_360021975_4_0_0&hpos=1&matching_block_id=895165501_360021975_4_0_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=895165501_360021975_4_0_0__99572&srepoch=1775478554&srpvid=269e57cbd16c05e9&type=total&ucfs=1&" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'common.booking' | t">
             <span class="booking-badge" aria-hidden="true">B</span>
           </a>
 
-          <a class="icon-link" href="https://www.google.com/maps?q=Miaouli+28,+Limenas+Thassos" target="_blank" rel="noopener noreferrer" aria-label="Directions">
+          <a class="icon-link" href="https://www.google.com/maps?q=Miaouli+28,+Limenas+Thassos" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'common.directions' | t">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
               <path d="M12 2a7 7 0 0 1 7 7c0 4.82-6.08 11.94-6.34 12.24a.86.86 0 0 1-1.32 0C11.08 20.94 5 13.82 5 9a7 7 0 0 1 7-7zm0 2a5 5 0 0 0-5 5c0 3.17 3.61 8.2 5 9.93 1.39-1.73 5-6.76 5-9.93a5 5 0 0 0-5-5zm0 2.7A2.3 2.3 0 1 1 9.7 9 2.3 2.3 0 0 1 12 6.7z"/>
             </svg>
@@ -49,18 +49,18 @@
     </div>
 
     <div class="nav-actions">
-      <div class="nav-external-links" aria-label="Quick links">
-        <a class="icon-link" href="https://www.instagram.com/bluequartzapartment/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+      <div class="nav-external-links" [attr.aria-label]="'app.quickLinksAria' | t">
+        <a class="icon-link" href="https://www.instagram.com/bluequartzapartment/" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'common.instagram' | t">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2zm0 1.8A3.95 3.95 0 0 0 3.8 7.75v8.5a3.95 3.95 0 0 0 3.95 3.95h8.5a3.95 3.95 0 0 0 3.95-3.95v-8.5a3.95 3.95 0 0 0-3.95-3.95h-8.5zm8.92 1.34a1.18 1.18 0 1 1-1.18 1.18 1.18 1.18 0 0 1 1.18-1.18zM12 7a5 5 0 1 1-5 5 5 5 0 0 1 5-5zm0 1.8A3.2 3.2 0 1 0 15.2 12 3.2 3.2 0 0 0 12 8.8z"/>
           </svg>
         </a>
 
-        <a class="icon-link" href="https://www.booking.com/hotel/gr/the-blue-quartz-limenas-thassos-limenas-thasou.el.html?aid=1610694&label=dubai-Scfkx0pXrZ1LOid9XRfjEgS502703446269%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-127603305%3Alp20368%3Ali%3Adec%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YfqnDqqG8nt1JmEaiQKil3Y&sid=2edc40887d710187a126966fcde23ab7&all_sr_blocks=895165501_360021975_4_0_0&checkin=2026-09-09&checkout=2026-09-16&dest_id=8951655&dest_type=hotel&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=895165501_360021975_4_0_0&hpos=1&matching_block_id=895165501_360021975_4_0_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=895165501_360021975_4_0_0__99572&srepoch=1775478554&srpvid=269e57cbd16c05e9&type=total&ucfs=1&" target="_blank" rel="noopener noreferrer" aria-label="Booking">
+        <a class="icon-link" href="https://www.booking.com/hotel/gr/the-blue-quartz-limenas-thassos-limenas-thasou.el.html?aid=1610694&label=dubai-Scfkx0pXrZ1LOid9XRfjEgS502703446269%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-127603305%3Alp20368%3Ali%3Adec%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YfqnDqqG8nt1JmEaiQKil3Y&sid=2edc40887d710187a126966fcde23ab7&all_sr_blocks=895165501_360021975_4_0_0&checkin=2026-09-09&checkout=2026-09-16&dest_id=8951655&dest_type=hotel&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=895165501_360021975_4_0_0&hpos=1&matching_block_id=895165501_360021975_4_0_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=895165501_360021975_4_0_0__99572&srepoch=1775478554&srpvid=269e57cbd16c05e9&type=total&ucfs=1&" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'common.booking' | t">
           <span class="booking-badge" aria-hidden="true">B</span>
         </a>
 
-        <a class="icon-link" href="https://www.google.com/maps?q=Miaouli+28,+Limenas+Thassos" target="_blank" rel="noopener noreferrer" aria-label="Directions">
+        <a class="icon-link" href="https://www.google.com/maps?q=Miaouli+28,+Limenas+Thassos" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'common.directions' | t">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M12 2a7 7 0 0 1 7 7c0 4.82-6.08 11.94-6.34 12.24a.86.86 0 0 1-1.32 0C11.08 20.94 5 13.82 5 9a7 7 0 0 1 7-7zm0 2a5 5 0 0 0-5 5c0 3.17 3.61 8.2 5 9.93 1.39-1.73 5-6.76 5-9.93a5 5 0 0 0-5-5zm0 2.7A2.3 2.3 0 1 1 9.7 9 2.3 2.3 0 0 1 12 6.7z"/>
           </svg>
@@ -82,24 +82,24 @@
   <div class="footer-inner">
     <div class="footer-brand-block">
       <h3>
-        <a [routerLink]="['/']" fragment="home-top" class="footer-brand-link">Blue Quartz Apartment</a>
+        <a [routerLink]="['/']" fragment="home-top" class="footer-brand-link">{{ 'app.footer.brand' | t }}</a>
       </h3>
-      <p>Limenas Thassos, Greece</p>
+      <p>{{ 'app.footer.location' | t }}</p>
     </div>
 
     <div class="footer-links">
-      <div class="footer-external-links" aria-label="External links">
-        <a class="icon-link" href="https://www.instagram.com/bluequartzapartment/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+      <div class="footer-external-links" [attr.aria-label]="'app.externalLinksAria' | t">
+        <a class="icon-link" href="https://www.instagram.com/bluequartzapartment/" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'common.instagram' | t">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M7.75 2h8.5A5.76 5.76 0 0 1 22 7.75v8.5A5.76 5.76 0 0 1 16.25 22h-8.5A5.76 5.76 0 0 1 2 16.25v-8.5A5.76 5.76 0 0 1 7.75 2zm0 1.8A3.95 3.95 0 0 0 3.8 7.75v8.5a3.95 3.95 0 0 0 3.95 3.95h8.5a3.95 3.95 0 0 0 3.95-3.95v-8.5a3.95 3.95 0 0 0-3.95-3.95h-8.5zm8.92 1.34a1.18 1.18 0 1 1-1.18 1.18 1.18 1.18 0 0 1 1.18-1.18zM12 7a5 5 0 1 1-5 5 5 5 0 0 1 5-5zm0 1.8A3.2 3.2 0 1 0 15.2 12 3.2 3.2 0 0 0 12 8.8z"/>
           </svg>
         </a>
 
-        <a class="icon-link" href="https://www.booking.com/hotel/gr/the-blue-quartz-limenas-thassos-limenas-thasou.el.html?aid=1610694&label=dubai-Scfkx0pXrZ1LOid9XRfjEgS502703446269%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-127603305%3Alp20368%3Ali%3Adec%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YfqnDqqG8nt1JmEaiQKil3Y&sid=2edc40887d710187a126966fcde23ab7&all_sr_blocks=895165501_360021975_4_0_0&checkin=2026-09-09&checkout=2026-09-16&dest_id=8951655&dest_type=hotel&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=895165501_360021975_4_0_0&hpos=1&matching_block_id=895165501_360021975_4_0_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=895165501_360021975_4_0_0__99572&srepoch=1775478554&srpvid=269e57cbd16c05e9&type=total&ucfs=1&" target="_blank" rel="noopener noreferrer" aria-label="Booking">
+        <a class="icon-link" href="https://www.booking.com/hotel/gr/the-blue-quartz-limenas-thassos-limenas-thasou.el.html?aid=1610694&label=dubai-Scfkx0pXrZ1LOid9XRfjEgS502703446269%3Apl%3Ata%3Ap1%3Ap2%3Aac%3Aap%3Aneg%3Afi%3Atikwd-127603305%3Alp20368%3Ali%3Adec%3Adm%3Appccp%3DUmFuZG9tSVYkc2RlIyh9YfqnDqqG8nt1JmEaiQKil3Y&sid=2edc40887d710187a126966fcde23ab7&all_sr_blocks=895165501_360021975_4_0_0&checkin=2026-09-09&checkout=2026-09-16&dest_id=8951655&dest_type=hotel&dist=0&group_adults=2&group_children=0&hapos=1&highlighted_blocks=895165501_360021975_4_0_0&hpos=1&matching_block_id=895165501_360021975_4_0_0&no_rooms=1&req_adults=2&req_children=0&room1=A%2CA&sb_price_type=total&sr_order=popularity&sr_pri_blocks=895165501_360021975_4_0_0__99572&srepoch=1775478554&srpvid=269e57cbd16c05e9&type=total&ucfs=1&" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'common.booking' | t">
           <span class="booking-badge" aria-hidden="true">B</span>
         </a>
 
-        <a class="icon-link" href="https://www.google.com/maps?q=Miaouli+28,+Limenas+Thassos" target="_blank" rel="noopener noreferrer" aria-label="Directions">
+        <a class="icon-link" href="https://www.google.com/maps?q=Miaouli+28,+Limenas+Thassos" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'common.directions' | t">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M12 2a7 7 0 0 1 7 7c0 4.82-6.08 11.94-6.34 12.24a.86.86 0 0 1-1.32 0C11.08 20.94 5 13.82 5 9a7 7 0 0 1 7-7zm0 2a5 5 0 0 0-5 5c0 3.17 3.61 8.2 5 9.93 1.39-1.73 5-6.76 5-9.93a5 5 0 0 0-5-5zm0 2.7A2.3 2.3 0 1 1 9.7 9 2.3 2.3 0 0 1 12 6.7z"/>
           </svg>
@@ -107,11 +107,11 @@
       </div>
 
       <div class="footer-site-links">
-        <a [routerLink]="['/']" fragment="home-top">Home</a>
-        <a [routerLink]="['/facilities']">Facilities</a>
-        <a [routerLink]="['/']" fragment="check-availability-section">Check Availability</a>
-        <a [routerLink]="['/']" fragment="find-us-section">Find Us</a>
-        <a href="/privacy-policy.html" (click)="openPrivacyPolicy($event)">Privacy Policy</a>
+        <a [routerLink]="['/']" fragment="home-top">{{ 'common.home' | t }}</a>
+        <a [routerLink]="['/facilities']">{{ 'common.facilities' | t }}</a>
+        <a [routerLink]="['/']" fragment="check-availability-section">{{ 'common.checkAvailability' | t }}</a>
+        <a [routerLink]="['/']" fragment="find-us-section">{{ 'common.findUs' | t }}</a>
+        <a href="/privacy-policy.html" (click)="openPrivacyPolicy($event)">{{ 'common.privacyPolicy' | t }}</a>
       </div>
     </div>
 
@@ -137,8 +137,8 @@
   </div>
 
   <div class="footer-bottom">
-    <span>© {{ currentYear }} Blue Quartz Apartment. All rights reserved.</span>
-    <span><a href="/privacy-policy.html" (click)="openPrivacyPolicy($event)">Privacy Policy</a></span>
-    <span>Designed and developed by <a class="footer-credit-link" href="https://koutsidiskon.github.io/" target="_blank" rel="noopener noreferrer">Konstantinos Koutsidis</a></span>
+    <span>{{ 'app.footer.rights' | t : { year: currentYear } }}</span>
+    <span><a href="/privacy-policy.html" (click)="openPrivacyPolicy($event)">{{ 'common.privacyPolicy' | t }}</a></span>
+    <span>{{ 'app.footer.creditPrefix' | t }} <a class="footer-credit-link" href="https://koutsidiskon.github.io/" target="_blank" rel="noopener noreferrer">Konstantinos Koutsidis</a></span>
   </div>
 </footer>

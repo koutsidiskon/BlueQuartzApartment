@@ -1,18 +1,17 @@
 <header class="hero-header" id="home-top">
   <div class="hero-image-container">
-    <img src="images/bedroom1.webp" alt="The Blue Quartz Master Suite" class="hero-image">
+    <img src="images/bedroom1.webp" [attr.alt]="'home.hero.alt' | t" class="hero-image">
     
     <div class="hero-overlay" >
       <div class="hero-content">
-        <span class="hero-badge">Exclusive Cycladic Living</span>
-        <h1 class="hero-title">Crystal Waters,<br><span>Eternal Serenity.</span></h1>
+        <span class="hero-badge">{{ 'home.hero.badge' | t }}</span>
+        <h1 class="hero-title">{{ 'home.hero.titleLine1' | t }}<br><span>{{ 'home.hero.titleLine2' | t }}</span></h1>
         <p class="hero-subtitle">
-          Immerse yourself in the ultimate Aegean escape. Where the deep blue of the sea 
-          meets the pure white of Cycladic architecture.
+          {{ 'home.hero.subtitle' | t }}
         </p>
         <div class="hero-actions">
-          <a class="btn-primary" href="#check-availability-section">Check Availability</a>
-          <button class="btn-secondary" routerLink="/facilities">View Gallery</button>
+          <a class="btn-primary" href="#check-availability-section">{{ 'home.hero.checkAvailability' | t }}</a>
+          <button class="btn-secondary" routerLink="/facilities">{{ 'home.hero.viewGallery' | t }}</button>
         </div>
       </div>
     </div>
@@ -23,21 +22,19 @@
   <div class="container">
     <div class="welcome-grid">
       <div class="text-block">
-        <h2 class="section-title">The Blue Quartz Philosophy</h2>
+        <h2 class="section-title">{{ 'home.philosophy.title' | t }}</h2>
         <p>
-          Inspired by the clarity of quartz crystals and the majestic aesthetics of 
-          world-class luxury, our suite offers a sanctuary of peace. Every detail 
-          has been curated to provide an atmosphere of refined elegance.
+          {{ 'home.philosophy.description' | t }}
         </p>
       </div>
       <div class="stat-block">
         <div class="stat-item">
           <span class="stat-number">01</span>
-          <span class="stat-label">Master Suite</span>
+          <span class="stat-label">{{ 'home.philosophy.masterSuite' | t }}</span>
         </div>
         <div class="stat-item">
           <span class="stat-number">A+</span>
-          <span class="stat-label">Sea View</span>
+          <span class="stat-label">{{ 'home.philosophy.seaView' | t }}</span>
         </div>
       </div>
     </div>
@@ -47,8 +44,8 @@
 <section id="facilities-section" class="facilities-section">
   <div class="container">
     <div class="section-header">
-      <h2 class="section-title">Superior Facilities</h2>
-      <p class="section-subtitle">Everything you need for an unforgettable stay</p>
+      <h2 class="section-title">{{ 'home.facilities.title' | t }}</h2>
+      <p class="section-subtitle">{{ 'home.facilities.subtitle' | t }}</p>
     </div>
 
     <div class="facilities-grid">
@@ -56,52 +53,52 @@
         <div class="icon-box">
           <span class="material-icons">king_bed</span>
         </div>
-        <h3>Master Bedroom</h3>
-        <p>King-size bed with premium anatomic mattress for perfect sleep.</p>
+        <h3>{{ 'home.facilities.cards.bedroom.title' | t }}</h3>
+        <p>{{ 'home.facilities.cards.bedroom.description' | t }}</p>
       </div>
 
       <div class="facility-card">
         <div class="icon-box">
           <span class="material-icons">ac_unit</span>
         </div>
-        <h3>Climate Control</h3>
-        <p>Full air-conditioning and heating for year-round comfort.</p>
+        <h3>{{ 'home.facilities.cards.climate.title' | t }}</h3>
+        <p>{{ 'home.facilities.cards.climate.description' | t }}</p>
       </div>
 
       <div class="facility-card">
         <div class="icon-box">
           <span class="material-icons">tv</span>
         </div>
-        <h3>Entertainment</h3>
-        <p>Smart TV with streaming services and high-speed Wi-Fi.</p>
+        <h3>{{ 'home.facilities.cards.entertainment.title' | t }}</h3>
+        <p>{{ 'home.facilities.cards.entertainment.description' | t }}</p>
       </div>
 
       <div class="facility-card">
         <div class="icon-box">
           <span class="material-icons">deck</span>
         </div>
-        <h3>Sea View Balcony</h3>
-        <p>Private balcony offering sweeping views of the Aegean Sea and unforgettable sunset skies.</p>
+        <h3>{{ 'home.facilities.cards.balcony.title' | t }}</h3>
+        <p>{{ 'home.facilities.cards.balcony.description' | t }}</p>
       </div>
 
       <div class="facility-card">
         <div class="icon-box">
           <span class="material-icons">kitchen</span>
         </div>
-        <h3>Full Kitchen</h3>
-        <p>Equipped with modern appliances to prepare your favorite meals.</p>
+        <h3>{{ 'home.facilities.cards.kitchen.title' | t }}</h3>
+        <p>{{ 'home.facilities.cards.kitchen.description' | t }}</p>
       </div>
     </div>
 
     <div class="facilities-photo-showcase">
       <div class="showcase-header">
-        <h3 class="showcase-title">Gallery Preview</h3>
-        <p class="showcase-subtitle">Browse the apartment spaces at a glance</p>
+        <h3 class="showcase-title">{{ 'home.facilities.showcase.title' | t }}</h3>
+        <p class="showcase-subtitle">{{ 'home.facilities.showcase.subtitle' | t }}</p>
       </div>
 
       @if (isGalleryLoading) {
         <div class="gallery-state-shell" aria-live="polite">
-          <p class="gallery-state">Loading photos...</p>
+          <p class="gallery-state">{{ 'home.facilities.showcase.loading' | t }}</p>
         </div>
       } @else if (galleryPreview.length > 0) {
         <div class="facilities-photo-canvas">
@@ -114,20 +111,20 @@
               [class.wide]="i === 4"
               [class.shift-right]="i === 2"
               (click)="openViewer(i, $event)">
-              <img [src]="photo.url" [alt]="photo.caption || 'Blue Quartz Apartment photo'">
+              <img [src]="photo.url" [alt]="photo.caption || ('home.facilities.photoAltFallback' | t)">
             </button>
           }
         </div>
       } @else {
         <div class="gallery-state-shell">
-          <p class="gallery-state">Photos will appear here soon.</p>
+          <p class="gallery-state">{{ 'home.facilities.showcase.empty' | t }}</p>
         </div>
       }
     </div>
 
     <div class="discover-more-container">
       <button class="btn-discover" routerLink="/facilities">
-        More Details for Your Stay
+        {{ 'home.facilities.discoverMore' | t }}
         <span class="material-icons">arrow_forward</span>
       </button>
     </div>
@@ -139,7 +136,7 @@
   [images]="galleryPreview"
   [(isOpen)]="isViewerOpen"
   [(activeIndex)]="viewerIndex"
-  altPrefix="Blue Quartz photo">
+  [altPrefix]="'home.facilities.viewerAltPrefix' | t">
 </app-fullscreen-gallery>
 
 <app-check-availability></app-check-availability>

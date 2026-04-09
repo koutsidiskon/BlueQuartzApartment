@@ -3,11 +3,12 @@ import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router
 import { CommonModule } from '@angular/common';
 import { PrivacyPolicyDialogService } from './service/privacy-policy-dialog';
 import { filter } from 'rxjs/operators';
+import { TranslatePipe } from './pipes/translate.pipe';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, CommonModule],
+  imports: [RouterOutlet, RouterLink, CommonModule, TranslatePipe],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
