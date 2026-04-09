@@ -36,12 +36,18 @@
             <span class="category">{{ getCategoryLabel(room.category) }}</span>
             <h2>{{ getRoomTitle(room.category) }}</h2>
             <p>{{ getRoomDescription(room.category) }}</p>
-            
-            <ul class="feature-list">
-              @for (feat of getFeatures(room.category); track feat) {
-                <li><span class="material-icons">check</span> {{ feat }}</li>
-              }
-            </ul>
+
+            <div class="amenity-block">
+              <h3 class="amenity-title">What this space offers</h3>
+              <ul class="feature-list">
+                @for (feat of getFeatures(room.category); track feat.label) {
+                  <li class="feature-item">
+                    <span class="amenity-icon material-icons">{{ feat.icon }}</span>
+                    <span class="amenity-label">{{ feat.label }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
           </div>
 
           @if (room.images.length > 1) {
@@ -74,6 +80,26 @@
 
         </div>
       }
+
+      <section class="house-rules" aria-label="House rules">
+        <div class="rules-header">
+          <span class="category">House Rules</span>
+          <h2>Good to Know Before You Arrive</h2>
+          <p>
+            These simple rules help us keep the apartment clean, peaceful, and ready for every guest.
+          </p>
+        </div>
+
+        <div class="rules-grid">
+          @for (rule of houseRules; track rule.title) {
+            <article class="rule-card">
+              <span class="material-icons">{{ rule.icon }}</span>
+              <h3>{{ rule.title }}</h3>
+              <p>{{ rule.description }}</p>
+            </article>
+          }
+        </div>
+      </section>
 
       <div class="book-now-container">
         <a class="btn-book-now" routerLink="/" fragment="check-availability-section">

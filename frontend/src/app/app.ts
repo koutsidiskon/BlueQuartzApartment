@@ -13,6 +13,9 @@ import { filter } from 'rxjs/operators';
 })
 
 export class App implements OnInit {
+  private static readonly HOME_SECTIONS = ['home-top', 'welcome-section', 'facilities-section', 'check-availability-section', 'find-us-section'];
+  private static readonly LAST_HOME_SECTION_KEY = 'lastHomeSection';
+
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
   private privacyPolicyDialog = inject(PrivacyPolicyDialogService);
@@ -23,6 +26,7 @@ export class App implements OnInit {
   isFacilitiesPage = false;
   currentYear = new Date().getFullYear();
   private previousUrl = '';
+  private hasAppliedReloadSectionRestore = false;
 
   // Monitoring scroll events to update the active section and navigation bar 
   @HostListener('window:scroll', [])
@@ -54,6 +58,11 @@ export class App implements OnInit {
       } else {
         this.checkActiveSection(); 
 
+        // On hard refresh, restore by section (not raw pixel) for stable UX.
+        if (!fragment && this.isPageReload() && !this.hasAppliedReloadSectionRestore) {
+          this.restoreSectionAfterReload();
+        }
+
         // When coming from /facilities, re-assert anchor after layout settles.
         if (fromFacilities && fragment) {
           this.ensureFragmentVisibility(fragment);
@@ -75,6 +84,7 @@ export class App implements OnInit {
 
       target.scrollIntoView({ behavior, block: 'start' });
       this.currentSection = fragment;
+      this.rememberHomeSection(fragment);
     };
 
     alignToFragment(firstBehavior);
@@ -85,7 +95,45 @@ export class App implements OnInit {
   // Method to set the active section when a navigation link is clicked in mobile view
   setActive(section: string) {
     this.currentSection = section;
+    this.rememberHomeSection(section);
     this.menuOpen = false; 
+  }
+
+  private restoreSectionAfterReload(): void {
+    this.hasAppliedReloadSectionRestore = true;
+    const storedSection = sessionStorage.getItem(App.LAST_HOME_SECTION_KEY);
+    if (!storedSection || !App.HOME_SECTIONS.includes(storedSection)) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const behavior: ScrollBehavior = prefersReducedMotion ? 'auto' : 'smooth';
+
+    const alignToStoredSection = (scrollBehavior: ScrollBehavior) => {
+      const target = document.getElementById(storedSection);
+      if (!target) return;
+
+      target.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
+      this.currentSection = storedSection;
+      this.rememberHomeSection(storedSection);
+    };
+
+    setTimeout(() => alignToStoredSection(behavior), 120);
+    setTimeout(() => alignToStoredSection('auto'), 520);
+    setTimeout(() => alignToStoredSection('auto'), 980);
+  }
+
+  private rememberHomeSection(section: string): void {
+    if (!this.isFacilitiesPage && App.HOME_SECTIONS.includes(section)) {
+      sessionStorage.setItem(App.LAST_HOME_SECTION_KEY, section);
+    }
+  }
+
+  private isPageReload(): boolean {
+    const navEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    if (navEntry?.type) return navEntry.type === 'reload';
+
+    // Fallback for older browsers.
+    const legacyNav = (performance as any).navigation;
+    return legacyNav && legacyNav.type === 1;
   }
 
   openPrivacyPolicy(event: Event): void {
@@ -95,7 +143,7 @@ export class App implements OnInit {
 
   // check which section is currently in view and update the active section accordingly
   checkActiveSection() {
-    const sections = ['home-top', 'welcome-section', 'facilities-section', 'check-availability-section', 'find-us-section'];
+    const sections = App.HOME_SECTIONS;
     const navHeight = 100;
     let current = 'home-top';
 
@@ -115,6 +163,7 @@ export class App implements OnInit {
 
     if (this.currentSection !== current) {
       this.currentSection = current;
+      this.rememberHomeSection(current);
       this.cdr.detectChanges();
     }
   }

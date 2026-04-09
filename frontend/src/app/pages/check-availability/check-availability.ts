@@ -161,8 +161,7 @@ export class CheckAvailability implements AfterViewInit {
     // Synchronizes the selected date range from the inline calendar to the check-in and check-out pickers
     private syncDateRangeFromInlineCalendar(selectedDates: Date[]): void {
 
-        if (!this.checkInFp || !this.checkOutFp) 
-            return;
+        if (!this.checkInFp || !this.checkOutFp) return;
 
         this.isSyncingFromInline = true;
         try {

@@ -5,6 +5,17 @@ import { finalize, retry, timer, timeout } from 'rxjs';
 import { ImageService, HouseImage } from '../../service/image'; 
 import { FullscreenGallery } from '../../shared/fullscreen-gallery/fullscreen-gallery';
 
+interface AmenityFeature {
+  icon: string;
+  label: string;
+}
+
+interface HouseRule {
+  icon: string;
+  title: string;
+  description: string;
+}
+
 @Component({
   selector: 'app-facilities',
   standalone: true,
@@ -19,6 +30,48 @@ export class Facilities implements OnInit {
   loadError = '';
   isViewerOpen = false;
   viewerIndex = 0;
+  houseRules: HouseRule[] = [
+    {
+      icon: 'smoke_free',
+      title: 'No Smoking Indoors',
+      description: 'Smoking is strictly prohibited inside the apartment. You may use outdoor areas responsibly.'
+    },
+    {
+      icon: 'celebration',
+      title: 'No Parties or Events',
+      description: 'Parties and loud gatherings are not allowed to protect the space and respect the neighborhood.'
+    },
+    {
+      icon: 'nightlight',
+      title: 'Respect Quiet Hours',
+      description: 'Please keep noise low during local quiet hours and be considerate of nearby residents.'
+    },
+    {
+      icon: 'login',
+      title: 'Check-In After 15:00',
+      description: 'Arrival is available after 3:00 PM so the apartment can be fully cleaned and prepared.'
+    },
+    {
+      icon: 'logout',
+      title: 'Check-Out Before 10:00',
+      description: 'Departure is before 10:00 AM to allow enough time for cleaning before the next guests.'
+    },
+    {
+      icon: 'build_circle',
+      title: 'Report Any Damage',
+      description: 'Please inform the hosts immediately about any damage. Extensive damage may require compensation.'
+    },
+    {
+      icon: 'group',
+      title: 'Registered Guests Only',
+      description: 'Only guests included in the reservation are allowed to stay overnight in the property.'
+    },
+    {
+      icon: 'lock',
+      title: 'Keep the Home Secure',
+      description: 'Lock doors and switch off air conditioning and appliances when leaving the apartment.'
+    }
+  ];
 
   constructor(
     private imageService: ImageService,
@@ -111,14 +164,43 @@ export class Facilities implements OnInit {
     return descriptions[cat] || 'Experience absolute comfort in our premises.';
   }
 
-  getFeatures(cat: string): string[] {
-    const features: any = {
-      'bedroom': ["Extra pillows, blankets and sheets for your comfort",'High-thread count cotton sheets', 'Blackout curtains',"Iron for clothes" ], 
-      'living-room': ['Convertible premium corner sofa', 'Ambient architectural lighting'],
-      'kitchen': ['Nespresso® Vertuo Coffee System', 'Professional-grade cookware'],
-      'bathroom': ['Walk-in rainfall shower', 'Premium organic toiletries'],
-      'veranda': ['Outdoor lounge furniture', 'Unobstructed sea views']
+  getFeatures(cat: string): AmenityFeature[] {
+    const features: Record<string, AmenityFeature[]> = {
+      'bedroom': [
+        { icon: 'king_bed', label: 'Master bedroom with premium mattress' },
+        { icon: 'curtains', label: 'Blackout curtains for restful sleep' },
+        { icon: 'checkroom', label: 'Iron and ironing board' },
+        { icon: 'local_laundry_service', label: 'Washing machine on the back balcony' },
+        { icon: 'bed', label: 'Extra pillows, blankets, and fresh linens' }
+      ],
+      'living-room': [
+        { icon: 'weekend', label: 'Large corner sofa for comfortable lounging' },
+        { icon: 'bed', label: 'Convertible sofa for extra sleeping space' },
+        { icon: 'tv', label: 'Smart TV with streaming, including Netflix' },
+        { icon: 'wifi', label: 'High-speed Wi-Fi throughout the entire property' }
+      ],
+      'kitchen': [
+        { icon: 'kitchen', label: 'Fully equipped kitchen with complete cookware' },
+        { icon: 'soup_kitchen', label: 'Pots, pans, oven trays, and essential utensils' },
+        { icon: 'wine_bar', label: 'Water and wine glasses with full tableware set' },
+        { icon: 'coffee_maker', label: 'Espresso machine, kettle, and coffee filters' },
+        { icon: 'local_dining', label: 'Dishwasher for quick and effortless cleanup' }
+      ],
+      'bathroom': [
+        { icon: 'shower', label: 'Shampoo, conditioner, and body wash' },
+        { icon: 'soap', label: 'Hand soap and fresh toilet paper' },
+        { icon: 'mode_fan', label: 'Hair dryer available for daily use' },
+        { icon: 'cleaning_services', label: 'Cleaning products available if needed' }
+      ],
+      'veranda': [
+        { icon: 'table_restaurant', label: 'Outdoor table with comfortable chairs for dining and relaxing' },
+        { icon: 'wb_twilight', label: 'Open sea view with beautiful sunset moments' },
+        { icon: 'air', label: 'Fresh coastal breeze for calm mornings and peaceful nights' }
+      ]
     };
-    return features[cat] || ['Premium amenities', 'Hand-picked details'];
+
+    return features[cat] || [
+      { icon: 'star', label: 'Premium amenities with carefully selected details' }
+    ];
   }
 }

@@ -177,23 +177,130 @@ $deep-navy: #003366;
 }
 
 // --- ΛΙΣΤΑ ΠΑΡΟΧΩΝ ---
+.amenity-block {
+  margin-top: 2.3rem;
+}
+
+.amenity-title {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: $deep-navy;
+  letter-spacing: 0.01em;
+}
+
 .feature-list {
   list-style: none;
   padding: 0;
-  margin-top: 2.5rem;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(240px, 1fr));
+  column-gap: 1.25rem;
+  row-gap: 0.75rem;
 
-  li {
+  .feature-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 1rem;
+    gap: 0.8rem;
+    margin-bottom: 0;
+    padding: 0.45rem 0.15rem;
     color: $deep-navy !important;
-    font-weight: 500;
+    font-weight: 400;
+    line-height: 1.35;
 
-    .material-icons {
-      color: $crystal-blue;
-      font-size: 1.3rem;
+    .amenity-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba($crystal-blue, 0.16);
+      color: $deep-navy;
+      font-size: 1.08rem;
+      line-height: 1;
+      flex-shrink: 0;
+      overflow: hidden;
     }
+
+    .amenity-label {
+      font-size: 0.98rem;
+      color: rgba($deep-navy, 0.92);
+    }
+  }
+}
+
+.house-rules {
+  margin: 1.5rem 0 4rem;
+  padding: 2.2rem;
+  border: 1px solid rgba($deep-navy, 0.12);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(227, 245, 255, 0.4) 0%, rgba(255, 255, 255, 0.95) 100%);
+}
+
+.rules-header {
+  text-align: center;
+  margin-bottom: 1.8rem;
+
+  .category {
+    color: $crystal-blue;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    margin-bottom: 0.6rem;
+    display: block;
+  }
+
+  h2 {
+    font-family: $font-logo;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    margin: 0 0 0.6rem;
+    color: $deep-navy;
+  }
+
+  p {
+    margin: 0;
+    color: rgba($deep-navy, 0.82);
+  }
+}
+
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(250px, 1fr));
+  gap: 0.9rem;
+}
+
+.rule-card {
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba($deep-navy, 0.1);
+  background: rgba(255, 255, 255, 0.92);
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 0.65rem;
+  row-gap: 0.2rem;
+
+  .material-icons {
+    grid-row: 1 / span 2;
+    color: $crystal-blue;
+    font-size: 1.2rem;
+    margin-top: 0.1rem;
+  }
+
+  h3 {
+    margin: 0;
+    color: $deep-navy;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+    color: rgba($deep-navy, 0.82);
+    font-size: 0.94rem;
+    line-height: 1.45;
   }
 }
 
@@ -490,17 +597,55 @@ $deep-navy: #003366;
 
         // Η Λίστα με τις παροχές (Wi-Fi, AC κλπ)
         .feature-list {
-          margin-top: 2rem;
-          display: flex;
-          flex-direction: column;
-          align-items: center; // Κεντράρουμε και τη λίστα
+          grid-template-columns: 1fr;
+          display: grid;
+          align-items: stretch;
+          row-gap: 0.55rem;
           
-          li {
+          .feature-item {
             font-size: 0.95rem;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0;
+            text-align: left;
+            padding: 0.5rem 0;
+          }
+
+          .amenity-label {
+            font-size: 0.94rem;
           }
         }
       }
+    }
+  }
+
+  .house-rules {
+    margin: 0.8rem 0 3rem;
+    padding: 1.2rem;
+  }
+
+  .rules-header {
+    margin-bottom: 1.1rem;
+
+    h2 {
+      font-size: 1.7rem;
+    }
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+  }
+
+  .rules-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rule-card {
+    h3 {
+      font-size: 0.97rem;
+    }
+
+    p {
+      font-size: 0.9rem;
     }
   }
 
