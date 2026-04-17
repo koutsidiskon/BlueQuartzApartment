@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, HostListener, inject } from '@angular/core';
+import { Component, AfterViewInit, DoCheck, ViewChild, ElementRef, HostListener, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InquiryService } from '../../service/inquiry';
 import { PrivacyPolicyDialogService } from '../../service/privacy-policy-dialog';
@@ -6,7 +6,33 @@ import { getSuccessPopupHtml } from './check-availability-popup.template';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { I18nService } from '../../service/i18n';
 import flatpickr from 'flatpickr';
+import { Bulgarian } from 'flatpickr/dist/l10n/bg.js';
+import { Greek } from 'flatpickr/dist/l10n/gr.js';
+import { Romanian } from 'flatpickr/dist/l10n/ro.js';
+import { Serbian } from 'flatpickr/dist/l10n/sr.js';
+import { Turkish } from 'flatpickr/dist/l10n/tr.js';
 import Swal from 'sweetalert2';
+
+const GREEK_LOCALE_NO_TONOS = {
+    ...Greek,
+    months: {
+        shorthand: ['Ιαν', 'Φεβ', 'Μαρ', 'Απρ', 'Μαι', 'Ιουν', 'Ιουλ', 'Αυγ', 'Σεπ', 'Οκτ', 'Νοε', 'Δεκ'],
+        longhand: [
+            'Ιανουαριος',
+            'Φεβρουαριος',
+            'Μαρτιος',
+            'Απριλιος',
+            'Μαιος',
+            'Ιουνιος',
+            'Ιουλιος',
+            'Αυγουστος',
+            'Σεπτεμβριος',
+            'Οκτωβριος',
+            'Νοεμβριος',
+            'Δεκεμβριος'
+        ]
+    }
+};
 
 declare global {
   interface Window {
@@ -28,7 +54,7 @@ const RECAPTCHA_SITE_KEY: string = '6Ld6vqwsAAAAAEaQhbmrjCwTAxTNqH64GCr0qMmZ';
   templateUrl: './check-availability.html',
   styleUrl: './check-availability.scss'
 })
-export class CheckAvailability implements AfterViewInit {
+export class CheckAvailability implements AfterViewInit, DoCheck {
     private inquiryService = inject(InquiryService);
                 private privacyPolicyDialog = inject(PrivacyPolicyDialogService);
                 private i18n = inject(I18nService);
@@ -46,9 +72,22 @@ export class CheckAvailability implements AfterViewInit {
     private checkOutFp: any;
     private inlineFp: any;
     private isSyncingFromInline = false;
+    private lastRenderedLanguage = '';
 
     ngAfterViewInit() {
         this.initDatePickers();
+        this.lastRenderedLanguage = this.i18n.getLanguage();
+        this.updateDatePickerLocale();
+        this.updateDatePickerPlaceholders();
+    }
+
+    ngDoCheck(): void {
+        const currentLanguage = this.i18n.getLanguage();
+        if (currentLanguage === this.lastRenderedLanguage) return;
+
+        this.lastRenderedLanguage = currentLanguage;
+        this.updateDatePickerLocale();
+        this.updateDatePickerPlaceholders();
     }
 
     // Adjusts the number of months shown in the date pickers based on the window or phone for better responsiveness
@@ -70,6 +109,7 @@ export class CheckAvailability implements AfterViewInit {
     // Sets up synchronization between the check-in/check-out pickers and the inline calendar
     private initDatePickers() {
         if (this.checkInPicker?.nativeElement && this.checkOutPicker?.nativeElement) {
+        const locale = this.getFlatpickrLocaleByLanguage(this.i18n.getLanguage());
         const isMobile = window.innerWidth <= 768;
         const months = isMobile ? 1 : 2;
 
@@ -80,6 +120,7 @@ export class CheckAvailability implements AfterViewInit {
             showMonths: months,
             monthSelectorType: 'static',
             shorthandCurrentMonth: false,
+            locale,
             altInput: true,
             altFormat: 'F j, Y',
             disableMobile: true,
@@ -104,6 +145,7 @@ export class CheckAvailability implements AfterViewInit {
             showMonths: months,
             monthSelectorType: 'static',
             shorthandCurrentMonth: false,
+            locale,
             altInput: true,
             altFormat: 'F j, Y',
             disableMobile: true,
@@ -141,16 +183,19 @@ export class CheckAvailability implements AfterViewInit {
 
         applyNativeValidation(this.checkInFp, 'checkIn');
         applyNativeValidation(this.checkOutFp, 'checkOut');
+        this.updateDatePickerPlaceholders();
         }
 
         // Init the inline calendar for availability presentation on the right side
         if (this.inlineCalendar?.nativeElement) {
+            const locale = this.getFlatpickrLocaleByLanguage(this.i18n.getLanguage());
             this.inlineFp = flatpickr(this.inlineCalendar.nativeElement, {
                 inline: true,
                 minDate: 'today',
                 showMonths: 1,  
                 mode: 'range',
                 dateFormat: 'Y-m-d',
+                locale,
                 monthSelectorType: 'static',
                 shorthandCurrentMonth: false,
                 disableMobile: true,
@@ -158,6 +203,61 @@ export class CheckAvailability implements AfterViewInit {
                 // Disable dates to visually show booked days:
                 // disable: ['2026-04-10', '2026-04-11', '2026-04-12']  // Add dummy dates if you wish
             });
+        }
+    }
+
+    private getFlatpickrLocaleByLanguage(language: string): any {
+        switch (language) {
+            case 'el':
+                return GREEK_LOCALE_NO_TONOS;
+            case 'ro':
+                return Romanian;
+            case 'sr':
+                return Serbian;
+            case 'bg':
+                return Bulgarian;
+            case 'tr':
+                return Turkish;
+            default:
+                return 'default';
+        }
+    }
+
+    private updateDatePickerLocale(): void {
+        const locale = this.getFlatpickrLocaleByLanguage(this.i18n.getLanguage());
+
+        const applyLocale = (fp: any): void => {
+            if (!fp) return;
+
+            fp.set('locale', locale);
+            fp.redraw();
+
+            if (fp.selectedDates?.length) {
+                fp.setDate([...fp.selectedDates], false);
+            }
+        };
+
+        applyLocale(this.checkInFp);
+        applyLocale(this.checkOutFp);
+        applyLocale(this.inlineFp);
+    }
+
+    private updateDatePickerPlaceholders(): void {
+        const checkInPlaceholder = this.i18n.t('checkAvailability.form.checkInPlaceholder');
+        const checkOutPlaceholder = this.i18n.t('checkAvailability.form.checkOutPlaceholder');
+
+        if (this.checkInPicker?.nativeElement) {
+            this.checkInPicker.nativeElement.placeholder = checkInPlaceholder;
+        }
+        if (this.checkOutPicker?.nativeElement) {
+            this.checkOutPicker.nativeElement.placeholder = checkOutPlaceholder;
+        }
+
+        if (this.checkInFp?.altInput) {
+            this.checkInFp.altInput.placeholder = checkInPlaceholder;
+        }
+        if (this.checkOutFp?.altInput) {
+            this.checkOutFp.altInput.placeholder = checkOutPlaceholder;
         }
     }
 

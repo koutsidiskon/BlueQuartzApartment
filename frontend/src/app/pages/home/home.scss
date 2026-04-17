@@ -83,6 +83,7 @@ $font-logo: 'Playfair Display', serif;
     gap: 1.5rem;
     .btn-primary, .btn-secondary {
       font-family: inherit; // FIX: default font for both
+      font-size: 1rem;
       margin: 0; // FIX: reset margin
       padding: 1.2rem 2.8rem;
       font-weight: 600;

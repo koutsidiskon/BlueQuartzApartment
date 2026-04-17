@@ -9,26 +9,6 @@
 
   <div class="nav-container">
     <div class="nav-tabs" [class.open]="menuOpen">
-        <a routerLink="/" fragment="home-top" 
-          (click)="setActive('home-top')"
-          [class.active]="currentSection === 'home-top' && !isFacilitiesPage">{{ 'nav.home' | t }}</a>
-          
-        <a [routerLink]="isFacilitiesPage ? [] : ['/']" 
-          [fragment]="isFacilitiesPage ? undefined : 'facilities-section'"
-          [class.active]="isFacilitiesPage || currentSection === 'facilities-section'"
-          [style.pointer-events]="isFacilitiesPage ? 'none' : 'auto'"
-          [style.cursor]="isFacilitiesPage ? 'default' : 'pointer'">
-          {{ 'nav.facilities' | t }}
-        </a>
-                  
-        <a routerLink="/" fragment="check-availability-section" 
-          (click)="setActive('check-availability-section')"
-          [class.active]="currentSection === 'check-availability-section'&& !isFacilitiesPage">{{ 'nav.checkAvailability' | t }}</a>
-
-        <a routerLink="/" fragment="find-us-section" 
-          (click)="setActive('find-us-section')"
-          [class.active]="currentSection === 'find-us-section'&& !isFacilitiesPage">{{ 'nav.findUs' | t }}</a>
-
         <div class="nav-mobile-language" [attr.aria-label]="'language.switcherAria' | t">
           <div class="lang-switcher mobile" [attr.aria-label]="'language.switcherAria' | t">
             <div class="lang-dropdown custom" [class.open]="mobileLanguageMenuOpen">
@@ -57,6 +37,26 @@
             </div>
           </div>
         </div>
+
+        <a routerLink="/" fragment="home-top" 
+          (click)="setActive('home-top')"
+          [class.active]="currentSection === 'home-top' && !isFacilitiesPage">{{ 'nav.home' | t }}</a>
+          
+        <a [routerLink]="isFacilitiesPage ? [] : ['/']" 
+          [fragment]="isFacilitiesPage ? undefined : 'facilities-section'"
+          [class.active]="isFacilitiesPage || currentSection === 'facilities-section'"
+          [style.pointer-events]="isFacilitiesPage ? 'none' : 'auto'"
+          [style.cursor]="isFacilitiesPage ? 'default' : 'pointer'">
+          {{ 'nav.facilities' | t }}
+        </a>
+                  
+        <a routerLink="/" fragment="check-availability-section" 
+          (click)="setActive('check-availability-section')"
+          [class.active]="currentSection === 'check-availability-section'&& !isFacilitiesPage">{{ 'nav.checkAvailability' | t }}</a>
+
+        <a routerLink="/" fragment="find-us-section" 
+          (click)="setActive('find-us-section')"
+          [class.active]="currentSection === 'find-us-section'&& !isFacilitiesPage">{{ 'nav.findUs' | t }}</a>
 
         <div class="nav-mobile-icons" [attr.aria-label]="'app.quickLinksAria' | t">
           <a class="icon-link" href="https://www.instagram.com/bluequartzapartment/" target="_blank" rel="noopener noreferrer" [attr.aria-label]="'common.instagram' | t">
