@@ -8,33 +8,48 @@
     <div class="availability-content-grid">
       <!-- Left side: Existing Form -->
       <div class="check-availability-form-wrapper">
-        <form class="quartz-form" (submit)="onSubmit($event)">
+        <form class="quartz-form" (submit)="onSubmit($event)" novalidate>
         
         <div class="form-row">
           <div class="form-group">
             <label for="fullName">{{ 'checkAvailability.form.fullName' | t }}</label>
-            <input #fullName type="text" id="fullName" [attr.placeholder]="'checkAvailability.form.fullNamePlaceholder' | t" required>
+            <input #fullName type="text" id="fullName" [attr.placeholder]="'checkAvailability.form.fullNamePlaceholder' | t" [class.input-error]="shouldShowFieldError('fullName')" (input)="clearFieldError('fullName')" required>
+            @if (shouldShowFieldError('fullName')) {
+              <p class="field-error">{{ 'checkAvailability.validation.requiredField' | t }}</p>
+            }
           </div>
           <div class="form-group">
             <label for="email">{{ 'checkAvailability.form.email' | t }}</label>
-            <input #email type="email" id="email" [attr.placeholder]="'checkAvailability.form.emailPlaceholder' | t" required>
+            <input #email type="email" id="email" [attr.placeholder]="'checkAvailability.form.emailPlaceholder' | t" [class.input-error]="shouldShowFieldError('email')" (input)="clearFieldError('email')" required>
+            @if (shouldShowFieldError('email')) {
+              <p class="field-error">{{ 'checkAvailability.validation.requiredField' | t }}</p>
+            }
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="checkIn">{{ 'checkAvailability.form.checkIn' | t }}</label>
-            <div class="date-input-wrapper">
+            <div class="date-input-wrapper" [class.has-error]="shouldShowFieldError('checkIn')">
               <input type="text" id="checkIn" autocomplete="off"  #checkInPicker [attr.placeholder]="'checkAvailability.form.checkInPlaceholder' | t" required>
               <span class="material-icons date-icon">calendar_today</span>
             </div>
+            @if (shouldShowFieldError('checkIn')) {
+              <p class="field-error">{{ 'checkAvailability.validation.requiredField' | t }}</p>
+            }
           </div>
           <div class="form-group">
             <label for="checkOut">{{ 'checkAvailability.form.checkOut' | t }}</label>
-            <div class="date-input-wrapper">
+            <div class="date-input-wrapper" [class.has-error]="shouldShowFieldError('checkOut') || minStayError">
               <input type="text" id="checkOut" #checkOutPicker autocomplete="off" [attr.placeholder]="'checkAvailability.form.checkOutPlaceholder' | t" required>
               <span class="material-icons date-icon">calendar_today</span>
             </div>
+            @if (shouldShowFieldError('checkOut')) {
+              <p class="field-error">{{ 'checkAvailability.validation.requiredField' | t }}</p>
+            }
+            @if (minStayError) {
+              <p class="field-error">{{ 'checkAvailability.validation.minStay' | t: { nights: minStayNights } }}</p>
+            }
           </div>
         </div>
 
@@ -42,13 +57,16 @@
           <div class="form-group">
             <label for="guests">{{ 'checkAvailability.form.guests' | t }}</label>
             <div class="select-wrapper">
-              <select #guests id="guests" required>
+              <select #guests id="guests" [class.input-error]="shouldShowFieldError('guests')" (change)="clearFieldError('guests')" required>
                 <option value="1">{{ 'checkAvailability.form.guests1' | t }}</option>
                 <option value="2">{{ 'checkAvailability.form.guests2' | t }}</option>
                 <option value="3">{{ 'checkAvailability.form.guests3' | t }}</option>
                 <option value="4">{{ 'checkAvailability.form.guests4' | t }}</option>
               </select>
             </div>
+            @if (shouldShowFieldError('guests')) {
+              <p class="field-error">{{ 'checkAvailability.validation.requiredField' | t }}</p>
+            }
           </div>
           <div class="form-group">
             <!-- Empty column to keep Guests field nicely sized -->
@@ -75,12 +93,15 @@
 
         <div class="form-group checkbox-group">
           <label class="checkbox-label" for="gdprConsent">
-            <input type="checkbox" id="gdprConsent" required>
+            <input #gdprConsentInput type="checkbox" id="gdprConsent" [class.input-error]="shouldShowFieldError('gdprConsent')" (change)="clearFieldError('gdprConsent')" required>
             <span>
               {{ 'checkAvailability.form.gdprPrefix' | t }}
               <a href="/privacy-policy.html" (click)="openPrivacyPolicy($event)">{{ 'common.privacyPolicy' | t }}</a>{{ 'checkAvailability.form.gdprSuffix' | t }}
             </span>
           </label>
+          @if (shouldShowFieldError('gdprConsent')) {
+            <p class="field-error">{{ 'checkAvailability.validation.gdprRequired' | t }}</p>
+          }
         </div>
 
         <div class="form-submit">
@@ -107,6 +128,9 @@
           <!-- Container specifically for flatpickr inline to anchor to -->
           <input type="text" #inlineCalendar id="inlineCalendar" style="display:none;">
         </div>
+        @if (minStayError) {
+          <p class="calendar-validation-error">{{ 'checkAvailability.validation.minStay' | t: { nights: minStayNights } }}</p>
+        }
       </div>
       
       <div class="calendar-legend">

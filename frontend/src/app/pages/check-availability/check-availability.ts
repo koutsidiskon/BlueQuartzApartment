@@ -43,9 +43,12 @@ declare global {
   }
 }
 
+type RequiredFieldKey = 'fullName' | 'email' | 'checkIn' | 'checkOut' | 'guests' | 'gdprConsent';
+
 // Replace with your Google reCAPTCHA v3 SITE key.
 // This must match the key used in frontend/src/index.html script URL.
 const RECAPTCHA_SITE_KEY: string = '6Ld6vqwsAAAAAEaQhbmrjCwTAxTNqH64GCr0qMmZ';
+const MIN_STAY_NIGHTS = 5;
 
 @Component({
   selector: 'app-check-availability',
@@ -63,6 +66,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     @ViewChild('email') emailInput!: ElementRef;
     @ViewChild('message') messageInput!: ElementRef;
     @ViewChild('botField') botFieldInput!: ElementRef;
+    @ViewChild('gdprConsentInput') gdprConsentInput!: ElementRef;
     @ViewChild('checkInPicker') checkInPicker!: ElementRef;
     @ViewChild('checkOutPicker') checkOutPicker!: ElementRef;
     @ViewChild('guests') guestsInput!: ElementRef;
@@ -73,6 +77,16 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     private inlineFp: any;
     private isSyncingFromInline = false;
     private lastRenderedLanguage = '';
+    readonly minStayNights = MIN_STAY_NIGHTS;
+    minStayError = false;
+    requiredFieldErrors: Record<RequiredFieldKey, boolean> = {
+        fullName: false,
+        email: false,
+        checkIn: false,
+        checkOut: false,
+        guests: false,
+        gdprConsent: false
+    };
 
     ngAfterViewInit() {
         this.initDatePickers();
@@ -126,8 +140,26 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
             disableMobile: true,
 
             onChange: (selectedDates) => {
+                if (selectedDates.length > 0) {
+                    this.clearFieldError('checkOut');
+                }
 
-                if (this.isSyncingFromInline || !this.inlineFp || !this.checkInFp?.selectedDates?.length) 
+                if (this.isSyncingFromInline) {
+                    return;
+                }
+
+                if (selectedDates.length > 0 && this.checkInFp?.selectedDates?.length) {
+                    const startDate = this.checkInFp.selectedDates[0];
+                    const endDate = selectedDates[0];
+
+                    if (!this.isMinimumStayValid(startDate, endDate)) {
+                        this.minStayError = true;
+                    } else {
+                        this.minStayError = false;
+                    }
+                }
+
+                if (!this.inlineFp || !this.checkInFp?.selectedDates?.length) 
                     return;
 
                 const startDate = this.checkInFp.selectedDates[0];
@@ -151,10 +183,21 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
             disableMobile: true,
 
             onChange: (selectedDates) => {
+                if (selectedDates.length > 0) {
+                    this.clearFieldError('checkIn');
+                }
 
                 if (this.checkOutFp && selectedDates.length > 0) {
+                    const startDate = selectedDates[0];
 
-                    this.checkOutFp.set('minDate', selectedDates[0]);
+                    this.checkOutFp.set('minDate', startDate);
+
+                    const currentCheckOut = this.checkOutFp?.selectedDates?.[0];
+                    if (currentCheckOut && !this.isMinimumStayValid(startDate, currentCheckOut)) {
+                        this.minStayError = true;
+                    } else {
+                        this.minStayError = false;
+                    }
 
                     if (!this.isSyncingFromInline) {
                         setTimeout(() => this.checkOutFp.open(), 100);
@@ -163,7 +206,12 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
 
                 if (!this.isSyncingFromInline && this.inlineFp && selectedDates.length > 0) {
                     const maybeEndDate = this.checkOutFp?.selectedDates?.[0];
-                    this.inlineFp.setDate(maybeEndDate ? [selectedDates[0], maybeEndDate] : [selectedDates[0]], false);
+                    const startDate = selectedDates[0];
+                    if (maybeEndDate) {
+                        this.inlineFp.setDate([startDate, maybeEndDate], false);
+                    } else {
+                        this.inlineFp.setDate([startDate], false);
+                    }
                 }
             }
         });
@@ -271,22 +319,39 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
             if (selectedDates.length === 0) {
                 this.checkInFp.clear();
                 this.checkOutFp.clear();
+                this.minStayError = false;
                 return;
             }
 
             const [startDate, endDate] = selectedDates;
 
-            this.checkInFp.setDate(startDate, true);
-            this.checkOutFp.set('minDate', startDate);
-
-            if (endDate) {
-                this.checkOutFp.setDate(endDate, true);
-            } else {
+            if (!endDate) {
+                this.checkInFp.setDate(startDate, true);
+                this.clearFieldError('checkIn');
+                this.checkOutFp.set('minDate', startDate);
                 this.checkOutFp.clear();
+                this.clearFieldError('checkOut');
+                this.minStayError = false;
+                return;
             }
+
+            this.checkInFp.setDate(startDate, true);
+            this.clearFieldError('checkIn');
+            this.checkOutFp.set('minDate', startDate);
+            this.checkOutFp.setDate(endDate, true);
+            this.clearFieldError('checkOut');
+            this.minStayError = !this.isMinimumStayValid(startDate, endDate);
         } finally {
             this.isSyncingFromInline = false;
         }
+    }
+
+    private isMinimumStayValid(checkInDate: Date, checkOutDate: Date): boolean {
+        const start = new Date(checkInDate.getFullYear(), checkInDate.getMonth(), checkInDate.getDate());
+        const end = new Date(checkOutDate.getFullYear(), checkOutDate.getMonth(), checkOutDate.getDate());
+        const millisecondsPerDay = 24 * 60 * 60 * 1000;
+        const nights = Math.round((end.getTime() - start.getTime()) / millisecondsPerDay);
+        return nights >= MIN_STAY_NIGHTS;
     }
 
     openPrivacyPolicy(event: Event): void {
@@ -319,16 +384,8 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     onSubmit(event: Event) {
     event.preventDefault();
 
-    const hasCheckIn = this.checkInFp?.selectedDates.length > 0;
-    const hasCheckOut = this.checkOutFp?.selectedDates.length > 0;
-
-    if (!hasCheckIn || !hasCheckOut) {
-        Swal.fire({
-            title: this.i18n.t('checkAvailability.alerts.missingDates.title'),
-            icon: 'warning',
-            confirmButtonColor: '#003366'
-        });
-        return; 
+    if (!this.validateRequiredFields()) {
+        return;
     }
 
     const nameValue = this.fullNameInput?.nativeElement.value || '';
@@ -398,9 +455,61 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
         this.emailInput.nativeElement.value = '';
         this.messageInput.nativeElement.value = '';
         if (this.botFieldInput?.nativeElement) this.botFieldInput.nativeElement.value = '';
+        if (this.gdprConsentInput?.nativeElement) this.gdprConsentInput.nativeElement.checked = false;
         if (this.guestsInput?.nativeElement) this.guestsInput.nativeElement.value = '1';
         if (this.checkInFp) this.checkInFp.clear();
         if (this.checkOutFp) this.checkOutFp.clear();
         if (this.inlineFp) this.inlineFp.clear();
+        this.resetRequiredFieldErrors();
+    }
+
+    clearFieldError(field: RequiredFieldKey): void {
+        this.requiredFieldErrors[field] = false;
+        if (field === 'checkIn' || field === 'checkOut') {
+            this.minStayError = false;
+        }
+    }
+
+    shouldShowFieldError(field: RequiredFieldKey): boolean {
+        return this.requiredFieldErrors[field];
+    }
+
+    private validateRequiredFields(): boolean {
+        const fullName = (this.fullNameInput?.nativeElement?.value || '').trim();
+        const email = (this.emailInput?.nativeElement?.value || '').trim();
+        const guests = (this.guestsInput?.nativeElement?.value || '').toString().trim();
+        const hasCheckIn = this.checkInFp?.selectedDates.length > 0;
+        const hasCheckOut = this.checkOutFp?.selectedDates.length > 0;
+        const hasGdprConsent = !!this.gdprConsentInput?.nativeElement?.checked;
+
+        this.requiredFieldErrors.fullName = !fullName;
+        this.requiredFieldErrors.email = !email;
+        this.requiredFieldErrors.checkIn = !hasCheckIn;
+        this.requiredFieldErrors.checkOut = !hasCheckOut;
+        this.requiredFieldErrors.guests = !guests;
+        this.requiredFieldErrors.gdprConsent = !hasGdprConsent;
+
+        if (hasCheckIn && hasCheckOut) {
+            const startDate = this.checkInFp.selectedDates[0];
+            const endDate = this.checkOutFp.selectedDates[0];
+            this.minStayError = !this.isMinimumStayValid(startDate, endDate);
+        } else {
+            this.minStayError = false;
+        }
+
+        const hasRequiredFieldErrors = (Object.keys(this.requiredFieldErrors) as RequiredFieldKey[])
+            .some((field) => this.requiredFieldErrors[field]);
+
+        return !hasRequiredFieldErrors && !this.minStayError;
+    }
+
+    private resetRequiredFieldErrors(): void {
+        this.requiredFieldErrors.fullName = false;
+        this.requiredFieldErrors.email = false;
+        this.requiredFieldErrors.checkIn = false;
+        this.requiredFieldErrors.checkOut = false;
+        this.requiredFieldErrors.guests = false;
+        this.requiredFieldErrors.gdprConsent = false;
+        this.minStayError = false;
     }
 }

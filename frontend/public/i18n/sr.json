@@ -138,12 +138,14 @@
       "bedroom": [
         "Glavna spavaća soba sa premium dušekom",
         "Blackout zavese za miran san",
+        "Klima uređaj u spavaćoj sobi",
         "Pegla i daska za peglanje",
         "Mašina za veš na zadnjem balkonu",
         "Dodatni jastuci, ćebad i sveža posteljina"
       ],
       "living-room": [
         "Velika ugaona sofa za udobno opuštanje",
+        "Klima uređaj u dnevnom boravku",
         "Rasklopiva sofa za dodatni prostor za spavanje",
         "Smart TV sa streaming servisima, uključujući Netflix",
         "Brz Wi-Fi u celoj nekretnini"
@@ -231,6 +233,11 @@
       "recaptchaPrefix": "Ovaj sajt je zaštićen reCAPTCHA sistemom i važe Google",
       "recaptchaAnd": "i",
       "recaptchaApply": "."
+    },
+    "validation": {
+      "requiredField": "Ovo polje je obavezno.",
+      "gdprRequired": "Morate prihvatiti politiku privatnosti da biste nastavili.",
+      "minStay": "Minimalni boravak je {{nights}} noći."
     },
     "calendar": {
       "available": "Dostupno",

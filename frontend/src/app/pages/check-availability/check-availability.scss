@@ -95,6 +95,15 @@ $font-logo: 'Playfair Display', serif;
       display: flex;
       flex-direction: column;
 
+      .field-error {
+        margin: 0.45rem 0 0;
+        font-family: $font-body;
+        font-size: 0.82rem;
+        color: #b42318;
+        font-weight: 500;
+        line-height: 1.25;
+      }
+
       label {
         font-family: $font-body;
         font-size: 0.9rem;
@@ -134,6 +143,11 @@ $font-logo: 'Playfair Display', serif;
         min-height: 120px;
       }
 
+      .input-error {
+        border-color: #f04438 !important;
+        box-shadow: 0 0 0 2px rgba(240, 68, 56, 0.12) !important;
+      }
+
       .date-input-wrapper {
         position: relative;
         display: flex;
@@ -166,6 +180,13 @@ $font-logo: 'Playfair Display', serif;
             outline: none !important;
             border-color: $crystal-blue !important;
             box-shadow: 0 0 0 3px rgba($crystal-blue, 0.1) !important;
+          }
+        }
+
+        &.has-error {
+          ::ng-deep input[type="text"] {
+            border-color: #f04438 !important;
+            box-shadow: 0 0 0 2px rgba(240, 68, 56, 0.12) !important;
           }
         }
 
@@ -358,6 +379,16 @@ $font-logo: 'Playfair Display', serif;
       max-width: 100%;
       border-radius: 12px; 
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .calendar-validation-error {
+      margin: 1rem 0 0;
+      text-align: center;
+      font-family: $font-body;
+      font-size: 0.88rem;
+      color: #b42318;
+      font-weight: 500;
+      line-height: 1.35;
     }
   }
 

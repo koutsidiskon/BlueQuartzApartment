@@ -138,12 +138,14 @@
       "bedroom": [
         "Dormitor principal cu saltea premium",
         "Draperii blackout pentru somn odihnitor",
+        "Aer condiționat în dormitor",
         "Fier și masă de călcat",
         "Mașină de spălat pe balconul din spate",
         "Perne, pături și lenjerii suplimentare"
       ],
       "living-room": [
         "Canapea mare de colț pentru relaxare confortabilă",
+        "Aer condiționat în living",
         "Canapea extensibilă pentru locuri suplimentare de dormit",
         "Smart TV cu streaming, inclusiv Netflix",
         "Wi-Fi de mare viteză în întreaga proprietate"
@@ -231,6 +233,11 @@
       "recaptchaPrefix": "Acest site este protejat de reCAPTCHA, iar",
       "recaptchaAnd": "și",
       "recaptchaApply": "se aplică."
+    },
+    "validation": {
+      "requiredField": "Acest câmp este obligatoriu.",
+      "gdprRequired": "Trebuie să accepți politica de confidențialitate pentru a continua.",
+      "minStay": "Sejurul minim este de {{nights}} nopți."
     },
     "calendar": {
       "available": "Disponibil",

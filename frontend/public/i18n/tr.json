@@ -138,12 +138,14 @@
       "bedroom": [
         "Premium yataklı master yatak odası",
         "Rahat uyku için karartma perdeleri",
+        "Yatak odasında klima",
         "Ütü ve ütü masası",
         "Arka balkonda çamaşır makinesi",
         "Ek yastıklar, battaniyeler ve temiz nevresimler"
       ],
       "living-room": [
         "Konforlu dinlenme için büyük köşe koltuk",
+        "Salonda klima",
         "Ek yatak alanı sağlayan açılır kanepe",
         "Netflix dahil yayın servisli Smart TV",
         "Tüm mülkte yüksek hızlı Wi-Fi"
@@ -231,6 +233,11 @@
       "recaptchaPrefix": "Bu site reCAPTCHA ile korunmaktadır ve Google",
       "recaptchaAnd": "ile",
       "recaptchaApply": "geçerlidir."
+    },
+    "validation": {
+      "requiredField": "Bu alan zorunludur.",
+      "gdprRequired": "Devam etmek için gizlilik politikasını kabul etmelisiniz.",
+      "minStay": "Minimum konaklama süresi {{nights}} gecedir."
     },
     "calendar": {
       "available": "Müsait",

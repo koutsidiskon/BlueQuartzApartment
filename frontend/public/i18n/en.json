@@ -138,12 +138,14 @@
       "bedroom": [
         "Master bedroom with premium mattress",
         "Blackout curtains for restful sleep",
+        "Air conditioning in the bedroom",
         "Iron and ironing board",
         "Washing machine on the back balcony",
         "Extra pillows, blankets, and fresh linens"
       ],
       "living-room": [
         "Large corner sofa for comfortable lounging",
+        "Air conditioning in the living room",
         "Convertible sofa for extra sleeping space",
         "Smart TV with streaming, including Netflix",
         "High-speed Wi-Fi throughout the entire property"
@@ -231,6 +233,11 @@
       "recaptchaPrefix": "This site is protected by reCAPTCHA and the Google",
       "recaptchaAnd": "and",
       "recaptchaApply": "apply."
+    },
+    "validation": {
+      "requiredField": "This field is required.",
+      "gdprRequired": "You must accept the privacy policy to continue.",
+      "minStay": "Minimum stay is {{nights}} nights."
     },
     "calendar": {
       "available": "Available",

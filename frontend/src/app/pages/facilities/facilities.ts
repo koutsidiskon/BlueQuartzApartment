@@ -151,8 +151,8 @@ export class Facilities implements OnInit {
 
   getFeatures(cat: string): AmenityFeature[] {
     const featureIcons: Record<string, string[]> = {
-      'bedroom': ['king_bed', 'curtains', 'checkroom', 'local_laundry_service', 'bed'],
-      'living-room': ['weekend', 'bed', 'tv', 'wifi'],
+      'bedroom': ['king_bed', 'curtains', 'ac_unit', 'checkroom', 'local_laundry_service', 'bed'],
+      'living-room': ['weekend', 'ac_unit', 'bed', 'tv', 'wifi'],
       'kitchen': ['kitchen', 'soup_kitchen', 'wine_bar', 'coffee_maker', 'local_dining'],
       'bathroom': ['shower', 'soap', 'mode_fan', 'cleaning_services'],
       'veranda': ['table_restaurant', 'wb_twilight', 'air']
