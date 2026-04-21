@@ -292,6 +292,6 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 <div align="center">
 
-Built with ❤️ by [koutsidiskon](https://koutsidiskon.github.io/)
+Built with ☕ and undocumented features by [koutsidiskon](https://koutsidiskon.github.io/)
 
 </div>
