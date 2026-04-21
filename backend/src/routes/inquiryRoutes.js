@@ -1,6 +1,7 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import { inquiryController } from '../controllers/inquiryController.js';
+import { requireAdminAuth } from '../middleware/adminAuth.js';
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ const inquiryLimiter = rateLimit({
 	}
 });
 
-router.get('/', inquiryController.getAllInquiries);
+router.get('/', requireAdminAuth, inquiryController.getAllInquiries);
 router.post('/', inquiryLimiter, (req, res) => inquiryController.createInquiry(req, res));
 
 

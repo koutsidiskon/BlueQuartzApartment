@@ -237,7 +237,8 @@
     "validation": {
       "requiredField": "Това поле е задължително.",
       "gdprRequired": "Трябва да приемете политиката за поверителност, за да продължите.",
-      "minStay": "Минималният престой е {{nights}} нощувки."
+      "minStay": "Минималният престой е {{nights}} нощувки.",
+      "blockedRange": "Избраният период включва заети дати. Моля, изберете друг период."
     },
     "calendar": {
       "available": "Свободно",
@@ -283,6 +284,63 @@
     "previousAria": "Предишна снимка",
     "nextAria": "Следваща снимка",
     "goToPhotoAria": "Отиди на снимка {{index}}"
+  },
+  "adminLogin": {
+    "eyebrow": "Blue Quartz",
+    "title": "Админ вход",
+    "subtitle": "Въведете данните си, за да продължите към админ зоната.",
+    "formTitle": "Вход",
+    "email": "Имейл",
+    "password": "Парола",
+    "emailPlaceholder": "name@example.com",
+    "passwordPlaceholder": "Въведете парола",
+    "submit": "Сигурен вход",
+    "submitting": "Влизане...",
+    "errors": {
+      "required": "Моля, въведете имейл и парола.",
+      "loginFailed": "Входът е неуспешен.",
+      "invalidCredentials": "Входът е неуспешен. Проверете данните си."
+    }
+  },
+  "adminPanel": {
+    "eyebrow": "Blue Quartz",
+    "title": "Админ зона",
+    "subtitle": "Успешно сте влезли.",
+    "tabsAria": "Админ табове",
+    "calendarTab": "Календар",
+    "inquiriesTab": "Запитвания",
+    "calendarTitle": "Календар на наличността",
+    "inquiriesTitle": "Запитвания за резервация",
+    "blockSelected": "Блокирай избраните дати",
+    "unblockSelected": "Отблокирай избраните дати",
+    "calendar": {
+      "loadError": "Неуспешно зареждане на блокираните дати.",
+      "saveError": "Неуспешно обновяване на датите.",
+      "blockSuccess": "Избраните дати са блокирани.",
+      "unblockSuccess": "Избраните дати са отблокирани."
+    },
+    "inquiries": {
+      "loading": "Зареждане на запитвания...",
+      "empty": "Все още няма запитвания.",
+      "loadError": "Неуспешно зареждане на запитванията.",
+      "fullName": "Име",
+      "email": "Имейл",
+      "checkIn": "Настаняване",
+      "checkOut": "Напускане",
+      "guests": "Гости",
+      "message": "Съобщение",
+      "noMessage": "Няма съобщение",
+      "received": "Получено",
+      "prev": "Назад",
+      "next": "Напред",
+      "page": "Страница",
+      "total": "Общо"
+    },
+    "logout": "Изход",
+    "loggingOut": "Излизане...",
+    "errors": {
+      "logoutFailed": "Изходът е неуспешен. Опитайте отново."
+    }
   },
   "privacyDialog": {
     "title": "Политика за поверителност",

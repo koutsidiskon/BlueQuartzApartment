@@ -31,6 +31,7 @@ export class App implements OnInit {
   isFacilitiesPage = false;
   currentYear = new Date().getFullYear();
   currentLanguage = 'en';
+  isAdminRoute = false;
   mobileLanguageMenuOpen = false;
   desktopLanguageMenuOpen = false;
   private previousUrl = '';
@@ -39,6 +40,8 @@ export class App implements OnInit {
   // Monitoring scroll events to update the active section and navigation bar 
   @HostListener('window:scroll', [])
   onWindowScroll() {
+    if (this.isAdminRoute) return;
+
     this.isScrolled = window.scrollY > 50;
     if (!this.isFacilitiesPage) {
       this.checkActiveSection();
@@ -57,6 +60,7 @@ export class App implements OnInit {
   // Monitoring route changes to reset the menu and update the active section
   ngOnInit() {
     this.currentLanguage = this.languageFacade.getCurrentLanguage();
+    this.isAdminRoute = this.router.url.startsWith('/admin');
     void this.languageFacade.preloadAllLanguages();
     
     this.router.events.pipe(
@@ -67,6 +71,14 @@ export class App implements OnInit {
       const fragment = this.router.parseUrl(nextUrl).fragment;
 
       this.closeAllMenus();
+      this.isAdminRoute = nextUrl.startsWith('/admin');
+
+      if (this.isAdminRoute) {
+        this.isFacilitiesPage = false;
+        this.previousUrl = nextUrl;
+        this.cdr.detectChanges();
+        return;
+      }
      
       this.isFacilitiesPage = nextUrl.includes('/facilities');
       if (this.isFacilitiesPage) {

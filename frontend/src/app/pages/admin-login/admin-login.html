@@ -1,0 +1,74 @@
+<section class="admin-login-page" id="admin-login-top">
+  <div class="admin-login-shell">
+    <div class="admin-language-switcher lang-switcher desktop" [attr.aria-label]="'language.switcherAria' | t">
+      <div class="lang-dropdown custom" [class.open]="desktopLanguageMenuOpen">
+        <button
+          type="button"
+          class="lang-select-btn"
+          [attr.aria-label]="'language.switcherAria' | t"
+          (click)="toggleDesktopLanguageMenu($event)">
+          <span class="flag">{{ getLanguageFlag(currentLanguage) }}</span>
+          <span class="material-icons lang-chevron" aria-hidden="true">expand_more</span>
+        </button>
+
+        @if (desktopLanguageMenuOpen) {
+          <div class="lang-menu" (click)="$event.stopPropagation()">
+            @for (lang of languageOptions; track lang.code) {
+              <button
+                type="button"
+                class="lang-menu-item"
+                [class.active]="lang.code === currentLanguage"
+                (click)="selectDesktopLanguage(lang.code, $event)">
+                <span class="flag">{{ lang.flag }}</span>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <header class="admin-login-header">
+      <span class="eyebrow">{{ 'app.footer.brand' | t : undefined : 'Blue Quartz Apartment' }}</span>
+      <h1>{{ 'adminLogin.title' | t : undefined : 'Admin Login' }}</h1>
+      <p>
+        {{ 'adminLogin.subtitle' | t : undefined : 'Enter your credentials to continue to the admin area.' }}
+      </p>
+    </header>
+
+    <article class="admin-login-card">
+      <h2>{{ 'adminLogin.formTitle' | t : undefined : 'Sign in' }}</h2>
+
+      <form (ngSubmit)="submitLogin()" #loginForm="ngForm" novalidate>
+        <label class="field-label" for="adminEmail">{{ 'adminLogin.email' | t : undefined : 'Email' }}</label>
+        <input
+          #emailInput
+          id="adminEmail"
+          name="adminEmail"
+          type="email"
+          autocomplete="username"
+          [(ngModel)]="email"
+          required
+          [placeholder]="'adminLogin.emailPlaceholder' | t : undefined : 'name@example.com'">
+
+        <label class="field-label" for="adminPassword">{{ 'adminLogin.password' | t : undefined : 'Password' }}</label>
+        <input
+          #passwordInput
+          id="adminPassword"
+          name="adminPassword"
+          type="password"
+          autocomplete="current-password"
+          [(ngModel)]="password"
+          required
+          [placeholder]="'adminLogin.passwordPlaceholder' | t : undefined : 'Enter password'">
+
+        <button type="submit" class="primary-btn" [disabled]="isSubmitting">
+          <span>Sign in</span>
+        </button>
+      </form>
+
+      @if (error) {
+        <p class="login-error">{{ error }}</p>
+      }
+    </article>
+  </div>
+</section>

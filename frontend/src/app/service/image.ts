@@ -14,7 +14,7 @@ export interface HouseImage {
 @Injectable({ providedIn: 'root' } )
 
 export class ImageService {
-  private apiUrl = 'http://localhost:3000/api/images';
+  private apiUrl = '/api/images';
 
   constructor(private http: HttpClient) { }
 

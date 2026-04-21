@@ -1,3 +1,4 @@
+@if (!isAdminRoute) {
 <nav [class.scrolled]="isScrolled" [class.force-white]="isFacilitiesPage">
   <a routerLink="/" fragment="home-top" class="logo">
     <img src="logo.png" [attr.alt]="'app.logoAlt' | t" class="logo-mark">
@@ -129,11 +130,13 @@
     </div>
   </div>
 </nav>
+}
 
 <main class="main-view">
   <router-outlet></router-outlet>
 </main>
 
+@if (!isAdminRoute) {
 <footer class="site-footer">
   <div class="footer-inner">
     <div class="footer-brand-block">
@@ -198,3 +201,4 @@
     <span>{{ 'app.footer.creditPrefix' | t }} <a class="footer-credit-link" href="https://koutsidiskon.github.io/" target="_blank" rel="noopener noreferrer">Konstantinos Koutsidis</a></span>
   </div>
 </footer>
+}

@@ -237,7 +237,8 @@
     "validation": {
       "requiredField": "Bu alan zorunludur.",
       "gdprRequired": "Devam etmek için gizlilik politikasını kabul etmelisiniz.",
-      "minStay": "Minimum konaklama süresi {{nights}} gecedir."
+      "minStay": "Minimum konaklama süresi {{nights}} gecedir.",
+      "blockedRange": "Seçtiğiniz aralık dolu tarihleri içeriyor. Lütfen başka bir aralık seçin."
     },
     "calendar": {
       "available": "Müsait",
@@ -283,6 +284,63 @@
     "previousAria": "Önceki görsel",
     "nextAria": "Sonraki görsel",
     "goToPhotoAria": "{{index}} numaralı fotoğrafa git"
+  },
+  "adminLogin": {
+    "eyebrow": "Blue Quartz",
+    "title": "Yönetici Girişi",
+    "subtitle": "Yönetici alanına devam etmek için bilgilerinizi girin.",
+    "formTitle": "Giriş",
+    "email": "E-posta",
+    "password": "Şifre",
+    "emailPlaceholder": "name@example.com",
+    "passwordPlaceholder": "Şifrenizi girin",
+    "submit": "Güvenli giriş",
+    "submitting": "Giriş yapılıyor...",
+    "errors": {
+      "required": "Lütfen e-posta ve şifre girin.",
+      "loginFailed": "Giriş başarısız oldu.",
+      "invalidCredentials": "Giriş başarısız oldu. Lütfen bilgilerinizi kontrol edin."
+    }
+  },
+  "adminPanel": {
+    "eyebrow": "Blue Quartz",
+    "title": "Yönetim Alanı",
+    "subtitle": "Başarıyla giriş yaptınız.",
+    "tabsAria": "Yönetici sekmeleri",
+    "calendarTab": "Takvim",
+    "inquiriesTab": "Talepler",
+    "calendarTitle": "Takvim Uygunluğu",
+    "inquiriesTitle": "Rezervasyon Talepleri",
+    "blockSelected": "Seçili tarihleri kapat",
+    "unblockSelected": "Seçili tarihleri aç",
+    "calendar": {
+      "loadError": "Kapalı tarihler yüklenemedi.",
+      "saveError": "Tarihler güncellenemedi.",
+      "blockSuccess": "Seçili tarihler kapatıldı.",
+      "unblockSuccess": "Seçili tarihler açıldı."
+    },
+    "inquiries": {
+      "loading": "Talepler yükleniyor...",
+      "empty": "Henüz talep yok.",
+      "loadError": "Talepler yüklenemedi.",
+      "fullName": "Ad",
+      "email": "E-posta",
+      "checkIn": "Giriş",
+      "checkOut": "Çıkış",
+      "guests": "Misafir",
+      "message": "Mesaj",
+      "noMessage": "Mesaj yok",
+      "received": "Alınma",
+      "prev": "Önceki",
+      "next": "Sonraki",
+      "page": "Sayfa",
+      "total": "Toplam"
+    },
+    "logout": "Çıkış",
+    "loggingOut": "Çıkış yapılıyor...",
+    "errors": {
+      "logoutFailed": "Çıkış yapılamadı. Lütfen tekrar deneyin."
+    }
   },
   "privacyDialog": {
     "title": "Gizlilik Politikası",

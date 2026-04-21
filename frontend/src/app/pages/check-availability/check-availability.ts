@@ -1,6 +1,9 @@
-import { Component, AfterViewInit, DoCheck, ViewChild, ElementRef, HostListener, inject } from '@angular/core';
+import { Component, AfterViewInit, DoCheck, ViewChild, ElementRef, HostListener, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs';
 import { InquiryService } from '../../service/inquiry';
+import { AvailabilityCalendarService } from '../../service/availability-calendar';
 import { PrivacyPolicyDialogService } from '../../service/privacy-policy-dialog';
 import { getSuccessPopupHtml } from './check-availability-popup.template';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -59,8 +62,10 @@ const MIN_STAY_NIGHTS = 5;
 })
 export class CheckAvailability implements AfterViewInit, DoCheck {
     private inquiryService = inject(InquiryService);
-                private privacyPolicyDialog = inject(PrivacyPolicyDialogService);
-                private i18n = inject(I18nService);
+    private availabilityCalendar = inject(AvailabilityCalendarService);
+    private privacyPolicyDialog = inject(PrivacyPolicyDialogService);
+    private i18n = inject(I18nService);
+    private destroyRef = inject(DestroyRef);
 
     @ViewChild('fullName') fullNameInput!: ElementRef;
     @ViewChild('email') emailInput!: ElementRef;
@@ -76,9 +81,11 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     private checkOutFp: any;
     private inlineFp: any;
     private isSyncingFromInline = false;
+    private blockedDateSet = new Set<string>();
     private lastRenderedLanguage = '';
     readonly minStayNights = MIN_STAY_NIGHTS;
     minStayError = false;
+    blockedRangeError = false;
     requiredFieldErrors: Record<RequiredFieldKey, boolean> = {
         fullName: false,
         email: false,
@@ -90,6 +97,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
 
     ngAfterViewInit() {
         this.initDatePickers();
+        this.loadBlockedDates();
         this.lastRenderedLanguage = this.i18n.getLanguage();
         this.updateDatePickerLocale();
         this.updateDatePickerPlaceholders();
@@ -135,6 +143,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
             monthSelectorType: 'static',
             shorthandCurrentMonth: false,
             locale,
+            disable: [(date: Date) => this.isBlockedDate(date)],
             altInput: true,
             altFormat: 'F j, Y',
             disableMobile: true,
@@ -157,6 +166,10 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
                     } else {
                         this.minStayError = false;
                     }
+
+                    this.blockedRangeError = this.hasBlockedDateInRange(startDate, endDate);
+                } else {
+                    this.blockedRangeError = false;
                 }
 
                 if (!this.inlineFp || !this.checkInFp?.selectedDates?.length) 
@@ -178,6 +191,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
             monthSelectorType: 'static',
             shorthandCurrentMonth: false,
             locale,
+            disable: [(date: Date) => this.isBlockedDate(date)],
             altInput: true,
             altFormat: 'F j, Y',
             disableMobile: true,
@@ -197,6 +211,12 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
                         this.minStayError = true;
                     } else {
                         this.minStayError = false;
+                    }
+
+                    if (currentCheckOut) {
+                        this.blockedRangeError = this.hasBlockedDateInRange(startDate, currentCheckOut);
+                    } else {
+                        this.blockedRangeError = false;
                     }
 
                     if (!this.isSyncingFromInline) {
@@ -247,11 +267,62 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
                 monthSelectorType: 'static',
                 shorthandCurrentMonth: false,
                 disableMobile: true,
+                onDayCreate: (_dObj, _dStr, _fp, dayElem) => {
+                    const dayDate = (dayElem as any).dateObj as Date | undefined;
+                    if (!dayDate) return;
+
+                    if (this.isBlockedDate(dayDate)) {
+                        dayElem.classList.add('booked-day');
+                    }
+                },
                 onChange: (selectedDates) => this.syncDateRangeFromInlineCalendar(selectedDates),
                 // Disable dates to visually show booked days:
                 // disable: ['2026-04-10', '2026-04-11', '2026-04-12']  // Add dummy dates if you wish
             });
         }
+    }
+
+    private loadBlockedDates(): void {
+        this.availabilityCalendar.blockedDates$.pipe(
+            filter((dates): dates is string[] => dates !== null),
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(dates => this.applyBlockedDates(dates));
+
+        this.availabilityCalendar.getBlockedDates().subscribe({
+            error: (error) => console.error('Could not load blocked dates:', error)
+        });
+    }
+
+    private applyBlockedDates(dates: string[]): void {
+        const normalizedDates = dates
+            .map((date) => String(date || '').trim())
+            .filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date));
+
+        this.blockedDateSet = new Set(normalizedDates);
+
+        const applyDisableRule = (fp: any): void => {
+            if (!fp) return;
+            fp.set('disable', [(date: Date) => this.isBlockedDate(date)]);
+            fp.redraw();
+        };
+
+        applyDisableRule(this.checkInFp);
+        applyDisableRule(this.checkOutFp);
+
+        if (this.inlineFp) {
+            this.inlineFp.redraw();
+        }
+    }
+
+    private isBlockedDate(date: Date): boolean {
+        return this.blockedDateSet.has(this.toDateKey(date));
+    }
+
+    private toDateKey(date: Date): string {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     private getFlatpickrLocaleByLanguage(language: string): any {
@@ -320,6 +391,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
                 this.checkInFp.clear();
                 this.checkOutFp.clear();
                 this.minStayError = false;
+                this.blockedRangeError = false;
                 return;
             }
 
@@ -332,6 +404,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
                 this.checkOutFp.clear();
                 this.clearFieldError('checkOut');
                 this.minStayError = false;
+                this.blockedRangeError = false;
                 return;
             }
 
@@ -341,9 +414,27 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
             this.checkOutFp.setDate(endDate, true);
             this.clearFieldError('checkOut');
             this.minStayError = !this.isMinimumStayValid(startDate, endDate);
+            this.blockedRangeError = this.hasBlockedDateInRange(startDate, endDate);
         } finally {
             this.isSyncingFromInline = false;
         }
+    }
+
+    private hasBlockedDateInRange(checkInDate: Date, checkOutDate: Date): boolean {
+        const start = new Date(checkInDate.getFullYear(), checkInDate.getMonth(), checkInDate.getDate());
+        const end = new Date(checkOutDate.getFullYear(), checkOutDate.getMonth(), checkOutDate.getDate());
+
+        if (end <= start) {
+            return false;
+        }
+
+        for (let cursor = new Date(start); cursor < end; cursor.setDate(cursor.getDate() + 1)) {
+            if (this.isBlockedDate(cursor)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private isMinimumStayValid(checkInDate: Date, checkOutDate: Date): boolean {
@@ -493,14 +584,16 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
             const startDate = this.checkInFp.selectedDates[0];
             const endDate = this.checkOutFp.selectedDates[0];
             this.minStayError = !this.isMinimumStayValid(startDate, endDate);
+            this.blockedRangeError = this.hasBlockedDateInRange(startDate, endDate);
         } else {
             this.minStayError = false;
+            this.blockedRangeError = false;
         }
 
         const hasRequiredFieldErrors = (Object.keys(this.requiredFieldErrors) as RequiredFieldKey[])
             .some((field) => this.requiredFieldErrors[field]);
 
-        return !hasRequiredFieldErrors && !this.minStayError;
+        return !hasRequiredFieldErrors && !this.minStayError && !this.blockedRangeError;
     }
 
     private resetRequiredFieldErrors(): void {
@@ -511,5 +604,6 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
         this.requiredFieldErrors.guests = false;
         this.requiredFieldErrors.gdprConsent = false;
         this.minStayError = false;
+        this.blockedRangeError = false;
     }
 }

@@ -237,7 +237,8 @@
     "validation": {
       "requiredField": "This field is required.",
       "gdprRequired": "You must accept the privacy policy to continue.",
-      "minStay": "Minimum stay is {{nights}} nights."
+      "minStay": "Minimum stay is {{nights}} nights.",
+      "blockedRange": "Your selected stay includes reserved dates. Please choose another range."
     },
     "calendar": {
       "available": "Available",
@@ -283,6 +284,63 @@
     "previousAria": "Previous image",
     "nextAria": "Next image",
     "goToPhotoAria": "Go to photo {{index}}"
+  },
+  "adminLogin": {
+    "eyebrow": "Blue Quartz",
+    "title": "Admin Login",
+    "subtitle": "Enter your credentials to continue to the admin area.",
+    "formTitle": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "emailPlaceholder": "name@example.com",
+    "passwordPlaceholder": "Enter password",
+    "submit": "Sign in securely",
+    "submitting": "Signing in...",
+    "errors": {
+      "required": "Please provide email and password.",
+      "loginFailed": "Login failed.",
+      "invalidCredentials": "Login failed. Please check your credentials."
+    }
+  },
+  "adminPanel": {
+    "eyebrow": "Blue Quartz",
+    "title": "Admin Area",
+    "subtitle": "You are connected successfully.",
+    "tabsAria": "Admin tabs",
+    "calendarTab": "Calendar",
+    "inquiriesTab": "Inquiries",
+    "calendarTitle": "Calendar Availability",
+    "inquiriesTitle": "Booking Inquiries",
+    "blockSelected": "Reserve dates",
+    "unblockSelected": "Release dates",
+    "calendar": {
+      "loadError": "Could not load reserved dates.",
+      "saveError": "Could not update dates.",
+      "blockSuccess": "Selected dates were reserved.",
+      "unblockSuccess": "Selected dates were released."
+    },
+    "inquiries": {
+      "loading": "Loading inquiries...",
+      "empty": "No inquiries yet.",
+      "loadError": "Could not load inquiries.",
+      "fullName": "Name",
+      "email": "Email",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "guests": "Guests",
+      "message": "Message",
+      "noMessage": "No message",
+      "received": "Received",
+      "prev": "Previous",
+      "next": "Next",
+      "page": "Page",
+      "total": "Total"
+    },
+    "logout": "Logout",
+    "loggingOut": "Logging out...",
+    "errors": {
+      "logoutFailed": "Logout failed. Please try again."
+    }
   },
   "privacyDialog": {
     "title": "Privacy Policy",

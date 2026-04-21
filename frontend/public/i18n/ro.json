@@ -237,7 +237,8 @@
     "validation": {
       "requiredField": "Acest câmp este obligatoriu.",
       "gdprRequired": "Trebuie să accepți politica de confidențialitate pentru a continua.",
-      "minStay": "Sejurul minim este de {{nights}} nopți."
+      "minStay": "Sejurul minim este de {{nights}} nopți.",
+      "blockedRange": "Perioada selectată include date indisponibile. Te rugăm să alegi alt interval."
     },
     "calendar": {
       "available": "Disponibil",
@@ -283,6 +284,63 @@
     "previousAria": "Imaginea anterioară",
     "nextAria": "Imaginea următoare",
     "goToPhotoAria": "Mergi la fotografia {{index}}"
+  },
+  "adminLogin": {
+    "eyebrow": "Blue Quartz",
+    "title": "Autentificare Admin",
+    "subtitle": "Introdu datele tale pentru a continua în zona de administrare.",
+    "formTitle": "Autentificare",
+    "email": "Email",
+    "password": "Parolă",
+    "emailPlaceholder": "name@example.com",
+    "passwordPlaceholder": "Introdu parola",
+    "submit": "Autentificare securizată",
+    "submitting": "Se autentifică...",
+    "errors": {
+      "required": "Te rugăm să introduci emailul și parola.",
+      "loginFailed": "Autentificarea a eșuat.",
+      "invalidCredentials": "Autentificarea a eșuat. Verifică datele introduse."
+    }
+  },
+  "adminPanel": {
+    "eyebrow": "Blue Quartz",
+    "title": "Zonă Admin",
+    "subtitle": "Autentificare reușită.",
+    "tabsAria": "Taburi admin",
+    "calendarTab": "Calendar",
+    "inquiriesTab": "Cereri",
+    "calendarTitle": "Disponibilitate Calendar",
+    "inquiriesTitle": "Cereri de rezervare",
+    "blockSelected": "Blochează datele selectate",
+    "unblockSelected": "Deblochează datele selectate",
+    "calendar": {
+      "loadError": "Nu s-au putut încărca datele blocate.",
+      "saveError": "Nu s-au putut actualiza datele.",
+      "blockSuccess": "Datele selectate au fost blocate.",
+      "unblockSuccess": "Datele selectate au fost deblocate."
+    },
+    "inquiries": {
+      "loading": "Se încarcă cererile...",
+      "empty": "Nu există încă cereri.",
+      "loadError": "Nu s-au putut încărca cererile.",
+      "fullName": "Nume",
+      "email": "Email",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "guests": "Oaspeți",
+      "message": "Mesaj",
+      "noMessage": "Fără mesaj",
+      "received": "Primit",
+      "prev": "Anterior",
+      "next": "Următor",
+      "page": "Pagina",
+      "total": "Total"
+    },
+    "logout": "Deconectare",
+    "loggingOut": "Se deconectează...",
+    "errors": {
+      "logoutFailed": "Deconectarea a eșuat. Te rugăm să încerci din nou."
+    }
   },
   "privacyDialog": {
     "title": "Politica de confidențialitate",

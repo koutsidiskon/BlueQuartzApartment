@@ -13,10 +13,36 @@ export interface InquiryData {
   recaptchaToken?: string;
 }
 
+export interface InquiryListItem {
+  id: number;
+  fullName: string;
+  email: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  message: string | null;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InquiryPagination {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+export interface InquiryListResponse {
+  success: boolean;
+  data: InquiryListItem[];
+  pagination: InquiryPagination;
+}
+
 @Injectable({ providedIn: 'root' })
 
 export class InquiryService {
-  private apiUrl = 'http://localhost:3000/api/inquiries'; 
+  private apiUrl = '/api/inquiries';
 
   constructor(private http: HttpClient) {}
 
@@ -24,6 +50,16 @@ export class InquiryService {
   createInquiry(data: InquiryData): Observable<any> {
     // console.log(" Sending inquiry data to backend:", data);
     return this.http.post(this.apiUrl, data);
+  }
+
+  getInquiries(page: number, pageSize: number): Observable<InquiryListResponse> {
+    return this.http.get<InquiryListResponse>(this.apiUrl, {
+      withCredentials: true,
+      params: {
+        page: String(page),
+        pageSize: String(pageSize)
+      }
+    });
   }
   
   

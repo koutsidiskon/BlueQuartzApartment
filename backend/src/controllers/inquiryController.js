@@ -1,4 +1,6 @@
+import { Op } from 'sequelize';
 import { Inquiry } from '../models/Inquiry.js';
+import { BlockedDate } from '../models/BlockedDate.js';
 
 export class InquiryController {
   
@@ -44,6 +46,31 @@ export class InquiryController {
             });
         }
 
+        const checkInDate = new Date(checkIn);
+        const checkOutDate = new Date(checkOut);
+        if (Number.isNaN(checkInDate.getTime()) || Number.isNaN(checkOutDate.getTime()) || checkOutDate <= checkInDate) {
+          return res.status(400).json({
+          success: false,
+          message: 'Invalid check-in/check-out date range.'
+          });
+        }
+
+        const conflictingBlockedDate = await BlockedDate.findOne({
+          where: {
+          date: {
+            [Op.gte]: checkIn,
+            [Op.lt]: checkOut
+          }
+          }
+        });
+
+        if (conflictingBlockedDate) {
+          return res.status(400).json({
+          success: false,
+          message: 'Selected dates include unavailable days. Please choose another range.'
+          });
+        }
+
         const newInquiry = await Inquiry.create({
             fullName,
             email,
@@ -74,10 +101,33 @@ export class InquiryController {
    
     async getAllInquiries(req, res) {
         try {
-        const inquiries = await Inquiry.findAll({
-            order: [['createdAt', 'DESC']]
-        });
-        return res.json({ success: true, data: inquiries });
+      const requestedPage = Number.parseInt(String(req.query?.page || '1'), 10);
+      const requestedPageSize = Number.parseInt(String(req.query?.pageSize || '10'), 10);
+
+      const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+      const pageSizeRaw = Number.isFinite(requestedPageSize) && requestedPageSize > 0 ? requestedPageSize : 10;
+      const pageSize = Math.min(pageSizeRaw, 50);
+      const offset = (page - 1) * pageSize;
+
+      const result = await Inquiry.findAndCountAll({
+        order: [['createdAt', 'DESC']],
+        limit: pageSize,
+        offset
+      });
+
+      const totalItems = Number(result.count || 0);
+      const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+
+      return res.json({
+        success: true,
+        data: result.rows,
+        pagination: {
+          page,
+          pageSize,
+          totalItems,
+          totalPages
+        }
+      });
         } catch (error) {
         return res.status(500).json({ success: false, error: error.message });
         }

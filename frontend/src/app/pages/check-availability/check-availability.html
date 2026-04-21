@@ -50,6 +50,9 @@
             @if (minStayError) {
               <p class="field-error">{{ 'checkAvailability.validation.minStay' | t: { nights: minStayNights } }}</p>
             }
+            @if (blockedRangeError) {
+              <p class="field-error">{{ 'checkAvailability.validation.blockedRange' | t : undefined : 'Your selected stay includes reserved dates. Please choose another range.' }}</p>
+            }
           </div>
         </div>
 
@@ -130,6 +133,9 @@
         </div>
         @if (minStayError) {
           <p class="calendar-validation-error">{{ 'checkAvailability.validation.minStay' | t: { nights: minStayNights } }}</p>
+        }
+        @if (blockedRangeError) {
+          <p class="calendar-validation-error">{{ 'checkAvailability.validation.blockedRange' | t : undefined : 'Your selected stay includes reserved dates. Please choose another range.' }}</p>
         }
       </div>
       

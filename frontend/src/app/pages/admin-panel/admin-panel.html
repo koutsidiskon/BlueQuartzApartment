@@ -1,0 +1,206 @@
+<section class="admin-panel-page" id="admin-panel-top">
+  <div class="admin-panel-shell">
+    <nav class="admin-nav" [attr.aria-label]="'adminPanel.tabsAria' | t : undefined : 'Admin tabs'">
+
+      <button type="button" class="hamburger" (click)="menuOpen = !menuOpen" [attr.aria-label]="'adminPanel.tabsAria' | t : undefined : 'Admin menu'">
+        <span></span><span></span><span></span>
+      </button>
+
+      <a routerLink="/" fragment="home-top" class="admin-brand" aria-label="Blue Quartz Apartment">
+        <img src="logo.png" alt="Blue Quartz Apartment" class="brand-mark">
+        <span class="brand-text">
+          <span class="brand-name">The Blue Quartz</span>
+          <span class="brand-sub">Apartment Limenas Thassos</span>
+        </span>
+      </a>
+
+      <div class="admin-nav-menu" [class.open]="menuOpen">
+        <div class="admin-nav-tabs">
+          <button
+            type="button"
+            class="nav-tab"
+            [class.active]="activeTab === 'calendar'"
+            (click)="switchTab('calendar')">
+            {{ 'adminPanel.calendarTab' | t : undefined : 'Calendar' }}
+          </button>
+          <button
+            type="button"
+            class="nav-tab"
+            [class.active]="activeTab === 'inquiries'"
+            (click)="switchTab('inquiries')">
+            {{ 'adminPanel.inquiriesTab' | t : undefined : 'Inquiries' }}
+          </button>
+        </div>
+
+        <div class="lang-switcher" [attr.aria-label]="'language.switcherAria' | t">
+          <div class="lang-dropdown custom" [class.open]="desktopLanguageMenuOpen">
+            <button
+              type="button"
+              class="lang-select-btn"
+              [attr.aria-label]="'language.switcherAria' | t"
+              (click)="toggleDesktopLanguageMenu($event)">
+              <span class="flag">{{ getLanguageFlag(currentLanguage) }}</span>
+              <span class="material-icons lang-chevron" aria-hidden="true">expand_more</span>
+            </button>
+
+            @if (desktopLanguageMenuOpen) {
+              <div class="lang-menu" (click)="$event.stopPropagation()">
+                @for (lang of languageOptions; track lang.code) {
+                  <button
+                    type="button"
+                    class="lang-menu-item"
+                    [class.active]="lang.code === currentLanguage"
+                    (click)="selectDesktopLanguage(lang.code, $event)">
+                    <span class="flag">{{ lang.flag }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <button type="button" class="logout-btn" [disabled]="isLoggingOut" (click)="logout()">
+          @if (!isLoggingOut) {
+            <span>{{ 'adminPanel.logout' | t : undefined : 'Logout' }}</span>
+          } @else {
+            <span>{{ 'adminPanel.loggingOut' | t : undefined : 'Logging out...' }}</span>
+          }
+        </button>
+      </div>
+    </nav>
+
+    <header class="admin-panel-header">
+      <h1>{{ panelTitle }}</h1>
+    </header>
+
+    <section class="tab-panel calendar-panel" [class.hidden-panel]="activeTab !== 'calendar'" [attr.aria-hidden]="activeTab !== 'calendar'">
+      <div class="calendar-range-controls">
+        <div class="range-field">
+          <label for="adminRangeFromInput">{{ 'adminPanel.rangeFrom' | t : undefined : 'From date' }}</label>
+          <div class="date-input-wrapper">
+            <input
+              type="text"
+              id="adminRangeFromInput"
+              #adminRangeFromInput
+              autocomplete="off"
+              [attr.placeholder]="'adminPanel.rangeFromPlaceholder' | t : undefined : 'Select start date'"
+            >
+            <span class="material-icons date-icon">calendar_today</span>
+          </div>
+        </div>
+
+        <div class="range-field">
+          <label for="adminRangeToInput">{{ 'adminPanel.rangeTo' | t : undefined : 'To date' }}</label>
+          <div class="date-input-wrapper">
+            <input
+              type="text"
+              id="adminRangeToInput"
+              #adminRangeToInput
+              autocomplete="off"
+              [attr.placeholder]="'adminPanel.rangeToPlaceholder' | t : undefined : 'Select end date'"
+            >
+            <span class="material-icons date-icon">calendar_today</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-calendar-card">
+        <input type="text" #adminInlineCalendar id="adminInlineCalendar" style="display: none;">
+      </div>
+
+      <div class="calendar-actions">
+        <button
+          type="button"
+          class="action-btn reserve"
+          [disabled]="!canReserveSelection()"
+          (click)="blockSelectedDates()">
+          {{ 'adminPanel.blockSelected' | t : undefined : 'Reserve dates' }}
+        </button>
+
+        <button
+          type="button"
+          class="action-btn release"
+          [disabled]="!canReleaseSelection()"
+          (click)="unblockSelectedDates()">
+          {{ 'adminPanel.unblockSelected' | t : undefined : 'Release dates' }}
+        </button>
+      </div>
+
+      @if (calendarMessage) {
+        <p class="status ok">{{ calendarMessage }}</p>
+      }
+
+      @if (calendarError) {
+        <p class="status error">{{ calendarError }}</p>
+      }
+    </section>
+
+    <section class="tab-panel inquiries-panel" [class.hidden-panel]="activeTab !== 'inquiries'" [attr.aria-hidden]="activeTab !== 'inquiries'">
+      @if (isInquiriesLoading) {
+        <p class="status loading">{{ 'adminPanel.inquiries.loading' | t : undefined : 'Loading inquiries...' }}</p>
+      }
+
+      @if (inquiriesError) {
+        <p class="status error">{{ inquiriesError }}</p>
+      }
+
+      @if (!isInquiriesLoading && !inquiriesError && !inquiries.length) {
+        <p class="status empty">{{ 'adminPanel.inquiries.empty' | t : undefined : 'No inquiries yet.' }}</p>
+      }
+
+      @if (inquiries.length) {
+        <div class="inquiry-list" role="table" [attr.aria-label]="'adminPanel.inquiriesTab' | t : undefined : 'Inquiries'">
+          <div class="inquiry-head" role="row">
+            <span>{{ 'adminPanel.inquiries.fullName' | t : undefined : 'Name' }}</span>
+            <span>{{ 'adminPanel.inquiries.email' | t : undefined : 'Email' }}</span>
+            <span>{{ 'adminPanel.inquiries.checkIn' | t : undefined : 'Check-in' }}</span>
+            <span>{{ 'adminPanel.inquiries.checkOut' | t : undefined : 'Check-out' }}</span>
+            <span>{{ 'adminPanel.inquiries.guests' | t : undefined : 'Guests' }}</span>
+            <span>{{ 'adminPanel.inquiries.message' | t : undefined : 'Message' }}</span>
+            <span>{{ 'adminPanel.inquiries.received' | t : undefined : 'Received' }}</span>
+          </div>
+
+          @for (inquiry of inquiries; track inquiry.id) {
+            <article class="inquiry-row" role="row">
+              <span class="name" [attr.data-label]="'adminPanel.inquiries.fullName' | t : undefined : 'Name'">{{ inquiry.fullName }}</span>
+              <span [attr.data-label]="'adminPanel.inquiries.email' | t : undefined : 'Email'">{{ inquiry.email }}</span>
+              <span [attr.data-label]="'adminPanel.inquiries.checkIn' | t : undefined : 'Check-in'">{{ inquiry.checkIn }}</span>
+              <span [attr.data-label]="'adminPanel.inquiries.checkOut' | t : undefined : 'Check-out'">{{ inquiry.checkOut }}</span>
+              <span [attr.data-label]="'adminPanel.inquiries.guests' | t : undefined : 'Guests'">{{ inquiry.guests }}</span>
+              <span class="message" [attr.data-label]="'adminPanel.inquiries.message' | t : undefined : 'Message'">{{ inquiry.message || ('adminPanel.inquiries.noMessage' | t : undefined : 'No message') }}</span>
+              <span [attr.data-label]="'adminPanel.inquiries.received' | t : undefined : 'Received'">{{ inquiry.createdAt | date: 'short' }}</span>
+            </article>
+          }
+        </div>
+
+        <div class="pagination-row">
+          <button
+            type="button"
+            class="page-btn"
+            [disabled]="!hasInquiryPreviousPage() || isInquiriesLoading"
+            (click)="goToInquiryPage(inquiryPage - 1)">
+            {{ 'adminPanel.inquiries.prev' | t : undefined : 'Previous' }}
+          </button>
+
+          <p>
+            {{ 'adminPanel.inquiries.page' | t : undefined : 'Page' }} {{ inquiryPage }} / {{ inquiryTotalPages }}
+            ·
+            {{ 'adminPanel.inquiries.total' | t : undefined : 'Total' }} {{ inquiryTotalItems }}
+          </p>
+
+          <button
+            type="button"
+            class="page-btn"
+            [disabled]="!hasInquiryNextPage() || isInquiriesLoading"
+            (click)="goToInquiryPage(inquiryPage + 1)">
+            {{ 'adminPanel.inquiries.next' | t : undefined : 'Next' }}
+          </button>
+        </div>
+      }
+    </section>
+
+    @if (error) {
+      <p class="status error">{{ error }}</p>
+    }
+  </div>
+</section>

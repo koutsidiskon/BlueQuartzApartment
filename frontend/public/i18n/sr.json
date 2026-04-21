@@ -237,7 +237,8 @@
     "validation": {
       "requiredField": "Ovo polje je obavezno.",
       "gdprRequired": "Morate prihvatiti politiku privatnosti da biste nastavili.",
-      "minStay": "Minimalni boravak je {{nights}} noći."
+      "minStay": "Minimalni boravak je {{nights}} noći.",
+      "blockedRange": "Izabrani period sadrži zauzete datume. Molimo izaberite drugi period."
     },
     "calendar": {
       "available": "Dostupno",
@@ -283,6 +284,63 @@
     "previousAria": "Prethodna slika",
     "nextAria": "Sledeća slika",
     "goToPhotoAria": "Idi na fotografiju {{index}}"
+  },
+  "adminLogin": {
+    "eyebrow": "Blue Quartz",
+    "title": "Admin prijava",
+    "subtitle": "Unesite svoje podatke da biste nastavili u admin zonu.",
+    "formTitle": "Prijava",
+    "email": "Email",
+    "password": "Lozinka",
+    "emailPlaceholder": "name@example.com",
+    "passwordPlaceholder": "Unesite lozinku",
+    "submit": "Bezbedna prijava",
+    "submitting": "Prijava...",
+    "errors": {
+      "required": "Unesite email i lozinku.",
+      "loginFailed": "Prijava nije uspela.",
+      "invalidCredentials": "Prijava nije uspela. Proverite unete podatke."
+    }
+  },
+  "adminPanel": {
+    "eyebrow": "Blue Quartz",
+    "title": "Admin zona",
+    "subtitle": "Uspešno ste prijavljeni.",
+    "tabsAria": "Admin kartice",
+    "calendarTab": "Kalendar",
+    "inquiriesTab": "Upiti",
+    "calendarTitle": "Dostupnost kalendara",
+    "inquiriesTitle": "Upiti za rezervaciju",
+    "blockSelected": "Blokiraj izabrane datume",
+    "unblockSelected": "Odblokiraj izabrane datume",
+    "calendar": {
+      "loadError": "Nije moguće učitati blokirane datume.",
+      "saveError": "Nije moguće sačuvati izmene datuma.",
+      "blockSuccess": "Izabrani datumi su blokirani.",
+      "unblockSuccess": "Izabrani datumi su odblokirani."
+    },
+    "inquiries": {
+      "loading": "Učitavanje upita...",
+      "empty": "Još nema upita.",
+      "loadError": "Nije moguće učitati upite.",
+      "fullName": "Ime",
+      "email": "Email",
+      "checkIn": "Prijava",
+      "checkOut": "Odjava",
+      "guests": "Gosti",
+      "message": "Poruka",
+      "noMessage": "Nema poruke",
+      "received": "Primljeno",
+      "prev": "Prethodno",
+      "next": "Sledeće",
+      "page": "Stranica",
+      "total": "Ukupno"
+    },
+    "logout": "Odjava",
+    "loggingOut": "Odjavljivanje...",
+    "errors": {
+      "logoutFailed": "Odjava nije uspela. Pokušajte ponovo."
+    }
   },
   "privacyDialog": {
     "title": "Politika privatnosti",
