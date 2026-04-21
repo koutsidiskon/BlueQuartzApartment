@@ -97,7 +97,7 @@ export class InquiryController {
     }
 
   
-    // Ανάκτηση όλων των ερωτήσεων για το admin panel
+  
    
     async getAllInquiries(req, res) {
         try {
@@ -106,11 +106,25 @@ export class InquiryController {
 
       const page = Number.isFinite(requestedPage) && requestedPage > 0 ? requestedPage : 1;
       const pageSizeRaw = Number.isFinite(requestedPageSize) && requestedPageSize > 0 ? requestedPageSize : 10;
-      const pageSize = Math.min(pageSizeRaw, 50);
+      const pageSize = Math.min(pageSizeRaw, 100);
       const offset = (page - 1) * pageSize;
 
+      const search = String(req.query?.search || '').trim().slice(0, 100);
+      const allowedSortFields = ['createdAt', 'fullName', 'email', 'checkIn', 'checkOut', 'guests'];
+      const sortField = allowedSortFields.includes(req.query?.sortField) ? req.query.sortField : 'createdAt';
+      const sortDir = req.query?.sortDir === 'ASC' ? 'ASC' : 'DESC';
+
+      const where = {};
+      if (search) {
+        where[Op.or] = [
+          { email: { [Op.like]: `%${search}%` } },
+          { fullName: { [Op.like]: `%${search}%` } }
+        ];
+      }
+
       const result = await Inquiry.findAndCountAll({
-        order: [['createdAt', 'DESC']],
+        where,
+        order: [[sortField, sortDir]],
         limit: pageSize,
         offset
       });
@@ -131,6 +145,42 @@ export class InquiryController {
         } catch (error) {
         return res.status(500).json({ success: false, error: error.message });
         }
+    }
+
+    async deleteInquiries(req, res) {
+      try {
+        const { ids } = req.body;
+
+        if (!Array.isArray(ids) || ids.length === 0) {
+          return res.status(400).json({
+            success: false,
+            message: 'Please provide an array of inquiry IDs to delete.'
+          });
+        }
+
+        const validIds = ids
+          .map(id => Number(id))
+          .filter(id => Number.isInteger(id) && id > 0);
+
+        if (validIds.length === 0) {
+          return res.status(400).json({
+            success: false,
+            message: 'No valid inquiry IDs provided.'
+          });
+        }
+
+        const deletedCount = await Inquiry.destroy({
+          where: { id: { [Op.in]: validIds } }
+        });
+
+        return res.json({
+          success: true,
+          message: `${deletedCount} inquiry(ies) deleted successfully.`,
+          data: { deletedCount }
+        });
+      } catch (error) {
+        return res.status(500).json({ success: false, error: error.message });
+      }
     }
 }
 

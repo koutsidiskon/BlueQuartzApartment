@@ -16,8 +16,9 @@ const inquiryLimiter = rateLimit({
 	}
 });
 
-router.get('/', requireAdminAuth, inquiryController.getAllInquiries);
+router.get('/', requireAdminAuth, (req, res) => inquiryController.getAllInquiries(req, res));
 router.post('/', inquiryLimiter, (req, res) => inquiryController.createInquiry(req, res));
+router.delete('/', requireAdminAuth, (req, res) => inquiryController.deleteInquiries(req, res));
 
 
 export default router;
