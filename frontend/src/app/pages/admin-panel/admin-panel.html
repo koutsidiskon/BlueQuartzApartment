@@ -136,7 +136,64 @@
     </section>
 
     <section class="tab-panel inquiries-panel" [class.hidden-panel]="activeTab !== 'inquiries'" [attr.aria-hidden]="activeTab !== 'inquiries'">
-      @if (isInquiriesLoading) {
+
+      <div class="inquiry-toolbar">
+        <div class="search-wrapper">
+          <span class="material-icons search-icon">search</span>
+          <input
+            type="text"
+            class="search-input"
+            [value]="searchTerm"
+            (input)="onSearchInput($any($event).target.value)"
+            [attr.placeholder]="'adminPanel.inquiries.searchPlaceholder' | t : undefined : 'Search by name or email…'"
+            autocomplete="off"
+          >
+          @if (searchTerm) {
+            <button type="button" class="search-clear" (click)="clearSearch()" aria-label="Clear search">
+              <span class="material-icons">close</span>
+            </button>
+          }
+        </div>
+
+        <div class="sort-wrapper">
+          <select class="sort-select" (change)="onSortFieldChange($event)">
+            <option value="createdAt" [selected]="sortField === 'createdAt'">{{ 'adminPanel.inquiries.sortDate' | t : undefined : 'Date' }}</option>
+            <option value="fullName" [selected]="sortField === 'fullName'">{{ 'adminPanel.inquiries.sortName' | t : undefined : 'Name' }}</option>
+            <option value="email" [selected]="sortField === 'email'">{{ 'adminPanel.inquiries.sortEmail' | t : undefined : 'Email' }}</option>
+            <option value="checkIn" [selected]="sortField === 'checkIn'">{{ 'adminPanel.inquiries.sortCheckIn' | t : undefined : 'Check-in' }}</option>
+            <option value="guests" [selected]="sortField === 'guests'">{{ 'adminPanel.inquiries.sortGuests' | t : undefined : 'Guests' }}</option>
+          </select>
+          <button type="button" class="sort-dir-btn" (click)="onSortDirToggle()">
+            <span class="material-icons">{{ sortDir === 'DESC' ? 'arrow_downward' : 'arrow_upward' }}</span>
+          </button>
+        </div>
+
+        <div class="toolbar-actions">
+          @if (isSomeSelected()) {
+            <button type="button" class="delete-selected-btn" [disabled]="isDeleting" (click)="deleteSelectedInquiries()">
+              @if (isDeleting) {
+                <span class="material-icons spinning">sync</span>
+              } @else {
+                <span class="material-icons">delete</span>
+              }
+              <span>{{ 'adminPanel.inquiries.delete' | t : undefined : 'Delete' }} ({{ selectedInquiryIds.size }})</span>
+            </button>
+          }
+          <button type="button" class="refresh-btn" [disabled]="isInquiriesLoading" (click)="refreshInquiries()" [attr.title]="'adminPanel.inquiries.refresh' | t : undefined : 'Refresh'">
+            <span class="material-icons" [class.spinning]="isInquiriesLoading">refresh</span>
+          </button>
+        </div>
+      </div>
+
+      @if (deleteMessage) {
+        <p class="status ok">{{ deleteMessage }}</p>
+      }
+
+      @if (deleteError) {
+        <p class="status error">{{ deleteError }}</p>
+      }
+
+      @if (isInquiriesLoading && !inquiries.length) {
         <p class="status loading">{{ 'adminPanel.inquiries.loading' | t : undefined : 'Loading inquiries...' }}</p>
       }
 
@@ -151,6 +208,15 @@
       @if (inquiries.length) {
         <div class="inquiry-list" role="table" [attr.aria-label]="'adminPanel.inquiriesTab' | t : undefined : 'Inquiries'">
           <div class="inquiry-head" role="row">
+            <span class="col-check">
+              <input
+                type="checkbox"
+                [checked]="isAllSelected()"
+                [indeterminate]="isSomeSelected() && !isAllSelected()"
+                (change)="toggleSelectAll()"
+                [attr.aria-label]="'adminPanel.inquiries.selectAll' | t : undefined : 'Select all'"
+              >
+            </span>
             <span>{{ 'adminPanel.inquiries.fullName' | t : undefined : 'Name' }}</span>
             <span>{{ 'adminPanel.inquiries.email' | t : undefined : 'Email' }}</span>
             <span>{{ 'adminPanel.inquiries.checkIn' | t : undefined : 'Check-in' }}</span>
@@ -161,7 +227,14 @@
           </div>
 
           @for (inquiry of inquiries; track inquiry.id) {
-            <article class="inquiry-row" role="row">
+            <article class="inquiry-row" role="row" [class.selected]="isInquirySelected(inquiry.id)">
+              <span class="col-check">
+                <input
+                  type="checkbox"
+                  [checked]="isInquirySelected(inquiry.id)"
+                  (change)="toggleSelectInquiry(inquiry.id)"
+                >
+              </span>
               <span class="name" [attr.data-label]="'adminPanel.inquiries.fullName' | t : undefined : 'Name'">{{ inquiry.fullName }}</span>
               <span [attr.data-label]="'adminPanel.inquiries.email' | t : undefined : 'Email'">{{ inquiry.email }}</span>
               <span [attr.data-label]="'adminPanel.inquiries.checkIn' | t : undefined : 'Check-in'">{{ inquiry.checkIn }}</span>
@@ -174,6 +247,16 @@
         </div>
 
         <div class="pagination-row">
+          <div class="page-size-wrapper">
+            <span class="page-size-label">{{ 'adminPanel.inquiries.perPage' | t : undefined : 'Per page:' }}</span>
+            <select class="page-size-select" (change)="onPageSizeChange($event)">
+              <option value="10"  [selected]="inquiryPageSize === 10">10</option>
+              <option value="20"  [selected]="inquiryPageSize === 20">20</option>
+              <option value="50"  [selected]="inquiryPageSize === 50">50</option>
+              <option value="100" [selected]="inquiryPageSize === 100">100</option>
+            </select>
+          </div>
+
           <button
             type="button"
             class="page-btn"

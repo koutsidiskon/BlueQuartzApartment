@@ -12,6 +12,8 @@ function normalizeDateList(inputDates) {
 }
 
 export class CalendarController {
+
+  // this method is used by the admin panel to fetch all blocked dates from the database in order to display them in the calendar UI
   async getBlockedDates(_req, res) {
     try {
       const blockedDates = await BlockedDate.findAll({
@@ -32,6 +34,7 @@ export class CalendarController {
     }
   }
 
+  // this method is used by the admin panel to update the list of blocked dates in the database based on the admin's input in the calendar UI
   async updateBlockedDates(req, res) {
     try {
       const dates = normalizeDateList(req.body?.dates);

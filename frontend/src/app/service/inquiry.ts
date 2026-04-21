@@ -39,28 +39,41 @@ export interface InquiryListResponse {
   pagination: InquiryPagination;
 }
 
-@Injectable({ providedIn: 'root' })
+export interface DeleteInquiriesResponse {
+  success: boolean;
+  message: string;
+  data: { deletedCount: number };
+}
 
+@Injectable({ providedIn: 'root' })
 export class InquiryService {
   private apiUrl = '/api/inquiries';
 
   constructor(private http: HttpClient) {}
 
-  // Sends the inquiry data to the backend API to create a new inquiry record
   createInquiry(data: InquiryData): Observable<any> {
-    // console.log(" Sending inquiry data to backend:", data);
     return this.http.post(this.apiUrl, data);
   }
 
-  getInquiries(page: number, pageSize: number): Observable<InquiryListResponse> {
+  getInquiries(page: number, pageSize: number, search?: string, sortField?: string, sortDir?: string): Observable<InquiryListResponse> {
+    const params: Record<string, string> = {
+      page: String(page),
+      pageSize: String(pageSize)
+    };
+    if (search) params['search'] = search;
+    if (sortField) params['sortField'] = sortField;
+    if (sortDir) params['sortDir'] = sortDir;
+
     return this.http.get<InquiryListResponse>(this.apiUrl, {
       withCredentials: true,
-      params: {
-        page: String(page),
-        pageSize: String(pageSize)
-      }
+      params
     });
   }
-  
-  
+
+  deleteInquiries(ids: number[]): Observable<DeleteInquiriesResponse> {
+    return this.http.delete<DeleteInquiriesResponse>(this.apiUrl, {
+      withCredentials: true,
+      body: { ids }
+    });
+  }
 }

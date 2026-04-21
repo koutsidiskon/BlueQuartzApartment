@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 
+// This model represents the inquiries from potential guests who are interested in booking the apartment.
 export const Inquiry = sequelize.define('Inquiry', {
   
   fullName: {

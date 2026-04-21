@@ -1,6 +1,9 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 
+// This model represents the admin users who can log in to the admin panel and manage the website content and inquiries. 
+// It includes fields for email, password hash, role (owner or family), active status and last login time. The email field is unique and validated to ensure it is in a proper email format. 
+// The password is stored as a hash for security reasons.
 export const AdminUser = sequelize.define('AdminUser', {
   email: {
     type: DataTypes.STRING,

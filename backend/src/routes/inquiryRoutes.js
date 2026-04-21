@@ -5,6 +5,7 @@ import { requireAdminAuth } from '../middleware/adminAuth.js';
 
 const router = express.Router();
 
+// Rate limiter for inquiry submissions to prevent spam and abuse of the contact form
 const inquiryLimiter = rateLimit({
 	windowMs: 15 * 60 * 1000,
 	limit: 5,
@@ -16,8 +17,10 @@ const inquiryLimiter = rateLimit({
 	}
 });
 
-router.get('/', requireAdminAuth, inquiryController.getAllInquiries);
+// Inquiry routes for handling contact form submissions and managing inquiries in the admin panel
+router.get('/', requireAdminAuth, (req, res) => inquiryController.getAllInquiries(req, res));
 router.post('/', inquiryLimiter, (req, res) => inquiryController.createInquiry(req, res));
+router.delete('/', requireAdminAuth, (req, res) => inquiryController.deleteInquiries(req, res));
 
 
 export default router;

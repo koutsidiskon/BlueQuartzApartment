@@ -65,7 +65,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   inquiryPage = 1;
   inquiryTotalPages = 1;
   inquiryTotalItems = 0;
-  readonly inquiryPageSize = 10;
+  inquiryPageSize = 10;
   readonly languageOptions;
   private inlineFp: any;
   private rangeFromFp: any;
@@ -79,6 +79,15 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   private inquiryTotalPagesCache = 1;
   private inquiryRequestToken = 0;
   private lastRenderedLanguage = '';
+
+  selectedInquiryIds = new Set<number>();
+  searchTerm = '';
+  sortField = 'createdAt';
+  sortDir: 'ASC' | 'DESC' = 'DESC';
+  isDeleting = false;
+  deleteMessage = '';
+  deleteError = '';
+  private searchDebounceTimer: any = null;
 
   constructor(
     private adminAuth: AdminAuthService,
@@ -286,12 +295,14 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
     this.isInquiriesLoading = true;
     this.inquiriesError = '';
+    this.cdr.detectChanges();
     const requestToken = ++this.inquiryRequestToken;
 
-    this.inquiryService.getInquiries(page, this.inquiryPageSize).pipe(
+    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir).pipe(
       finalize(() => {
         if (requestToken === this.inquiryRequestToken) {
           this.isInquiriesLoading = false;
+          this.cdr.detectChanges();
         }
       })
     ).subscribe({
@@ -302,6 +313,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
         if (!response?.success) {
           this.inquiriesError = this.i18n.t('adminPanel.inquiries.loadError', undefined, 'Could not load inquiries.');
+          this.cdr.detectChanges();
           return;
         }
 
@@ -320,6 +332,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
         this.inquiryTotalPages = totalPages;
         this.inquiryTotalItems = totalItems;
 
+        this.cdr.detectChanges();
         this.prefetchInquiryPage(currentPage + 1);
         this.prefetchInquiryPage(currentPage - 1);
       },
@@ -329,6 +342,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
         }
 
         this.inquiriesError = this.i18n.t('adminPanel.inquiries.loadError', undefined, 'Could not load inquiries.');
+        this.cdr.detectChanges();
       }
     });
   }
@@ -338,7 +352,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     if (this.inquiryTotalPagesCache && page > this.inquiryTotalPagesCache) return;
     if (this.inquiryPageCache.has(page)) return;
 
-    this.inquiryService.getInquiries(page, this.inquiryPageSize).subscribe({
+    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir).subscribe({
       next: (response) => {
         if (!response?.success) return;
 
@@ -595,6 +609,139 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     if (this.rangeToFp) {
       this.rangeToFp.set('locale', locale);
     }
+  }
+
+  refreshInquiries(): void {
+    clearTimeout(this.searchDebounceTimer);
+    this.inquiryPageCache.clear();
+    this.selectedInquiryIds.clear();
+    this.deleteMessage = '';
+    this.deleteError = '';
+    this.loadInquiries(1);
+  }
+
+  onSearchInput(value: string): void {
+    this.searchTerm = value;
+    clearTimeout(this.searchDebounceTimer);
+    this.searchDebounceTimer = setTimeout(() => {
+      this.ngZone.run(() => {
+        this.inquiryPageCache.clear();
+        this.selectedInquiryIds.clear();
+        this.deleteMessage = '';
+        this.deleteError = '';
+        this.loadInquiries(1);
+      });
+    }, 350);
+  }
+
+  clearSearch(): void {
+    clearTimeout(this.searchDebounceTimer);
+    this.searchTerm = '';
+    this.inquiryPageCache.clear();
+    this.selectedInquiryIds.clear();
+    this.deleteMessage = '';
+    this.deleteError = '';
+    this.loadInquiries(1);
+  }
+
+  onPageSizeChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const newSize = Number(select.value);
+    if (newSize === this.inquiryPageSize) return;
+    this.inquiryPageSize = newSize;
+    this.inquiryPageCache.clear();
+    this.selectedInquiryIds.clear();
+    this.deleteMessage = '';
+    this.deleteError = '';
+    this.loadInquiries(1);
+  }
+
+  onSortFieldChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.sortField = select.value;
+    this.inquiryPageCache.clear();
+    this.selectedInquiryIds.clear();
+    this.deleteMessage = '';
+    this.deleteError = '';
+    this.loadInquiries(1);
+  }
+
+  onSortDirToggle(): void {
+    this.sortDir = this.sortDir === 'DESC' ? 'ASC' : 'DESC';
+    this.inquiryPageCache.clear();
+    this.selectedInquiryIds.clear();
+    this.deleteMessage = '';
+    this.deleteError = '';
+    this.loadInquiries(1);
+  }
+
+  toggleSelectInquiry(id: number): void {
+    if (this.selectedInquiryIds.has(id)) {
+      this.selectedInquiryIds.delete(id);
+    } else {
+      this.selectedInquiryIds.add(id);
+    }
+  }
+
+  isInquirySelected(id: number): boolean {
+    return this.selectedInquiryIds.has(id);
+  }
+
+  isAllSelected(): boolean {
+    return this.inquiries.length > 0 && this.inquiries.every(inq => this.selectedInquiryIds.has(inq.id));
+  }
+
+  isSomeSelected(): boolean {
+    return this.selectedInquiryIds.size > 0;
+  }
+
+  toggleSelectAll(): void {
+    if (this.isAllSelected()) {
+      this.inquiries.forEach(inq => this.selectedInquiryIds.delete(inq.id));
+    } else {
+      this.inquiries.forEach(inq => this.selectedInquiryIds.add(inq.id));
+    }
+  }
+
+  deleteSelectedInquiries(): void {
+    if (!this.selectedInquiryIds.size || this.isDeleting) return;
+
+    const ids = Array.from(this.selectedInquiryIds);
+    this.isDeleting = true;
+    this.deleteError = '';
+    this.deleteMessage = '';
+
+    this.inquiryService.deleteInquiries(ids).pipe(
+      finalize(() => {
+        this.isDeleting = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: (response) => {
+        if (!response?.success) {
+          this.deleteError = this.i18n.t('adminPanel.inquiries.deleteError', undefined, 'Could not delete the selected inquiries.');
+          this.cdr.detectChanges();
+          return;
+        }
+        const count = response.data?.deletedCount ?? ids.length;
+        this.deleteMessage = this.i18n.t('adminPanel.inquiries.deleteSuccess', undefined, `${count} inquiry/inquiries deleted successfully.`);
+        this.selectedInquiryIds.clear();
+        this.inquiryPageCache.clear();
+        this.cdr.detectChanges();
+        const safePageAfterDelete = this.inquiryPage > this.inquiryTotalPages ? 1 : this.inquiryPage;
+        this.loadInquiries(safePageAfterDelete);
+        setTimeout(() => {
+          this.ngZone.run(() => {
+            this.deleteMessage = '';
+            this.cdr.detectChanges();
+          });
+        }, 4000);
+      },
+      error: () => {
+        this.deleteError = this.i18n.t('adminPanel.inquiries.deleteError', undefined, 'Could not delete the selected inquiries.');
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   logout(): void {

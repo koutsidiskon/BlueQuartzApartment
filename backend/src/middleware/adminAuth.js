@@ -2,11 +2,15 @@ import jwt from 'jsonwebtoken';
 
 const AUTH_COOKIE_NAME = process.env.ADMIN_AUTH_COOKIE_NAME || 'bq_admin_token';
 
+// function to extract a Bearer token from the Authorization header
 function extractBearerToken(authHeader) {
   if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
   return authHeader.slice('Bearer '.length).trim();
 }
 
+// Middleware function for letting only authenticated admin users access certain routes. 
+// It checks for a JWT token in either the cookie or the Authorization header, verifies it, 
+// and attaches the decoded user information to the request object for use in downstream handlers.
 export function requireAdminAuth(req, res, next) {
   const jwtSecret = process.env.ADMIN_JWT_SECRET;
   if (!jwtSecret) {
@@ -43,6 +47,10 @@ export function requireAdminAuth(req, res, next) {
   }
 }
 
+// Higher-order middleware function to enforce that the authenticated admin user has one of the specified roles. 
+// It checks the user's role from the decoded JWT token and compares it against the allowed roles, returning a 403 error if they don't match.
+
+// This doesn't used currently, but it can be easily added to any route that requires role-based access control in the future.
 export function requireAdminRole(...roles) {
   return (req, res, next) => {
     const role = req.adminAuth?.role;

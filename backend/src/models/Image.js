@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 
+// This model represents the images for the apartment, which are stored in the database and used to display them in the gallery page and other sections of the website.
 export const Image = sequelize.define('Image', {
     url: {
         type: DataTypes.TEXT, 

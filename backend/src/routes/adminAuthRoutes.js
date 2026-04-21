@@ -5,6 +5,7 @@ import { requireAdminAuth } from '../middleware/adminAuth.js';
 
 const router = express.Router();
 
+// Rate limiter for login attempts to prevent brute-force attacks
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 5,
@@ -16,6 +17,7 @@ const loginLimiter = rateLimit({
   }
 });
 
+// Admin authentication routes
 router.post('/login', loginLimiter, (req, res) => adminAuthController.login(req, res));
 router.post('/logout', requireAdminAuth, (req, res) => adminAuthController.logout(req, res));
 router.get('/me', requireAdminAuth, (req, res) => adminAuthController.me(req, res));

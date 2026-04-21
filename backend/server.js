@@ -59,7 +59,9 @@ async function startServer() {
         await sequelize.sync({ alter: true });
         console.log('✅ Database & tables synced!');
 
-        await ensureInitialAdminUser();
+        // Ensure to create the initial admin user if it doesn't exist. This is important for being able to log in to the admin panel for the first time.
+        // You can set and additional admin users later using different email and password and add them to .env as well, or you can create them directly in the database.
+        // await ensureInitialAdminUser();
 
         app.listen(PORT, () => {
             console.log(`🚀 Server is running on port ${PORT}`);

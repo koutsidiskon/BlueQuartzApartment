@@ -57,6 +57,9 @@ function toSafeUser(user) {
 }
 
 export class AdminAuthController {
+
+  // Handles admin login by validating credentials, generating a JWT token, and setting it in an HTTP-only cookie for session management.
+  // It also updates the last login timestamp for the user.
   async login(req, res) {
     try {
       const email = String(req.body?.email || '').trim().toLowerCase();
@@ -103,6 +106,8 @@ export class AdminAuthController {
     }
   }
 
+  // Retrieves the currently authenticated admin user's information based on the JWT token provided in the cookie. 
+  // It validates the token, checks if the user is active, and returns the user's details.
   async me(req, res) {
     try {
       const userId = req.adminAuth?.userId;
@@ -128,6 +133,7 @@ export class AdminAuthController {
     }
   }
 
+  // Handles admin logout by clearing the authentication cookie, effectively ending the user's session.
   async logout(req, res) {
     res.clearCookie(AUTH_COOKIE_NAME, {
       httpOnly: true,

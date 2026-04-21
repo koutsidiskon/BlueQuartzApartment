@@ -1,6 +1,8 @@
 import bcrypt from 'bcryptjs';
 import { AdminUser } from '../models/AdminUser.js';
 
+// This function checks if an admin user exists, and if not, creates one using credentials from environment variables.
+// This is useful for the initial setup of the application, allowing you to log in to the admin panel for the first time. 
 export async function ensureInitialAdminUser() {
   const adminEmail = String(process.env.ADMIN_EMAIL || '').trim().toLowerCase();
   const adminPassword = String(process.env.ADMIN_PASSWORD || '');
