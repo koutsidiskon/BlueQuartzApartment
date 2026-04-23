@@ -108,7 +108,14 @@
         </div>
 
         <div class="form-submit">
-          <button type="submit" class="btn-submit">{{ 'checkAvailability.form.submit' | t }} <span class="material-icons">send</span></button>
+          <button type="submit" class="btn-submit" [disabled]="isSubmitting">
+            @if (isSubmitting) {
+              <span class="btn-spinner"></span>
+              {{ 'checkAvailability.form.submitting' | t }}
+            } @else {
+              {{ 'checkAvailability.form.submit' | t }} <span class="material-icons">send</span>
+            }
+          </button>
         </div>
 
         <p class="recaptcha-notice">

@@ -62,7 +62,12 @@
           [placeholder]="'adminLogin.passwordPlaceholder' | t : undefined : 'Enter password'">
 
         <button type="submit" class="primary-btn" [disabled]="isSubmitting">
-          <span>Sign in</span>
+          @if (isSubmitting) {
+            <span class="btn-spinner"></span>
+            <span>{{ 'adminLogin.submitting' | t : undefined : 'Signing in...' }}</span>
+          } @else {
+            <span>{{ 'adminLogin.submit' | t : undefined : 'Sign in' }}</span>
+          }
         </button>
       </form>
 

@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
 import { Inquiry } from '../models/Inquiry.js';
 import { BlockedDate } from '../models/BlockedDate.js';
-import { sendInquiryConfirmation } from '../services/emailService.js';
+import { sendInquiryConfirmation, sendAdminNotification } from '../services/emailService.js';
 
 export class InquiryController {
   
@@ -84,6 +84,9 @@ export class InquiryController {
 
         sendInquiryConfirmation({ fullName, email, checkIn, checkOut, guests: guests || 1, message })
           .catch(err => console.error('Confirmation email failed:', err));
+
+        sendAdminNotification({ fullName, email, checkIn, checkOut, guests: guests || 1, message })
+          .catch(err => console.error('Admin notification email failed:', err));
 
         return res.status(201).json({
             success: true,

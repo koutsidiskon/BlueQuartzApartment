@@ -230,6 +230,7 @@
       "gdprPrefix": "* Sunt de acord cu stocarea și prelucrarea datelor mele personale pentru această solicitare de rezervare, conform",
       "gdprSuffix": ".",
       "submit": "Trimite solicitarea",
+      "submitting": "Se trimite...",
       "recaptchaPrefix": "Acest site este protejat de reCAPTCHA, iar",
       "recaptchaAnd": "și",
       "recaptchaApply": "se aplică."

@@ -230,6 +230,7 @@
       "gdprPrefix": "* Bu rezervasyon talebi için kişisel verilerimin",
       "gdprSuffix": "kapsamında saklanmasını ve işlenmesini kabul ediyorum.",
       "submit": "Talep Gönder",
+      "submitting": "Gönderiliyor...",
       "recaptchaPrefix": "Bu site reCAPTCHA ile korunmaktadır ve Google",
       "recaptchaAnd": "ile",
       "recaptchaApply": "geçerlidir."

@@ -275,6 +275,21 @@ $font-logo: 'Playfair Display', serif;
         justify-content: center;
         margin: 0 auto;
 
+        &:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+
+        .btn-spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(255,255,255,0.4);
+          border-top-color: #fff;
+          border-radius: 50%;
+          animation: spin 0.7s linear infinite;
+          flex-shrink: 0;
+        }
+
         &:hover {
           background-color: $blue-quartz-light;
           transform: translateY(-2px);
@@ -455,4 +470,8 @@ $font-logo: 'Playfair Display', serif;
       font-size: 2.2rem;
     }
   }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

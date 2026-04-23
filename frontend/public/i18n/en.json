@@ -230,6 +230,7 @@
       "gdprPrefix": "* I agree to the storage and processing of my personal data for this booking inquiry according to the",
       "gdprSuffix": ".",
       "submit": "Send Inquiry",
+      "submitting": "Sending...",
       "recaptchaPrefix": "This site is protected by reCAPTCHA and the Google",
       "recaptchaAnd": "and",
       "recaptchaApply": "apply."

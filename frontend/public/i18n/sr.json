@@ -230,6 +230,7 @@
       "gdprPrefix": "* Saglasan/saglasna sam sa čuvanjem i obradom mojih ličnih podataka za ovaj upit za rezervaciju u skladu sa",
       "gdprSuffix": ".",
       "submit": "Pošalji upit",
+      "submitting": "Slanje...",
       "recaptchaPrefix": "Ovaj sajt je zaštićen reCAPTCHA sistemom i važe Google",
       "recaptchaAnd": "i",
       "recaptchaApply": "."

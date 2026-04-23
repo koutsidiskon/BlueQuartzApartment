@@ -86,6 +86,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     readonly minStayNights = MIN_STAY_NIGHTS;
     minStayError = false;
     blockedRangeError = false;
+    isSubmitting = false;
     requiredFieldErrors: Record<RequiredFieldKey, boolean> = {
         fullName: false,
         email: false,
@@ -482,6 +483,8 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     const nameValue = this.fullNameInput?.nativeElement.value || '';
     const firstName = nameValue.split(' ')[0];
 
+    this.isSubmitting = true;
+
     this.getRecaptchaToken().then((recaptchaToken) => {
       const inquiryData = {
           fullName: nameValue,
@@ -495,7 +498,8 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
       };
 
       this.inquiryService.createInquiry(inquiryData).subscribe({
-          next: (response) => {
+          next: (_) => {
+              this.isSubmitting = false;
               Swal.fire({
                   title: this.i18n.t('checkAvailability.popup.greeting', { firstName }),
                   icon: 'success',
@@ -520,6 +524,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
               this.resetForm(); 
           },
           error: (err) => {
+              this.isSubmitting = false;
               Swal.fire({
                   title: this.i18n.t('checkAvailability.alerts.submissionError.title'),
                   text: this.i18n.t('checkAvailability.alerts.submissionError.text'),
@@ -530,6 +535,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
           }
       });
     }).catch((error) => {
+      this.isSubmitting = false;
       Swal.fire({
                 title: this.i18n.t('checkAvailability.alerts.recaptchaError.title'),
                 text: this.i18n.t('checkAvailability.alerts.recaptchaError.text'),
