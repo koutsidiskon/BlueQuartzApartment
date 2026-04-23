@@ -121,6 +121,16 @@ html, body {
       color: #c8ced6 !important;
     }
 
+    &.nextMonthDay,
+    &.prevMonthDay {
+      opacity: 0.72 !important;
+    }
+
+    &.nextMonthDay.booked-day::after,
+    &.prevMonthDay.booked-day::after {
+      opacity: 0.5;
+    }
+
     &.booked-day {
       position: relative;
     }

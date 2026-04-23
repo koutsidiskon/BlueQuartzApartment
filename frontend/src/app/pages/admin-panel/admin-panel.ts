@@ -232,7 +232,10 @@ export class AdminPanel implements AfterViewInit, DoCheck {
         const dayDate = (dayElem as any).dateObj as Date | undefined;
         if (!dayDate) return;
 
-        if (this.isBlockedDate(dayDate)) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (dayDate >= today && this.isBlockedDate(dayDate)) {
           dayElem.classList.add('booked-day');
         }
       }
