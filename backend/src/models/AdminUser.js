@@ -8,7 +8,7 @@ export const AdminUser = sequelize.define('AdminUser', {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
+    unique: 'admin_email_unique',
     validate: {
       isEmail: true
     },
@@ -34,6 +34,10 @@ export const AdminUser = sequelize.define('AdminUser', {
     type: DataTypes.DATE,
     allowNull: true
   }
+}, {
+  indexes: [
+    { unique: true, fields: ['email'], name: 'admin_email_unique' }
+  ]
 });
 
 export default AdminUser;

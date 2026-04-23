@@ -6,8 +6,12 @@ export const BlockedDate = sequelize.define('BlockedDate', {
   date: {
     type: DataTypes.DATEONLY,
     allowNull: false,
-    unique: true
+    unique: 'blocked_date_unique'
   }
+}, {
+  indexes: [
+    { unique: true, fields: ['date'], name: 'blocked_date_unique' }
+  ]
 });
 
 export default BlockedDate;
