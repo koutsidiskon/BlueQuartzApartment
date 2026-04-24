@@ -1,59 +1,40 @@
 services:
   # 1. Βάση Δεδομένων (MariaDB)
   db:
-    image: mariadb:11.4 
+    image: mariadb:11.4
     container_name: bq_mariadb
     restart: always
+    env_file: .env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
     ports:
       - "3306:3306"
     volumes:
-      - mariadb_data:/var/lib/mysql # Αποθήκευση των δεδομένων της βάσης
+      - mariadb_data:/var/lib/mysql
 
   # 2. Το Backend (Node.js API)
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: bq_backend
     restart: always
+    env_file: .env
     ports:
-      - "3000:3000" # Το API σου τρέχει στην 3000
-    environment:
-      - DB_NAME=${DB_NAME}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=${DB_HOST}
-      - PORT=${PORT}
-      - NODE_ENV=${NODE_ENV}
-      - CORS_ORIGINS=${CORS_ORIGINS}
-      - RECAPTCHA_SECRET=${RECAPTCHA_SECRET}
-      - RECAPTCHA_THRESHOLD=${RECAPTCHA_THRESHOLD}
-      - ADMIN_JWT_SECRET=${ADMIN_JWT_SECRET}
-      - ADMIN_AUTH_COOKIE_NAME=${ADMIN_AUTH_COOKIE_NAME}
-      - ADMIN_EMAIL=${ADMIN_EMAIL}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_SECURE=${SMTP_SECURE}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASS=${SMTP_PASS}
-      - EMAIL_FROM=${EMAIL_FROM}
-      - RESEND_API_KEY=${RESEND_API_KEY}
+      - "3000:3000"
     depends_on:
-      - db # Περίμενε πρώτα να σηκωθεί η MariaDB
+      - db
 
   # 3. Το Frontend (Angular + Nginx)
   frontend:
-    build: 
+    build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: bq_frontend
     restart: always
     ports:
-      - "4200:80" # Ο υπολογιστής σου βλέπει την 4200, ο Nginx μέσα στο container τρέχει στην 80
+      - "4200:80"
     depends_on:
       - backend
 

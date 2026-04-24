@@ -81,6 +81,20 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   private lastRenderedLanguage = '';
 
   selectedInquiryIds = new Set<number>();
+  expandedMessageIds = new Set<number>();
+
+  toggleMessageExpand(id: number, event: Event): void {
+    event.stopPropagation();
+    if (this.expandedMessageIds.has(id)) {
+      this.expandedMessageIds.delete(id);
+    } else {
+      this.expandedMessageIds.add(id);
+    }
+  }
+
+  isMessageExpanded(id: number): boolean {
+    return this.expandedMessageIds.has(id);
+  }
   searchTerm = '';
   sortField = 'createdAt';
   sortDir: 'ASC' | 'DESC' = 'DESC';

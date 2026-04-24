@@ -240,7 +240,15 @@
               <span [attr.data-label]="'adminPanel.inquiries.checkIn' | t : undefined : 'Check-in'">{{ inquiry.checkIn }}</span>
               <span [attr.data-label]="'adminPanel.inquiries.checkOut' | t : undefined : 'Check-out'">{{ inquiry.checkOut }}</span>
               <span [attr.data-label]="'adminPanel.inquiries.guests' | t : undefined : 'Guests'">{{ inquiry.guests }}</span>
-              <span class="message" [attr.data-label]="'adminPanel.inquiries.message' | t : undefined : 'Message'">{{ inquiry.message || ('adminPanel.inquiries.noMessage' | t : undefined : 'No message') }}</span>
+              <span
+                class="message"
+                [class.expanded]="isMessageExpanded(inquiry.id)"
+                [class.has-message]="!!inquiry.message"
+                [attr.data-label]="'adminPanel.inquiries.message' | t : undefined : 'Message'"
+                (click)="inquiry.message ? toggleMessageExpand(inquiry.id, $event) : null"
+                [title]="inquiry.message ? (isMessageExpanded(inquiry.id) ? 'Click to collapse' : 'Click to expand') : ''">
+                {{ inquiry.message || ('adminPanel.inquiries.noMessage' | t : undefined : 'No message') }}
+              </span>
               <span [attr.data-label]="'adminPanel.inquiries.received' | t : undefined : 'Received'">{{ inquiry.createdAt | date: 'short' }}</span>
             </article>
           }

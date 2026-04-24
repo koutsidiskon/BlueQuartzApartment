@@ -486,6 +486,20 @@ $deep-navy: #003366;
       overflow: hidden;
       line-height: 1.35;
       max-height: 2.7em;
+      transition: max-height 0.2s ease;
+
+      &.has-message {
+        cursor: pointer;
+      }
+
+      &.expanded {
+        display: block;
+        -webkit-line-clamp: unset;
+        line-clamp: unset;
+        max-height: none;
+        overflow: visible;
+        white-space: pre-wrap;
+      }
     }
 
     &.selected {
