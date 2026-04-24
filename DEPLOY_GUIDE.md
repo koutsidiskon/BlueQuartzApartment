@@ -57,9 +57,11 @@ The `.tar` files are created in the project root. They are excluded from git via
 
 ---
 
-## Step 4 — Upload files to the server (FileZilla)
+## Step 4 — Upload .tar files to the server (FileZilla)
 
-Connect to the Contabo server via FileZilla using SFTP and upload the relevant files to the project directory on the server (e.g. `/root/BlueQuartzApartment-project/`):
+Open FileZilla, connect to the Contabo server via SFTP, and upload the `.tar` files to the project directory on the server (e.g. `/root/BlueQuartzApartment-project/`).
+
+Also upload any other files that changed:
 
 | File | Upload when |
 |---|---|
@@ -67,6 +69,8 @@ Connect to the Contabo server via FileZilla using SFTP and upload the relevant f
 | `frontend_FINAL.tar` | Frontend code changed |
 | `docker-compose.yml` | Compose file changed |
 | `.env` | Environment variables changed |
+
+> ⚠️ The `.tar` files can be large (500 MB – 1 GB). Make sure the upload completes fully before proceeding.
 
 ---
 
