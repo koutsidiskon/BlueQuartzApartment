@@ -233,6 +233,35 @@ docker-compose up --build
 
 ---
 
+## 🚢 Deploying to a VPS (linux/amd64)
+
+Since the project is developed on Apple Silicon (ARM), images must be cross-compiled before uploading to a linux/amd64 server.
+
+**1. Build for linux/amd64:**
+```bash
+docker build --platform linux/amd64 -t bluequartzapartment-project-backend:amd64 ./backend
+docker build --platform linux/amd64 -t bluequartzapartment-project-frontend:amd64 ./frontend
+```
+
+**2. Export as .tar:**
+```bash
+docker save -o backend_FINAL.tar bluequartzapartment-project-backend:amd64
+docker save -o frontend_FINAL.tar bluequartzapartment-project-frontend:amd64
+```
+
+**3. Upload to server** (via FileZilla/SFTP): `backend_FINAL.tar`, `frontend_FINAL.tar`, `docker-compose.yml`, `.env`
+
+**4. On the server:**
+```bash
+docker load -i backend_FINAL.tar
+docker load -i frontend_FINAL.tar
+docker compose up -d
+```
+
+> On the server, `docker-compose.yml` should use `image: bluequartzapartment-project-backend:amd64` instead of `build:` context. A detailed step-by-step guide is available locally in `DEPLOY_GUIDE.md` (not tracked by git).
+
+---
+
 ## 🖥️ Local Development (without Docker)
 
 **Backend**
