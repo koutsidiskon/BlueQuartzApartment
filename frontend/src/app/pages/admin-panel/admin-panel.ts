@@ -401,7 +401,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
           return;
         }
         const count = response.data?.deletedCount ?? ids.length;
-        this.deleteMessage = this.i18n.t('adminPanel.inquiries.deleteSuccess', undefined, `${count} inquiry/inquiries deleted successfully.`);
+        this.deleteMessage = this.i18n.t('adminPanel.inquiries.deleteSuccess', { count }, `${count} inquiry/inquiries deleted successfully.`);
         this.selectedInquiryIds.clear();
         this.inquiryPageCache.clear();
         this.cdr.detectChanges();
