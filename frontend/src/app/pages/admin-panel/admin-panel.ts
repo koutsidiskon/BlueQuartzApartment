@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AfterViewInit, ChangeDetectorRef, Component, DoCheck, ElementRef, HostListener, NgZone, ViewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -8,12 +9,14 @@ import { Greek } from 'flatpickr/dist/l10n/gr.js';
 import { Romanian } from 'flatpickr/dist/l10n/ro.js';
 import { Serbian } from 'flatpickr/dist/l10n/sr.js';
 import { Turkish } from 'flatpickr/dist/l10n/tr.js';
+import Swal from 'sweetalert2';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { AdminAuthService } from '../../service/admin-auth';
 import { I18nService } from '../../service/i18n';
 import { LanguageFacadeService } from '../../service/language-option';
 import { AvailabilityCalendarService } from '../../service/availability-calendar';
 import { InquiryListItem, InquiryService } from '../../service/inquiry';
+import { BookingService, BookingListItem, BookingCalendarItem, BookingSource, CreateBookingData } from '../../service/booking';
 
 const GREEK_LOCALE_NO_TONOS = {
   ...Greek,
@@ -39,7 +42,7 @@ const GREEK_LOCALE_NO_TONOS = {
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, RouterLink, TranslatePipe, FormsModule],
   templateUrl: './admin-panel.html',
   styleUrl: './admin-panel.scss'
 })
@@ -48,7 +51,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   @ViewChild('adminRangeFromInput') adminRangeFromInput!: ElementRef<HTMLInputElement>;
   @ViewChild('adminRangeToInput') adminRangeToInput!: ElementRef<HTMLInputElement>;
 
-  activeTab: 'calendar' | 'inquiries' = 'calendar';
+  activeTab: 'calendar' | 'inquiries' | 'bookings' = 'calendar';
   menuOpen = false;
   currentLanguage = 'en';
   desktopLanguageMenuOpen = false;
@@ -83,18 +86,6 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   selectedInquiryIds = new Set<number>();
   expandedMessageIds = new Set<number>();
 
-  toggleMessageExpand(id: number, event: Event): void {
-    event.stopPropagation();
-    if (this.expandedMessageIds.has(id)) {
-      this.expandedMessageIds.delete(id);
-    } else {
-      this.expandedMessageIds.add(id);
-    }
-  }
-
-  isMessageExpanded(id: number): boolean {
-    return this.expandedMessageIds.has(id);
-  }
   searchTerm = '';
   sortField = 'createdAt';
   sortDir: 'ASC' | 'DESC' = 'DESC';
@@ -102,6 +93,51 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   deleteMessage = '';
   deleteError = '';
   private searchDebounceTimer: any = null;
+
+  // ── Bookings tab ─────────────────────────────────────
+  bookings: BookingListItem[] = [];
+  bookingPage = 1;
+  bookingTotalPages = 1;
+  bookingTotalItems = 0;
+  bookingPageSize = 10;
+  bookingSearchTerm = '';
+  bookingSortField = 'checkIn';
+  bookingSortDir: 'ASC' | 'DESC' = 'DESC';
+  isBookingsLoading = false;
+  bookingsError = '';
+  private bookingPageCache = new Map<number, BookingListItem[]>();
+  private bookingTotalItemsCache = 0;
+  private bookingTotalPagesCache = 1;
+  private bookingRequestToken = 0;
+  private bookingSearchDebounceTimer: any = null;
+
+  // ── Calendar booking overlay ──────────────────────────
+  calendarBookings: BookingCalendarItem[] = [];
+
+  // ── Booking modal ─────────────────────────────────────
+  isBookingModalOpen = false;
+  isEditMode = false;
+  editingBookingId: number | null = null;
+  bookingModalFromInquiryId: number | null = null;
+  bookingModalData = {
+    guestName: '',
+    guestEmail: '',
+    guestPhone: '',
+    checkIn: '',
+    checkOut: '',
+    guestCount: 1,
+    notes: '',
+    source: 'Website' as BookingSource
+  };
+  isSavingBooking = false;
+  bookingModalError = '';
+  bookingModalManualBlockConflict: number | null = null; // count of conflicting manual blocks
+  private modalCheckInFp: any;
+  private modalCheckOutFp: any;
+
+  // ── Booking notes expand ──────────────────────────────
+  expandedBookingNoteIds = new Set<number>();
+  private deferredCheckInMap = new Map<string, BookingCalendarItem>();
 
   constructor(
     private adminAuth: AdminAuthService,
@@ -111,7 +147,8 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     private i18n: I18nService,
     private languageFacade: LanguageFacadeService,
     private availabilityCalendar: AvailabilityCalendarService,
-    private inquiryService: InquiryService
+    private inquiryService: InquiryService,
+    private bookingService: BookingService
   ) {
     this.currentLanguage = this.languageFacade.getCurrentLanguage();
     this.languageOptions = this.languageFacade.languageOptions;
@@ -121,7 +158,9 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.initCalendar();
     this.initRangeInputs();
     this.loadBlockedDates();
+    this.loadCalendarBookings();
     this.loadInquiries(1);
+    this.loadBookings(1);
     this.lastRenderedLanguage = this.i18n.getLanguage();
     this.updateCalendarLocale();
   }
@@ -136,6 +175,16 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
     if (!target?.closest('.lang-switcher')) {
       this.desktopLanguageMenuOpen = false;
+    }
+
+    if (
+      this.activeTab === 'calendar' &&
+      this.selectedDates.length > 0 &&
+      !target?.closest('.admin-calendar-card') &&
+      !target?.closest('.calendar-range-controls') &&
+      !target?.closest('.calendar-actions')
+    ) {
+      this.clearSelection();
     }
   }
 
@@ -154,13 +203,18 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.updateCalendarLocale();
   }
 
-  switchTab(tab: 'calendar' | 'inquiries'): void {
+  switchTab(tab: 'calendar' | 'inquiries' | 'bookings'): void {
     this.activeTab = tab;
     this.menuOpen = false;
     this.desktopLanguageMenuOpen = false;
 
     if (tab === 'inquiries') {
       this.loadInquiries(this.inquiryPage, true);
+      return;
+    }
+
+    if (tab === 'bookings') {
+      this.loadBookings(this.bookingPage, true);
       return;
     }
 
@@ -177,7 +231,9 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     if (this.activeTab === 'inquiries') {
       return this.i18n.t('adminPanel.inquiriesTitle', undefined, 'Booking Inquiries');
     }
-
+    if (this.activeTab === 'bookings') {
+      return 'Bookings';
+    }
     return this.i18n.t('adminPanel.calendarTitle', undefined, 'Calendar Availability');
   }
 
@@ -197,9 +253,10 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     return !!this.selectedDates.length && !this.isCalendarSaving && !this.isCalendarLoading;
   }
 
+  // ── Inquiry tab ───────────────────────────────────────
+
   goToInquiryPage(page: number): void {
     if (page < 1 || page > this.inquiryTotalPages) return;
-
     this.loadInquiries(page, true);
   }
 
@@ -211,421 +268,17 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     return this.inquiryPage < this.inquiryTotalPages;
   }
 
-  toggleDesktopLanguageMenu(event: Event): void {
+  toggleMessageExpand(id: number, event: Event): void {
     event.stopPropagation();
-    this.desktopLanguageMenuOpen = !this.desktopLanguageMenuOpen;
-  }
-
-  async selectDesktopLanguage(languageCode: string, event?: Event): Promise<void> {
-    event?.stopPropagation();
-    this.currentLanguage = await this.languageFacade.setLanguage(languageCode);
-    this.menuOpen = false;
-    this.desktopLanguageMenuOpen = false;
-  }
-
-  getLanguageFlag(languageCode: string): string {
-    return this.languageFacade.getFlag(languageCode);
-  }
-
-  private initCalendar(): void {
-    if (!this.adminInlineCalendar?.nativeElement) return;
-
-    const locale = this.getFlatpickrLocaleByLanguage(this.i18n.getLanguage());
-    this.inlineFp = flatpickr(this.adminInlineCalendar.nativeElement, {
-      inline: true,
-      minDate: 'today',
-      showMonths: 1,
-      mode: 'range',
-      dateFormat: 'Y-m-d',
-      locale,
-      monthSelectorType: 'static',
-      shorthandCurrentMonth: false,
-      disableMobile: true,
-      onChange: (selectedDates: Date[]) => this.ngZone.run(() => this.handleCalendarChange(selectedDates)),
-      onDayCreate: (_dObj, _dStr, _fp, dayElem) => {
-        const dayDate = (dayElem as any).dateObj as Date | undefined;
-        if (!dayDate) return;
-
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (dayDate >= today && this.isBlockedDate(dayDate)) {
-          dayElem.classList.add('booked-day');
-        }
-      }
-    });
-  }
-
-  private initRangeInputs(): void {
-    if (!this.adminRangeFromInput?.nativeElement || !this.adminRangeToInput?.nativeElement) return;
-
-    const locale = this.getFlatpickrLocaleByLanguage(this.i18n.getLanguage());
-    const commonOptions = {
-      dateFormat: 'Y-m-d',
-      minDate: 'today',
-      locale,
-      disableMobile: true,
-      allowInput: false
-    } as const;
-
-    this.rangeFromFp = flatpickr(this.adminRangeFromInput.nativeElement, {
-      ...commonOptions,
-      onChange: (selectedDates: Date[]) => {
-        this.ngZone.run(() => this.handleFromInputChange(selectedDates[0] ?? null));
-      }
-    });
-
-    this.rangeToFp = flatpickr(this.adminRangeToInput.nativeElement, {
-      ...commonOptions,
-      onChange: (selectedDates: Date[]) => {
-        this.ngZone.run(() => this.handleToInputChange(selectedDates[0] ?? null));
-      }
-    });
-  }
-
-  private rebuildCalendar(): void {
-    if (!this.adminInlineCalendar?.nativeElement) return;
-
-    if (this.inlineFp) {
-      this.inlineFp.destroy();
-      this.inlineFp = null;
-    }
-
-    requestAnimationFrame(() => {
-      this.initCalendar();
-    });
-  }
-
-  private loadInquiries(page: number, useCacheFirst = false): void {
-    const hasCachedPage = this.inquiryPageCache.has(page);
-
-    if (useCacheFirst && hasCachedPage) {
-      this.inquiries = this.inquiryPageCache.get(page) || [];
-      this.inquiryPage = page;
-      this.inquiryTotalItems = this.inquiryTotalItemsCache;
-      this.inquiryTotalPages = this.inquiryTotalPagesCache;
-      this.inquiriesError = '';
-      this.prefetchInquiryPage(page + 1);
-      this.prefetchInquiryPage(page - 1);
-      return;
-    }
-
-    this.isInquiriesLoading = true;
-    this.inquiriesError = '';
-    this.cdr.detectChanges();
-    const requestToken = ++this.inquiryRequestToken;
-
-    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir).pipe(
-      finalize(() => {
-        if (requestToken === this.inquiryRequestToken) {
-          this.isInquiriesLoading = false;
-          this.cdr.detectChanges();
-        }
-      })
-    ).subscribe({
-      next: (response) => {
-        if (requestToken !== this.inquiryRequestToken) {
-          return;
-        }
-
-        if (!response?.success) {
-          this.inquiriesError = this.i18n.t('adminPanel.inquiries.loadError', undefined, 'Could not load inquiries.');
-          this.cdr.detectChanges();
-          return;
-        }
-
-        const rows = Array.isArray(response.data) ? response.data : [];
-        const pagination = response.pagination;
-        const totalPages = Math.max(1, Number(pagination?.totalPages || 1));
-        const totalItems = Math.max(0, Number(pagination?.totalItems || 0));
-        const currentPage = Math.min(Math.max(1, Number(pagination?.page || page)), totalPages);
-
-        this.inquiryPageCache.set(currentPage, rows);
-        this.inquiryTotalItemsCache = totalItems;
-        this.inquiryTotalPagesCache = totalPages;
-
-        this.inquiries = rows;
-        this.inquiryPage = currentPage;
-        this.inquiryTotalPages = totalPages;
-        this.inquiryTotalItems = totalItems;
-
-        this.cdr.detectChanges();
-        this.prefetchInquiryPage(currentPage + 1);
-        this.prefetchInquiryPage(currentPage - 1);
-      },
-      error: () => {
-        if (requestToken !== this.inquiryRequestToken) {
-          return;
-        }
-
-        this.inquiriesError = this.i18n.t('adminPanel.inquiries.loadError', undefined, 'Could not load inquiries.');
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  private prefetchInquiryPage(page: number): void {
-    if (page < 1) return;
-    if (this.inquiryTotalPagesCache && page > this.inquiryTotalPagesCache) return;
-    if (this.inquiryPageCache.has(page)) return;
-
-    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir).subscribe({
-      next: (response) => {
-        if (!response?.success) return;
-
-        const rows = Array.isArray(response.data) ? response.data : [];
-        const totalPages = Math.max(1, Number(response.pagination?.totalPages || this.inquiryTotalPagesCache || 1));
-        const totalItems = Math.max(0, Number(response.pagination?.totalItems || this.inquiryTotalItemsCache || 0));
-        const currentPage = Math.min(Math.max(1, Number(response.pagination?.page || page)), totalPages);
-
-        this.inquiryPageCache.set(currentPage, rows);
-        this.inquiryTotalPagesCache = totalPages;
-        this.inquiryTotalItemsCache = totalItems;
-      },
-      error: () => {}
-    });
-  }
-
-  private loadBlockedDates(): void {
-    this.isCalendarLoading = true;
-    this.calendarError = '';
-
-    this.availabilityCalendar.getBlockedDates().pipe(
-      finalize(() => {
-        this.isCalendarLoading = false;
-      })
-    ).subscribe({
-      next: (response) => {
-        this.applyBlockedDates(response?.data || []);
-      },
-      error: () => {
-        this.calendarError = this.i18n.t('adminPanel.calendar.loadError', undefined, 'Could not load reserved dates.');
-      }
-    });
-  }
-
-  private updateSelectionState(blocked: boolean): void {
-    if (!this.selectedDates.length || this.isCalendarSaving) {
-      return;
-    }
-
-    this.isCalendarSaving = true;
-    this.calendarError = '';
-    this.calendarMessage = '';
-
-    this.availabilityCalendar.updateBlockedDates(this.selectedDates, blocked).pipe(
-      finalize(() => {
-        this.isCalendarSaving = false;
-      })
-    ).subscribe({
-      next: (response) => {
-        const updatedDates = response?.data || [];
-        this.applyBlockedDates(updatedDates);
-        this.clearSelection();
-
-        this.calendarMessage = blocked
-          ? this.i18n.t('adminPanel.calendar.blockSuccess', undefined, 'Selected dates were reserved.')
-          : this.i18n.t('adminPanel.calendar.unblockSuccess', undefined, 'Selected dates were released.');
-      },
-      error: (err) => {
-        this.calendarError = err?.error?.message || this.i18n.t('adminPanel.calendar.saveError', undefined, 'Could not update dates.');
-      }
-    });
-  }
-
-  // Handles user clicks on the inline calendar (onChange fires only on real user interaction)
-  private handleCalendarChange(selectedDates: Date[]): void {
-    if (this.isSyncingToCalendar) return;
-
-    this.calendarMessage = '';
-    this.calendarError = '';
-
-    if (!selectedDates.length) {
-      this.clearSelectionState();
-      this.syncRangeInputs();
-      this.cdr.detectChanges();
-      return;
-    }
-
-    const [startDate, endDate] = selectedDates;
-    this.selectedStartDate = new Date(startDate);
-    this.selectedEndDate = endDate ? new Date(endDate) : null;
-
-    if (!endDate) {
-      this.selectedDates = [this.toDateKey(startDate)];
+    if (this.expandedMessageIds.has(id)) {
+      this.expandedMessageIds.delete(id);
     } else {
-      this.selectedDates = this.enumerateDateRange(startDate, endDate);
-    }
-
-    this.syncRangeInputs();
-    this.cdr.detectChanges();
-  }
-
-  private handleFromInputChange(startDate: Date | null): void {
-    if (!startDate) {
-      this.clearSelection();
-      return;
-    }
-
-    const normalizedEnd = this.selectedEndDate && this.selectedEndDate >= startDate
-      ? this.selectedEndDate
-      : null;
-
-    this.applyRangeFromInputs(startDate, normalizedEnd);
-  }
-
-  private handleToInputChange(endDate: Date | null): void {
-    if (!endDate) {
-      this.applyRangeFromInputs(this.selectedStartDate, null);
-      return;
-    }
-
-    const rawStart = this.selectedStartDate ?? new Date(endDate);
-    const start = rawStart <= endDate ? rawStart : new Date(endDate);
-    const end = rawStart <= endDate ? new Date(endDate) : rawStart;
-
-    this.applyRangeFromInputs(start, end);
-  }
-
-  private applyRangeFromInputs(startDate: Date | null, endDate: Date | null): void {
-    this.calendarMessage = '';
-    this.calendarError = '';
-
-    if (!startDate) {
-      this.clearSelection();
-      return;
-    }
-
-    const normStart = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-    const normEnd = endDate
-      ? new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())
-      : null;
-
-    this.selectedStartDate = normStart;
-    this.selectedEndDate = normEnd;
-    this.selectedDates = normEnd
-      ? this.enumerateDateRange(normStart, normEnd)
-      : [this.toDateKey(normStart)];
-
-    // Push selection to inline calendar without triggering onChange
-    if (this.inlineFp) {
-      this.isSyncingToCalendar = true;
-      this.inlineFp.setDate(normEnd ? [normStart, normEnd] : [normStart], false);
-      this.inlineFp.jumpToDate(normEnd ?? normStart);
-      this.isSyncingToCalendar = false;
-    }
-
-    this.syncRangeInputs();
-    this.cdr.detectChanges();
-  }
-
-  private syncRangeInputs(): void {
-    if (this.rangeFromFp) {
-      if (this.selectedStartDate) {
-        this.rangeFromFp.setDate(this.selectedStartDate, false);
-      } else {
-        this.rangeFromFp.clear(false);
-      }
-    }
-
-    if (this.rangeToFp) {
-      if (this.selectedEndDate) {
-        this.rangeToFp.setDate(this.selectedEndDate, false);
-      } else {
-        this.rangeToFp.clear(false);
-      }
+      this.expandedMessageIds.add(id);
     }
   }
 
-  private clearSelectionState(): void {
-    this.selectedDates = [];
-    this.selectedStartDate = null;
-    this.selectedEndDate = null;
-  }
-
-  private clearSelection(clearInlineCalendar = true): void {
-    this.clearSelectionState();
-    this.syncRangeInputs();
-
-    if (clearInlineCalendar && this.inlineFp) {
-      const savedYear: number = this.inlineFp.currentYear;
-      const savedMonth: number = this.inlineFp.currentMonth;
-      this.isSyncingToCalendar = true;
-      this.inlineFp.clear(false);
-      this.inlineFp.jumpToDate(new Date(savedYear, savedMonth, 1), false);
-      this.isSyncingToCalendar = false;
-    }
-
-    this.cdr.detectChanges();
-  }
-
-  private enumerateDateRange(startDate: Date, endDate: Date): string[] {
-    const dates: string[] = [];
-    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-    const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-
-    for (let cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
-      dates.push(this.toDateKey(cursor));
-    }
-
-    return dates;
-  }
-
-  private applyBlockedDates(dates: string[]): void {
-    const normalizedDates = dates
-      .map((date) => String(date || '').trim())
-      .filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date));
-
-    this.blockedDateSet = new Set(normalizedDates);
-
-    if (this.inlineFp) {
-      this.inlineFp.redraw();
-    }
-  }
-
-  private isBlockedDate(date: Date): boolean {
-    return this.blockedDateSet.has(this.toDateKey(date));
-  }
-
-  private toDateKey(date: Date): string {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  private getFlatpickrLocaleByLanguage(language: string): any {
-    switch (language) {
-      case 'el':
-        return GREEK_LOCALE_NO_TONOS;
-      case 'ro':
-        return Romanian;
-      case 'sr':
-        return Serbian;
-      case 'bg':
-        return Bulgarian;
-      case 'tr':
-        return Turkish;
-      default:
-        return 'default';
-    }
-  }
-
-  private updateCalendarLocale(): void {
-    const locale = this.getFlatpickrLocaleByLanguage(this.i18n.getLanguage());
-
-    if (this.inlineFp) {
-      this.inlineFp.set('locale', locale);
-      this.inlineFp.redraw();
-    }
-
-    if (this.rangeFromFp) {
-      this.rangeFromFp.set('locale', locale);
-    }
-
-    if (this.rangeToFp) {
-      this.rangeToFp.set('locale', locale);
-    }
+  isMessageExpanded(id: number): boolean {
+    return this.expandedMessageIds.has(id);
   }
 
   refreshInquiries(): void {
@@ -759,6 +412,866 @@ export class AdminPanel implements AfterViewInit, DoCheck {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  // ── Booking modal ─────────────────────────────────────
+
+  openAddBookingModal(): void {
+    this.isEditMode = false;
+    this.editingBookingId = null;
+    this.bookingModalFromInquiryId = null;
+    this.bookingModalData = { guestName: '', guestEmail: '', guestPhone: '', checkIn: '', checkOut: '', guestCount: 1, notes: '', source: 'Website' };
+    this.bookingModalError = '';
+    this.isBookingModalOpen = true;
+    this.cdr.detectChanges();
+    setTimeout(() => this.initModalDatePickers(), 60);
+  }
+
+  openEditBookingModal(booking: BookingListItem): void {
+    this.isEditMode = true;
+    this.editingBookingId = booking.id;
+    this.bookingModalFromInquiryId = null;
+    this.bookingModalData = {
+      guestName: booking.guestName,
+      guestEmail: booking.guestEmail,
+      guestPhone: booking.guestPhone ?? '',
+      checkIn: booking.checkIn,
+      checkOut: booking.checkOut,
+      guestCount: booking.guestCount,
+      notes: booking.notes ?? '',
+      source: booking.source
+    };
+    this.bookingModalError = '';
+    this.isBookingModalOpen = true;
+    this.cdr.detectChanges();
+    setTimeout(() => this.initModalDatePickers(), 60);
+  }
+
+  openConfirmBookingModal(inquiry: InquiryListItem): void {
+    this.isEditMode = false;
+    this.editingBookingId = null;
+    this.bookingModalFromInquiryId = inquiry.id;
+    this.bookingModalData = {
+      guestName: inquiry.fullName,
+      guestEmail: inquiry.email,
+      guestPhone: '',
+      checkIn: inquiry.checkIn,
+      checkOut: inquiry.checkOut,
+      guestCount: inquiry.guests,
+      notes: '',
+      source: 'Website'
+    };
+    this.bookingModalError = '';
+    this.isBookingModalOpen = true;
+    this.cdr.detectChanges();
+    setTimeout(() => this.initModalDatePickers(), 60);
+  }
+
+  closeBookingModal(): void {
+    this.isBookingModalOpen = false;
+    this.bookingModalManualBlockConflict = null;
+    if (this.modalCheckInFp) { this.modalCheckInFp.destroy(); this.modalCheckInFp = null; }
+    if (this.modalCheckOutFp) { this.modalCheckOutFp.destroy(); this.modalCheckOutFp = null; }
+  }
+
+  // ── Booking notes expand ──────────────────────────────
+
+  toggleBookingNoteExpand(id: number, event: Event): void {
+    event.stopPropagation();
+    if (this.expandedBookingNoteIds.has(id)) {
+      this.expandedBookingNoteIds.delete(id);
+    } else {
+      this.expandedBookingNoteIds.add(id);
+    }
+  }
+
+  isBookingNoteExpanded(id: number): boolean {
+    return this.expandedBookingNoteIds.has(id);
+  }
+
+  // ── Open edit modal from calendar click ───────────────
+
+  openEditBookingFromCalendar(bookingId: number): void {
+    const found = this.bookings.find(b => b.id === bookingId);
+    if (found) {
+      this.openEditBookingModal(found);
+      return;
+    }
+    // Fetch if not in current page
+    this.bookingService.getBookings(1, 100).subscribe({
+      next: (res: any) => {
+        const all = Array.isArray(res?.data) ? res.data : [];
+        const booking = all.find((b: any) => b.id === bookingId);
+        if (booking) this.ngZone.run(() => this.openEditBookingModal(booking));
+      },
+      error: () => {}
+    });
+  }
+
+  onModalOverlayClick(event: Event): void {
+    if ((event.target as HTMLElement).classList.contains('booking-modal-overlay')) {
+      this.closeBookingModal();
+    }
+  }
+
+  saveBooking(force = false): void {
+    if (this.isSavingBooking) return;
+
+    const { guestName, guestEmail, checkIn, checkOut, guestCount, source, guestPhone, notes } = this.bookingModalData;
+
+    if (!guestName.trim() || !guestEmail.trim() || !checkIn || !checkOut) {
+      this.bookingModalError = 'Please fill in all required fields: Name, Email, Check-in, Check-out.';
+      return;
+    }
+
+    if (checkOut <= checkIn) {
+      this.bookingModalError = 'Check-out must be after check-in.';
+      return;
+    }
+
+    this.isSavingBooking = true;
+    this.bookingModalError = '';
+    this.bookingModalManualBlockConflict = null;
+
+    const data: CreateBookingData = {
+      guestName: guestName.trim(),
+      guestEmail: guestEmail.trim(),
+      guestPhone: guestPhone.trim() || undefined,
+      checkIn,
+      checkOut,
+      guestCount: Number(guestCount) || 1,
+      source,
+      notes: notes.trim() || undefined,
+      force: force || undefined
+    };
+
+    let obs$;
+    if (this.bookingModalFromInquiryId) {
+      obs$ = this.bookingService.createFromInquiry(this.bookingModalFromInquiryId, { guestPhone: data.guestPhone, notes: data.notes, force: data.force });
+    } else if (this.isEditMode && this.editingBookingId) {
+      obs$ = this.bookingService.updateBooking(this.editingBookingId, data);
+    } else {
+      obs$ = this.bookingService.createBooking(data);
+    }
+
+    obs$.pipe(finalize(() => { this.isSavingBooking = false; this.cdr.detectChanges(); })).subscribe({
+      next: (response: any) => {
+        if (!response?.success) {
+          this.bookingModalError = response?.message || 'Could not save booking.';
+          this.cdr.detectChanges();
+          return;
+        }
+        this.closeBookingModal();
+        this.bookingPageCache.clear();
+        this.loadBookings(1);
+        this.loadCalendarBookings();
+        this.loadBlockedDates();
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        const status = err?.status;
+        const body = err?.error;
+
+        if (status === 409 && body?.conflictType === 'booking') {
+          this.bookingModalError = `These dates conflict with an existing booking for ${body.guestName} (${body.checkIn} → ${body.checkOut}).`;
+          this.cdr.detectChanges();
+          return;
+        }
+
+        if (status === 409 && body?.conflictType === 'manual_block') {
+          this.bookingModalManualBlockConflict = body.blockedCount;
+          this.cdr.detectChanges();
+          return;
+        }
+
+        this.bookingModalError = body?.message || 'Could not save booking. Please try again.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  confirmOverrideManualBlocks(): void {
+    this.bookingModalManualBlockConflict = null;
+    this.saveBooking(true);
+  }
+
+  deleteBookingWithConfirm(booking: BookingListItem): void {
+    Swal.fire({
+      title: 'Delete Booking?',
+      html: `This will delete the booking for <strong>${booking.guestName}</strong> and release dates <strong>${booking.checkIn} → ${booking.checkOut}</strong>.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#8f1f1f',
+      cancelButtonColor: '#5c6370',
+      confirmButtonText: 'Yes, delete',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      this.bookingService.deleteBooking(booking.id).subscribe({
+        next: (response: any) => {
+          this.ngZone.run(() => {
+            if (!response?.success) {
+              Swal.fire('Error', 'Could not delete booking.', 'error');
+              return;
+            }
+            this.bookingPageCache.clear();
+            this.loadBookings(1);
+            this.loadCalendarBookings();
+            this.loadBlockedDates();
+            this.cdr.detectChanges();
+          });
+        },
+        error: () => {
+          this.ngZone.run(() => Swal.fire('Error', 'Could not delete booking. Please try again.', 'error'));
+        }
+      });
+    });
+  }
+
+  // ── Booking tab pagination/search/sort ────────────────
+
+  goToBookingPage(page: number): void {
+    if (page < 1 || page > this.bookingTotalPages) return;
+    this.loadBookings(page, true);
+  }
+
+  hasBookingPreviousPage(): boolean { return this.bookingPage > 1; }
+  hasBookingNextPage(): boolean { return this.bookingPage < this.bookingTotalPages; }
+
+  onBookingSearchInput(value: string): void {
+    this.bookingSearchTerm = value;
+    clearTimeout(this.bookingSearchDebounceTimer);
+    this.bookingSearchDebounceTimer = setTimeout(() => {
+      this.ngZone.run(() => {
+        this.bookingPageCache.clear();
+        this.loadBookings(1);
+      });
+    }, 350);
+  }
+
+  clearBookingSearch(): void {
+    clearTimeout(this.bookingSearchDebounceTimer);
+    this.bookingSearchTerm = '';
+    this.bookingPageCache.clear();
+    this.loadBookings(1);
+  }
+
+  onBookingPageSizeChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const newSize = Number(select.value);
+    if (newSize === this.bookingPageSize) return;
+    this.bookingPageSize = newSize;
+    this.bookingPageCache.clear();
+    this.loadBookings(1);
+  }
+
+  onBookingSortFieldChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.bookingSortField = select.value;
+    this.bookingPageCache.clear();
+    this.loadBookings(1);
+  }
+
+  onBookingSortDirToggle(): void {
+    this.bookingSortDir = this.bookingSortDir === 'DESC' ? 'ASC' : 'DESC';
+    this.bookingPageCache.clear();
+    this.loadBookings(1);
+  }
+
+  refreshBookings(): void {
+    clearTimeout(this.bookingSearchDebounceTimer);
+    this.bookingPageCache.clear();
+    this.loadBookings(1);
+  }
+
+  // ── Language ──────────────────────────────────────────
+
+  toggleDesktopLanguageMenu(event: Event): void {
+    event.stopPropagation();
+    this.desktopLanguageMenuOpen = !this.desktopLanguageMenuOpen;
+  }
+
+  async selectDesktopLanguage(languageCode: string, event?: Event): Promise<void> {
+    event?.stopPropagation();
+    this.currentLanguage = await this.languageFacade.setLanguage(languageCode);
+    this.menuOpen = false;
+    this.desktopLanguageMenuOpen = false;
+  }
+
+  getLanguageFlag(languageCode: string): string {
+    return this.languageFacade.getFlag(languageCode);
+  }
+
+  // ── Calendar init ─────────────────────────────────────
+
+  private initCalendar(): void {
+    if (!this.adminInlineCalendar?.nativeElement) return;
+
+    const locale = this.getFlatpickrLocaleByLanguage(this.i18n.getLanguage());
+    this.inlineFp = flatpickr(this.adminInlineCalendar.nativeElement, {
+      inline: true,
+      minDate: 'today',
+      showMonths: 1,
+      mode: 'range',
+      dateFormat: 'Y-m-d',
+      locale,
+      monthSelectorType: 'static',
+      shorthandCurrentMonth: false,
+      disableMobile: true,
+      onClose: (selectedDates: Date[]) => {
+        // If only start selected (no end), clear the selection
+        if (selectedDates.length === 1) {
+          this.ngZone.run(() => this.clearSelection());
+        }
+      },
+      onChange: (selectedDates: Date[]) => this.ngZone.run(() => this.handleCalendarChange(selectedDates)),
+      onDayCreate: (_dObj, _dStr, _fp, dayElem) => {
+        const dayDate = (dayElem as any).dateObj as Date | undefined;
+        if (!dayDate) return;
+
+        const dateKey = this.toDateKey(dayDate);
+        const checkOutBooking = this.calendarBookings.find(b => b.checkOut === dateKey);
+        const checkInBooking  = this.calendarBookings.find(b => b.checkIn  === dateKey);
+
+        // Combined day: same date is checkout of one booking AND check-in of another
+        if (checkOutBooking && checkInBooking) {
+          dayElem.classList.add('booking-day', 'booking-combined');
+          (dayElem as HTMLElement).style.setProperty('--booking-color',  checkOutBooking.color);
+          (dayElem as HTMLElement).style.setProperty('--checkout-color', checkOutBooking.color);
+          (dayElem as HTMLElement).style.setProperty('--checkin-color',  checkInBooking.color);
+          const label = document.createElement('span');
+          label.className = 'booking-day-label';
+          label.textContent = '↩ ↪';
+          label.title = `Out: ${checkOutBooking.guestName} (${checkOutBooking.checkIn} → ${checkOutBooking.checkOut})\nIn: ${checkInBooking.guestName} (${checkInBooking.checkIn} → ${checkInBooking.checkOut})`;
+          dayElem.appendChild(label);
+          return;
+        }
+
+        const midBooking  = this.calendarBookings.find(b => dateKey > b.checkIn && dateKey < b.checkOut);
+        const bookingInfo = checkInBooking ?? checkOutBooking ?? midBooking;
+
+        if (bookingInfo) {
+          const isCheckIn  = dateKey === bookingInfo.checkIn;
+          const isCheckOut = dateKey === bookingInfo.checkOut;
+
+          dayElem.classList.add('booking-day');
+          (dayElem as HTMLElement).style.setProperty('--booking-color', bookingInfo.color);
+
+          if (isCheckIn) {
+            dayElem.classList.add('booking-check-in');
+            const label = document.createElement('span');
+            label.className = 'booking-day-label';
+            label.textContent = '↪ in';
+            label.title = `${bookingInfo.guestName} (${bookingInfo.source})\n${bookingInfo.checkIn} → ${bookingInfo.checkOut}`;
+            dayElem.appendChild(label);
+          } else if (isCheckOut) {
+            dayElem.classList.add('booking-check-out');
+            if (this.isBlockedDate(dayDate)) dayElem.classList.add('booking-checkout-blocked');
+            const label = document.createElement('span');
+            label.className = 'booking-day-label';
+            label.textContent = '↩ out';
+            label.title = `${bookingInfo.guestName} (${bookingInfo.source})\n${bookingInfo.checkIn} → ${bookingInfo.checkOut}`;
+            dayElem.appendChild(label);
+          } else {
+            // Mid day: show deferred check-in name if this is the first day after a combined day
+            dayElem.classList.add('booking-mid');
+            const deferredBooking = this.deferredCheckInMap.get(dateKey);
+            if (deferredBooking) {
+              const label = document.createElement('span');
+              label.className = 'booking-day-label';
+              label.textContent = deferredBooking.guestName.split(' ')[0];
+              label.title = `${deferredBooking.guestName} (${deferredBooking.source})\n${deferredBooking.checkIn} → ${deferredBooking.checkOut}`;
+              dayElem.appendChild(label);
+            }
+            // Only mid days open the edit modal — check-in/out allow normal range selection
+            (dayElem as HTMLElement).style.cursor = 'pointer';
+            dayElem.addEventListener('click', (e: Event) => {
+              e.stopImmediatePropagation();
+              e.preventDefault();
+              this.ngZone.run(() => this.openEditBookingFromCalendar(bookingInfo.id));
+            }, true);
+          }
+          return;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (dayDate >= today && this.isBlockedDate(dayDate)) {
+          dayElem.classList.add('booked-day');
+        }
+      }
+    });
+  }
+
+  private initModalDatePickers(): void {
+    const checkInEl = document.getElementById('modalCheckInInput');
+    const checkOutEl = document.getElementById('modalCheckOutInput');
+    if (!checkInEl || !checkOutEl) return;
+
+    if (this.modalCheckInFp) { this.modalCheckInFp.destroy(); this.modalCheckInFp = null; }
+    if (this.modalCheckOutFp) { this.modalCheckOutFp.destroy(); this.modalCheckOutFp = null; }
+
+    const locale = this.getFlatpickrLocaleByLanguage(this.i18n.getLanguage());
+
+    this.modalCheckInFp = flatpickr(checkInEl, {
+      dateFormat: 'Y-m-d',
+      disableMobile: true,
+      locale,
+      onChange: (dates: Date[]) => {
+        this.ngZone.run(() => {
+          this.bookingModalData.checkIn = dates[0] ? this.toDateKey(dates[0]) : '';
+        });
+      }
+    });
+
+    this.modalCheckOutFp = flatpickr(checkOutEl, {
+      dateFormat: 'Y-m-d',
+      disableMobile: true,
+      locale,
+      onChange: (dates: Date[]) => {
+        this.ngZone.run(() => {
+          this.bookingModalData.checkOut = dates[0] ? this.toDateKey(dates[0]) : '';
+        });
+      }
+    });
+
+    if (this.bookingModalData.checkIn) this.modalCheckInFp.setDate(this.bookingModalData.checkIn, false);
+    if (this.bookingModalData.checkOut) this.modalCheckOutFp.setDate(this.bookingModalData.checkOut, false);
+  }
+
+  private initRangeInputs(): void {
+    if (!this.adminRangeFromInput?.nativeElement || !this.adminRangeToInput?.nativeElement) return;
+
+    const locale = this.getFlatpickrLocaleByLanguage(this.i18n.getLanguage());
+    const commonOptions = {
+      dateFormat: 'Y-m-d',
+      minDate: 'today',
+      locale,
+      disableMobile: true,
+      allowInput: false
+    } as const;
+
+    this.rangeFromFp = flatpickr(this.adminRangeFromInput.nativeElement, {
+      ...commonOptions,
+      onChange: (selectedDates: Date[]) => {
+        this.ngZone.run(() => this.handleFromInputChange(selectedDates[0] ?? null));
+      }
+    });
+
+    this.rangeToFp = flatpickr(this.adminRangeToInput.nativeElement, {
+      ...commonOptions,
+      onChange: (selectedDates: Date[]) => {
+        this.ngZone.run(() => this.handleToInputChange(selectedDates[0] ?? null));
+      }
+    });
+  }
+
+  private rebuildCalendar(): void {
+    if (!this.adminInlineCalendar?.nativeElement) return;
+
+    if (this.inlineFp) {
+      this.inlineFp.destroy();
+      this.inlineFp = null;
+    }
+
+    requestAnimationFrame(() => {
+      this.initCalendar();
+    });
+  }
+
+  // ── Data loading ──────────────────────────────────────
+
+  private loadInquiries(page: number, useCacheFirst = false): void {
+    const hasCachedPage = this.inquiryPageCache.has(page);
+
+    if (useCacheFirst && hasCachedPage) {
+      this.inquiries = this.inquiryPageCache.get(page) || [];
+      this.inquiryPage = page;
+      this.inquiryTotalItems = this.inquiryTotalItemsCache;
+      this.inquiryTotalPages = this.inquiryTotalPagesCache;
+      this.inquiriesError = '';
+      this.prefetchInquiryPage(page + 1);
+      this.prefetchInquiryPage(page - 1);
+      return;
+    }
+
+    this.isInquiriesLoading = true;
+    this.inquiriesError = '';
+    this.cdr.detectChanges();
+    const requestToken = ++this.inquiryRequestToken;
+
+    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir).pipe(
+      finalize(() => {
+        if (requestToken === this.inquiryRequestToken) {
+          this.isInquiriesLoading = false;
+          this.cdr.detectChanges();
+        }
+      })
+    ).subscribe({
+      next: (response) => {
+        if (requestToken !== this.inquiryRequestToken) return;
+
+        if (!response?.success) {
+          this.inquiriesError = this.i18n.t('adminPanel.inquiries.loadError', undefined, 'Could not load inquiries.');
+          this.cdr.detectChanges();
+          return;
+        }
+
+        const rows = Array.isArray(response.data) ? response.data : [];
+        const pagination = response.pagination;
+        const totalPages = Math.max(1, Number(pagination?.totalPages || 1));
+        const totalItems = Math.max(0, Number(pagination?.totalItems || 0));
+        const currentPage = Math.min(Math.max(1, Number(pagination?.page || page)), totalPages);
+
+        this.inquiryPageCache.set(currentPage, rows);
+        this.inquiryTotalItemsCache = totalItems;
+        this.inquiryTotalPagesCache = totalPages;
+        this.inquiries = rows;
+        this.inquiryPage = currentPage;
+        this.inquiryTotalPages = totalPages;
+        this.inquiryTotalItems = totalItems;
+
+        this.cdr.detectChanges();
+        this.prefetchInquiryPage(currentPage + 1);
+        this.prefetchInquiryPage(currentPage - 1);
+      },
+      error: () => {
+        if (requestToken !== this.inquiryRequestToken) return;
+        this.inquiriesError = this.i18n.t('adminPanel.inquiries.loadError', undefined, 'Could not load inquiries.');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private prefetchInquiryPage(page: number): void {
+    if (page < 1) return;
+    if (this.inquiryTotalPagesCache && page > this.inquiryTotalPagesCache) return;
+    if (this.inquiryPageCache.has(page)) return;
+
+    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir).subscribe({
+      next: (response) => {
+        if (!response?.success) return;
+        const rows = Array.isArray(response.data) ? response.data : [];
+        const totalPages = Math.max(1, Number(response.pagination?.totalPages || this.inquiryTotalPagesCache || 1));
+        const totalItems = Math.max(0, Number(response.pagination?.totalItems || this.inquiryTotalItemsCache || 0));
+        const currentPage = Math.min(Math.max(1, Number(response.pagination?.page || page)), totalPages);
+        this.inquiryPageCache.set(currentPage, rows);
+        this.inquiryTotalPagesCache = totalPages;
+        this.inquiryTotalItemsCache = totalItems;
+      },
+      error: () => {}
+    });
+  }
+
+  private loadBookings(page: number, useCacheFirst = false): void {
+    const hasCachedPage = this.bookingPageCache.has(page);
+
+    if (useCacheFirst && hasCachedPage) {
+      this.bookings = this.bookingPageCache.get(page) || [];
+      this.bookingPage = page;
+      this.bookingTotalItems = this.bookingTotalItemsCache;
+      this.bookingTotalPages = this.bookingTotalPagesCache;
+      this.bookingsError = '';
+      return;
+    }
+
+    this.isBookingsLoading = true;
+    this.bookingsError = '';
+    this.cdr.detectChanges();
+    const requestToken = ++this.bookingRequestToken;
+
+    this.bookingService.getBookings(page, this.bookingPageSize, this.bookingSearchTerm || undefined, this.bookingSortField, this.bookingSortDir).pipe(
+      finalize(() => {
+        if (requestToken === this.bookingRequestToken) {
+          this.isBookingsLoading = false;
+          this.cdr.detectChanges();
+        }
+      })
+    ).subscribe({
+      next: (response) => {
+        if (requestToken !== this.bookingRequestToken) return;
+
+        if (!response?.success) {
+          this.bookingsError = 'Could not load bookings.';
+          this.cdr.detectChanges();
+          return;
+        }
+
+        const rows = Array.isArray(response.data) ? response.data : [];
+        const pagination = response.pagination;
+        const totalPages = Math.max(1, Number(pagination?.totalPages || 1));
+        const totalItems = Math.max(0, Number(pagination?.totalItems || 0));
+        const currentPage = Math.min(Math.max(1, Number(pagination?.page || page)), totalPages);
+
+        this.bookingPageCache.set(currentPage, rows);
+        this.bookingTotalItemsCache = totalItems;
+        this.bookingTotalPagesCache = totalPages;
+        this.bookings = rows;
+        this.bookingPage = currentPage;
+        this.bookingTotalPages = totalPages;
+        this.bookingTotalItems = totalItems;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        if (requestToken !== this.bookingRequestToken) return;
+        this.bookingsError = 'Could not load bookings.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private loadCalendarBookings(): void {
+    this.bookingService.getBookingsForCalendar().subscribe({
+      next: (response) => {
+        this.calendarBookings = Array.isArray(response?.data) ? response.data : [];
+        this.rebuildDeferredCheckInMap();
+        if (this.inlineFp) this.inlineFp.redraw();
+      },
+      error: () => {}
+    });
+  }
+
+  private loadBlockedDates(): void {
+    this.isCalendarLoading = true;
+    this.calendarError = '';
+
+    this.availabilityCalendar.getBlockedDates().pipe(
+      finalize(() => {
+        this.isCalendarLoading = false;
+      })
+    ).subscribe({
+      next: (response) => {
+        this.applyBlockedDates(response?.data || []);
+      },
+      error: () => {
+        this.calendarError = this.i18n.t('adminPanel.calendar.loadError', undefined, 'Could not load reserved dates.');
+      }
+    });
+  }
+
+  // ── Calendar helpers ──────────────────────────────────
+
+  private getBookingForDate(date: Date): BookingCalendarItem | null {
+    const dateKey = this.toDateKey(date);
+    for (const booking of this.calendarBookings) {
+      if (dateKey >= booking.checkIn && dateKey <= booking.checkOut) {
+        return booking;
+      }
+    }
+    return null;
+  }
+
+  private rebuildDeferredCheckInMap(): void {
+    this.deferredCheckInMap.clear();
+    for (const b of this.calendarBookings) {
+      const [y, m, d] = b.checkIn.split('-').map(Number);
+      this.deferredCheckInMap.set(this.toDateKey(new Date(y, m - 1, d + 1)), b);
+    }
+  }
+
+  private updateSelectionState(blocked: boolean): void {
+    if (!this.selectedDates.length || this.isCalendarSaving) return;
+
+    // Block reserve/release only for mid-days of a booking (check-in and check-out are allowed)
+    const bookedDays = this.selectedDates.filter(d => {
+      const parts = d.split('-').map(Number);
+      const date = new Date(parts[0], parts[1] - 1, parts[2]);
+      const booking = this.getBookingForDate(date);
+      if (!booking) return false;
+      return d !== booking.checkIn && d !== booking.checkOut;
+    });
+    if (bookedDays.length > 0) {
+      this.calendarError = `${bookedDays.length} selected date(s) are part of an existing booking and cannot be ${blocked ? 'manually blocked' : 'released'}.`;
+      return;
+    }
+
+    this.isCalendarSaving = true;
+    this.calendarError = '';
+    this.calendarMessage = '';
+
+    this.availabilityCalendar.updateBlockedDates(this.selectedDates, blocked).pipe(
+      finalize(() => {
+        this.isCalendarSaving = false;
+      })
+    ).subscribe({
+      next: (response) => {
+        const updatedDates = response?.data || [];
+        this.applyBlockedDates(updatedDates);
+        this.clearSelection();
+        this.calendarMessage = blocked
+          ? this.i18n.t('adminPanel.calendar.blockSuccess', undefined, 'Selected dates were reserved.')
+          : this.i18n.t('adminPanel.calendar.unblockSuccess', undefined, 'Selected dates were released.');
+      },
+      error: (err) => {
+        this.calendarError = err?.error?.message || this.i18n.t('adminPanel.calendar.saveError', undefined, 'Could not update dates.');
+      }
+    });
+  }
+
+  private handleCalendarChange(selectedDates: Date[]): void {
+    if (this.isSyncingToCalendar) return;
+
+    this.calendarMessage = '';
+    this.calendarError = '';
+
+    if (!selectedDates.length) {
+      this.clearSelectionState();
+      this.syncRangeInputs();
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const [startDate, endDate] = selectedDates;
+    this.selectedStartDate = new Date(startDate);
+    this.selectedEndDate = endDate ? new Date(endDate) : null;
+
+    if (!endDate) {
+      this.selectedDates = [this.toDateKey(startDate)];
+    } else {
+      this.selectedDates = this.enumerateDateRange(startDate, endDate);
+    }
+
+    this.syncRangeInputs();
+    this.cdr.detectChanges();
+  }
+
+  private handleFromInputChange(startDate: Date | null): void {
+    if (!startDate) {
+      this.clearSelection();
+      return;
+    }
+    const normalizedEnd = this.selectedEndDate && this.selectedEndDate >= startDate ? this.selectedEndDate : null;
+    this.applyRangeFromInputs(startDate, normalizedEnd);
+  }
+
+  private handleToInputChange(endDate: Date | null): void {
+    if (!endDate) {
+      this.applyRangeFromInputs(this.selectedStartDate, null);
+      return;
+    }
+    const rawStart = this.selectedStartDate ?? new Date(endDate);
+    const start = rawStart <= endDate ? rawStart : new Date(endDate);
+    const end = rawStart <= endDate ? new Date(endDate) : rawStart;
+    this.applyRangeFromInputs(start, end);
+  }
+
+  private applyRangeFromInputs(startDate: Date | null, endDate: Date | null): void {
+    this.calendarMessage = '';
+    this.calendarError = '';
+
+    if (!startDate) {
+      this.clearSelection();
+      return;
+    }
+
+    const normStart = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const normEnd = endDate ? new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()) : null;
+
+    this.selectedStartDate = normStart;
+    this.selectedEndDate = normEnd;
+    this.selectedDates = normEnd ? this.enumerateDateRange(normStart, normEnd) : [this.toDateKey(normStart)];
+
+    if (this.inlineFp) {
+      this.isSyncingToCalendar = true;
+      this.inlineFp.setDate(normEnd ? [normStart, normEnd] : [normStart], false);
+      this.inlineFp.jumpToDate(normEnd ?? normStart);
+      this.isSyncingToCalendar = false;
+    }
+
+    this.syncRangeInputs();
+    this.cdr.detectChanges();
+  }
+
+  private syncRangeInputs(): void {
+    if (this.rangeFromFp) {
+      if (this.selectedStartDate) this.rangeFromFp.setDate(this.selectedStartDate, false);
+      else this.rangeFromFp.clear(false);
+    }
+    if (this.rangeToFp) {
+      if (this.selectedEndDate) this.rangeToFp.setDate(this.selectedEndDate, false);
+      else this.rangeToFp.clear(false);
+    }
+  }
+
+  private clearSelectionState(): void {
+    this.selectedDates = [];
+    this.selectedStartDate = null;
+    this.selectedEndDate = null;
+  }
+
+  private clearSelection(clearInlineCalendar = true): void {
+    this.clearSelectionState();
+    this.syncRangeInputs();
+
+    if (clearInlineCalendar && this.inlineFp) {
+      const savedYear: number = this.inlineFp.currentYear;
+      const savedMonth: number = this.inlineFp.currentMonth;
+      this.isSyncingToCalendar = true;
+      this.inlineFp.clear(false);
+      this.inlineFp.jumpToDate(new Date(savedYear, savedMonth, 1), false);
+      this.isSyncingToCalendar = false;
+    }
+
+    this.cdr.detectChanges();
+  }
+
+  private enumerateDateRange(startDate: Date, endDate: Date): string[] {
+    const dates: string[] = [];
+    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+    for (let cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
+      dates.push(this.toDateKey(cursor));
+    }
+
+    return dates;
+  }
+
+  private applyBlockedDates(dates: string[]): void {
+    const normalizedDates = dates
+      .map((date) => String(date || '').trim())
+      .filter((date) => /^\d{4}-\d{2}-\d{2}$/.test(date));
+
+    this.blockedDateSet = new Set(normalizedDates);
+
+    if (this.inlineFp) {
+      this.inlineFp.redraw();
+    }
+  }
+
+  private isBlockedDate(date: Date): boolean {
+    return this.blockedDateSet.has(this.toDateKey(date));
+  }
+
+  private toDateKey(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private getFlatpickrLocaleByLanguage(language: string): any {
+    switch (language) {
+      case 'el': return GREEK_LOCALE_NO_TONOS;
+      case 'ro': return Romanian;
+      case 'sr': return Serbian;
+      case 'bg': return Bulgarian;
+      case 'tr': return Turkish;
+      default: return 'default';
+    }
+  }
+
+  private updateCalendarLocale(): void {
+    const locale = this.getFlatpickrLocaleByLanguage(this.i18n.getLanguage());
+
+    if (this.inlineFp) {
+      this.inlineFp.set('locale', locale);
+      this.inlineFp.redraw();
+    }
+
+    if (this.rangeFromFp) this.rangeFromFp.set('locale', locale);
+    if (this.rangeToFp) this.rangeToFp.set('locale', locale);
   }
 
   logout(): void {

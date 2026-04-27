@@ -1,5 +1,6 @@
 import { Op } from 'sequelize';
 import { BlockedDate } from '../models/BlockedDate.js';
+import { Booking } from '../models/Booking.js';
 
 function normalizeDateList(inputDates) {
   if (!Array.isArray(inputDates)) return [];
@@ -11,19 +12,38 @@ function normalizeDateList(inputDates) {
   return Array.from(new Set(normalized)).sort();
 }
 
+function generateDateRange(checkIn, checkOut) {
+  const dates = [];
+  const end = new Date(checkOut);
+  for (let d = new Date(checkIn); d < end; d.setDate(d.getDate() + 1)) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    dates.push(`${y}-${m}-${day}`);
+  }
+  return dates;
+}
+
 export class CalendarController {
 
-  // this method is used by the admin panel to fetch all blocked dates from the database in order to display them in the calendar UI
+  // Returns the union of manually blocked dates and confirmed booking date ranges
   async getBlockedDates(_req, res) {
     try {
-      const blockedDates = await BlockedDate.findAll({
-        attributes: ['date'],
-        order: [['date', 'ASC']]
-      });
+      const [blockedDates, bookings] = await Promise.all([
+        BlockedDate.findAll({ attributes: ['date'] }),
+        Booking.findAll({ attributes: ['checkIn', 'checkOut'] })
+      ]);
+
+      const merged = new Set(blockedDates.map(entry => entry.date));
+      for (const booking of bookings) {
+        for (const date of generateDateRange(booking.checkIn, booking.checkOut)) {
+          merged.add(date);
+        }
+      }
 
       return res.json({
         success: true,
-        data: blockedDates.map((entry) => entry.date)
+        data: Array.from(merged).sort()
       });
     } catch (error) {
       console.error('Error fetching blocked dates:', error);

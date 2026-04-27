@@ -30,6 +30,13 @@
             (click)="switchTab('inquiries')">
             {{ 'adminPanel.inquiriesTab' | t : undefined : 'Inquiries' }}
           </button>
+          <button
+            type="button"
+            class="nav-tab"
+            [class.active]="activeTab === 'bookings'"
+            (click)="switchTab('bookings')">
+            Bookings
+          </button>
         </div>
 
         <div class="lang-switcher" [attr.aria-label]="'language.switcherAria' | t">
@@ -73,6 +80,7 @@
       <h1>{{ panelTitle }}</h1>
     </header>
 
+    <!-- ── Calendar tab ────────────────────────────────── -->
     <section class="tab-panel calendar-panel" [class.hidden-panel]="activeTab !== 'calendar'" [attr.aria-hidden]="activeTab !== 'calendar'">
       <div class="calendar-range-controls">
         <div class="range-field">
@@ -135,6 +143,7 @@
       }
     </section>
 
+    <!-- ── Inquiries tab ───────────────────────────────── -->
     <section class="tab-panel inquiries-panel" [class.hidden-panel]="activeTab !== 'inquiries'" [attr.aria-hidden]="activeTab !== 'inquiries'">
 
       <div class="inquiry-toolbar">
@@ -224,6 +233,7 @@
             <span>{{ 'adminPanel.inquiries.guests' | t : undefined : 'Guests' }}</span>
             <span>{{ 'adminPanel.inquiries.message' | t : undefined : 'Message' }}</span>
             <span>{{ 'adminPanel.inquiries.received' | t : undefined : 'Received' }}</span>
+            <span></span>
           </div>
 
           @for (inquiry of inquiries; track inquiry.id) {
@@ -250,6 +260,16 @@
                 {{ inquiry.message || ('adminPanel.inquiries.noMessage' | t : undefined : 'No message') }}
               </span>
               <span [attr.data-label]="'adminPanel.inquiries.received' | t : undefined : 'Received'">{{ inquiry.createdAt | date: 'short' }}</span>
+              <span class="col-action" data-label="Action">
+                <button
+                  type="button"
+                  class="confirm-booking-btn"
+                  title="Confirm as Booking"
+                  (click)="openConfirmBookingModal(inquiry)">
+                  <span class="material-icons">check_circle</span>
+                  <span class="confirm-label">Confirm</span>
+                </button>
+              </span>
             </article>
           }
         </div>
@@ -290,8 +310,246 @@
       }
     </section>
 
+    <!-- ── Bookings tab ────────────────────────────────── -->
+    <section class="tab-panel bookings-panel" [class.hidden-panel]="activeTab !== 'bookings'" [attr.aria-hidden]="activeTab !== 'bookings'">
+
+      <div class="inquiry-toolbar booking-toolbar">
+        <div class="search-wrapper">
+          <span class="material-icons search-icon">search</span>
+          <input
+            type="text"
+            class="search-input"
+            [value]="bookingSearchTerm"
+            (input)="onBookingSearchInput($any($event).target.value)"
+            placeholder="Search by name or email…"
+            autocomplete="off"
+          >
+          @if (bookingSearchTerm) {
+            <button type="button" class="search-clear" (click)="clearBookingSearch()" aria-label="Clear search">
+              <span class="material-icons">close</span>
+            </button>
+          }
+        </div>
+
+        <div class="sort-wrapper">
+          <select class="sort-select" (change)="onBookingSortFieldChange($event)">
+            <option value="checkIn"    [selected]="bookingSortField === 'checkIn'">Check-in</option>
+            <option value="createdAt"  [selected]="bookingSortField === 'createdAt'">Date added</option>
+            <option value="guestName"  [selected]="bookingSortField === 'guestName'">Name</option>
+            <option value="guestEmail" [selected]="bookingSortField === 'guestEmail'">Email</option>
+            <option value="guestCount" [selected]="bookingSortField === 'guestCount'">Guests</option>
+            <option value="source"     [selected]="bookingSortField === 'source'">Source</option>
+          </select>
+          <button type="button" class="sort-dir-btn" (click)="onBookingSortDirToggle()">
+            <span class="material-icons">{{ bookingSortDir === 'DESC' ? 'arrow_downward' : 'arrow_upward' }}</span>
+          </button>
+        </div>
+
+        <div class="toolbar-actions">
+          <button type="button" class="add-booking-btn" (click)="openAddBookingModal()">
+            <span class="material-icons">add</span>
+            <span>Add Booking</span>
+          </button>
+          <button type="button" class="refresh-btn" [disabled]="isBookingsLoading" (click)="refreshBookings()" title="Refresh">
+            <span class="material-icons" [class.spinning]="isBookingsLoading">refresh</span>
+          </button>
+        </div>
+      </div>
+
+      @if (isBookingsLoading && !bookings.length) {
+        <p class="status loading">Loading bookings...</p>
+      }
+
+      @if (bookingsError) {
+        <p class="status error">{{ bookingsError }}</p>
+      }
+
+      @if (!isBookingsLoading && !bookingsError && !bookings.length) {
+        <p class="status empty">No bookings yet. Use "Add Booking" or confirm an inquiry.</p>
+      }
+
+      @if (bookings.length) {
+        <div class="inquiry-list booking-list" role="table" aria-label="Bookings">
+          <div class="inquiry-head booking-head" role="row">
+            <span></span>
+            <span>Name</span>
+            <span>Email</span>
+            <span>Phone</span>
+            <span>Check-in</span>
+            <span>Check-out</span>
+            <span>Guests</span>
+            <span>Source</span>
+            <span>Notes</span>
+            <span>Added</span>
+            <span>Actions</span>
+          </div>
+
+          @for (booking of bookings; track booking.id) {
+            <article class="inquiry-row booking-row" role="row">
+              <span class="col-color-dot">
+                <span class="booking-color-dot" [style.background]="booking.color"></span>
+              </span>
+              <span class="name" data-label="Name">{{ booking.guestName }}</span>
+              <span data-label="Email">{{ booking.guestEmail }}</span>
+              <span data-label="Phone">{{ booking.guestPhone || '—' }}</span>
+              <span data-label="Check-in">{{ booking.checkIn }}</span>
+              <span data-label="Check-out">{{ booking.checkOut }}</span>
+              <span data-label="Guests">{{ booking.guestCount }}</span>
+              <span data-label="Source">
+                <span class="source-badge" [attr.data-source]="booking.source">{{ booking.source }}</span>
+              </span>
+              <span
+                class="booking-notes message"
+                [class.expanded]="isBookingNoteExpanded(booking.id)"
+                [class.has-message]="!!booking.notes"
+                data-label="Notes"
+                (click)="booking.notes ? toggleBookingNoteExpand(booking.id, $event) : null"
+                [title]="booking.notes ? (isBookingNoteExpanded(booking.id) ? 'Click to collapse' : 'Click to expand') : ''">
+                {{ booking.notes || '—' }}
+              </span>
+              <span class="booking-date-added" data-label="Added">{{ booking.createdAt | date: 'dd/MM/yy' }}</span>
+              <span class="col-action booking-actions" data-label="Actions">
+                <button type="button" class="edit-booking-btn" title="Edit" (click)="openEditBookingModal(booking)">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button type="button" class="delete-booking-btn" title="Delete" (click)="deleteBookingWithConfirm(booking)">
+                  <span class="material-icons">delete</span>
+                </button>
+              </span>
+            </article>
+          }
+        </div>
+
+        <div class="pagination-row">
+          <div class="page-size-wrapper">
+            <span class="page-size-label">Per page:</span>
+            <select class="page-size-select" (change)="onBookingPageSizeChange($event)">
+              <option value="10"  [selected]="bookingPageSize === 10">10</option>
+              <option value="20"  [selected]="bookingPageSize === 20">20</option>
+              <option value="50"  [selected]="bookingPageSize === 50">50</option>
+              <option value="100" [selected]="bookingPageSize === 100">100</option>
+            </select>
+          </div>
+
+          <button
+            type="button"
+            class="page-btn"
+            [disabled]="!hasBookingPreviousPage() || isBookingsLoading"
+            (click)="goToBookingPage(bookingPage - 1)">
+            Previous
+          </button>
+
+          <p>Page {{ bookingPage }} / {{ bookingTotalPages }} · Total {{ bookingTotalItems }}</p>
+
+          <button
+            type="button"
+            class="page-btn"
+            [disabled]="!hasBookingNextPage() || isBookingsLoading"
+            (click)="goToBookingPage(bookingPage + 1)">
+            Next
+          </button>
+        </div>
+      }
+    </section>
+
     @if (error) {
       <p class="status error">{{ error }}</p>
     }
   </div>
 </section>
+
+<!-- ── Booking modal ───────────────────────────────────── -->
+@if (isBookingModalOpen) {
+  <div class="booking-modal-overlay" (click)="onModalOverlayClick($event)">
+    <div class="booking-modal-card">
+      <div class="booking-modal-header">
+        <h2>{{ isEditMode ? 'Edit Booking' : (bookingModalFromInquiryId ? 'Confirm Booking' : 'New Booking') }}</h2>
+        <button type="button" class="modal-close-btn" (click)="closeBookingModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="booking-modal-body">
+        <div class="bm-row">
+          <div class="bm-field">
+            <label>Guest Name <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="bookingModalData.guestName" placeholder="Full name" autocomplete="off">
+          </div>
+          <div class="bm-field">
+            <label>Email <span class="req">*</span></label>
+            <input type="email" [(ngModel)]="bookingModalData.guestEmail" placeholder="email@example.com" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="bm-row">
+          <div class="bm-field">
+            <label>Phone</label>
+            <input type="text" [(ngModel)]="bookingModalData.guestPhone" placeholder="+30 6xx xxx xxxx" autocomplete="off">
+          </div>
+          <div class="bm-field bm-field--small">
+            <label>Guests <span class="req">*</span></label>
+            <input type="number" [(ngModel)]="bookingModalData.guestCount" min="1" max="20">
+          </div>
+        </div>
+
+        <div class="bm-row">
+          <div class="bm-field">
+            <label>Check-in <span class="req">*</span></label>
+            <input type="text" id="modalCheckInInput" autocomplete="off" placeholder="Select date" readonly>
+          </div>
+          <div class="bm-field">
+            <label>Check-out <span class="req">*</span></label>
+            <input type="text" id="modalCheckOutInput" autocomplete="off" placeholder="Select date" readonly>
+          </div>
+        </div>
+
+        <div class="bm-row">
+          <div class="bm-field">
+            <label>Source</label>
+            <select [(ngModel)]="bookingModalData.source">
+              <option value="Website">Website</option>
+              <option value="Booking">Booking</option>
+              <option value="Airbnb">Airbnb</option>
+              <option value="Email">Email</option>
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="bm-field bm-field--full">
+          <label>Notes</label>
+          <textarea [(ngModel)]="bookingModalData.notes" placeholder="Optional notes…" rows="3"></textarea>
+        </div>
+      </div>
+
+      @if (bookingModalError) {
+        <p class="status error bm-error">{{ bookingModalError }}</p>
+      }
+
+      @if (bookingModalManualBlockConflict) {
+        <div class="bm-conflict-warning">
+          <span class="material-icons">warning</span>
+          <div class="bm-conflict-text">
+            <strong>{{ bookingModalManualBlockConflict }} date(s) are manually blocked.</strong>
+            Assign them to this booking?
+          </div>
+          <div class="bm-conflict-actions">
+            <button type="button" class="bm-conflict-yes" (click)="confirmOverrideManualBlocks()">Yes, assign</button>
+            <button type="button" class="bm-conflict-no" (click)="bookingModalManualBlockConflict = null">Cancel</button>
+          </div>
+        </div>
+      }
+
+      <div class="booking-modal-footer">
+        <button type="button" class="bm-cancel-btn" (click)="closeBookingModal()">Cancel</button>
+        <button type="button" class="bm-save-btn" [disabled]="isSavingBooking" (click)="saveBooking()">
+          @if (isSavingBooking) {
+            <span class="material-icons spinning">sync</span>
+          }
+          {{ isSavingBooking ? 'Saving…' : (isEditMode ? 'Save Changes' : 'Create Booking') }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

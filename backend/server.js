@@ -7,6 +7,7 @@ import imageRoutes from './src/routes/imageRoutes.js';
 import inquiryRoutes from './src/routes/inquiryRoutes.js';
 import calendarRoutes from './src/routes/calendarRoutes.js';
 import adminAuthRoutes from './src/routes/adminAuthRoutes.js';
+import bookingRoutes from './src/routes/bookingRoutes.js';
 import { ensureInitialAdminUser } from './src/config/bootstrapAdmin.js';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -37,6 +38,7 @@ app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/inquiries', inquiryRoutes);
 app.use('/api/calendar', calendarRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 if (!process.env.RECAPTCHA_SECRET) {
     console.warn('⚠️ RECAPTCHA_SECRET is not set. reCAPTCHA verification is currently disabled.');
