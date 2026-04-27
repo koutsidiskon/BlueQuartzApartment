@@ -8,6 +8,7 @@ import { PrivacyPolicyDialogService } from '../../service/privacy-policy-dialog'
 import { getSuccessPopupHtml } from './check-availability-popup.template';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { I18nService } from '../../service/i18n';
+import { PhoneCountrySelectComponent } from '../../shared/phone-country-select.component';
 import flatpickr from 'flatpickr';
 import { Bulgarian } from 'flatpickr/dist/l10n/bg.js';
 import { Greek } from 'flatpickr/dist/l10n/gr.js';
@@ -46,7 +47,7 @@ declare global {
   }
 }
 
-type RequiredFieldKey = 'fullName' | 'email' | 'checkIn' | 'checkOut' | 'guests' | 'gdprConsent';
+type RequiredFieldKey = 'fullName' | 'email' | 'phone' | 'checkIn' | 'checkOut' | 'guests' | 'gdprConsent';
 
 // Replace with your Google reCAPTCHA v3 SITE key.
 // This must match the key used in frontend/src/index.html script URL.
@@ -56,7 +57,7 @@ const MIN_STAY_NIGHTS = 5;
 @Component({
   selector: 'app-check-availability',
   standalone: true,
-                imports: [CommonModule, TranslatePipe],
+                imports: [CommonModule, TranslatePipe, PhoneCountrySelectComponent],
   templateUrl: './check-availability.html',
   styleUrl: './check-availability.scss'
 })
@@ -69,6 +70,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
 
     @ViewChild('fullName') fullNameInput!: ElementRef;
     @ViewChild('email') emailInput!: ElementRef;
+    @ViewChild('phone') phoneInput!: ElementRef;
     @ViewChild('message') messageInput!: ElementRef;
     @ViewChild('botField') botFieldInput!: ElementRef;
     @ViewChild('gdprConsentInput') gdprConsentInput!: ElementRef;
@@ -76,6 +78,8 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     @ViewChild('checkOutPicker') checkOutPicker!: ElementRef;
     @ViewChild('guests') guestsInput!: ElementRef;
     @ViewChild('inlineCalendar') inlineCalendar!: ElementRef;
+
+    phoneCountryCode = '+30';
 
     private checkInFp: any;
     private checkOutFp: any;
@@ -90,6 +94,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     requiredFieldErrors: Record<RequiredFieldKey, boolean> = {
         fullName: false,
         email: false,
+        phone: false,
         checkIn: false,
         checkOut: false,
         guests: false,
@@ -221,7 +226,10 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
                     }
 
                     if (!this.isSyncingFromInline) {
-                        setTimeout(() => this.checkOutFp.open(), 100);
+                        setTimeout(() => {
+                            this.checkOutFp.jumpToDate(startDate, false);
+                            this.checkOutFp.open();
+                        }, 100);
                     }
                 }
 
@@ -492,6 +500,8 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
       const inquiryData = {
           fullName: nameValue,
           email: this.emailInput?.nativeElement.value || '',
+          phoneCountryCode: this.phoneCountryCode,
+          phone: this.phoneInput?.nativeElement.value?.trim() || '',
           message: this.messageInput?.nativeElement.value || '',
           botField: this.botFieldInput?.nativeElement.value?.trim() || '',
           recaptchaToken,
@@ -553,6 +563,8 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     private resetForm(): void {
         this.fullNameInput.nativeElement.value = '';
         this.emailInput.nativeElement.value = '';
+        if (this.phoneInput?.nativeElement) this.phoneInput.nativeElement.value = '';
+        this.phoneCountryCode = '+30';
         this.messageInput.nativeElement.value = '';
         if (this.botFieldInput?.nativeElement) this.botFieldInput.nativeElement.value = '';
         if (this.gdprConsentInput?.nativeElement) this.gdprConsentInput.nativeElement.checked = false;
@@ -577,6 +589,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     private validateRequiredFields(): boolean {
         const fullName = (this.fullNameInput?.nativeElement?.value || '').trim();
         const email = (this.emailInput?.nativeElement?.value || '').trim();
+        const phone = (this.phoneInput?.nativeElement?.value || '').trim();
         const guests = (this.guestsInput?.nativeElement?.value || '').toString().trim();
         const hasCheckIn = this.checkInFp?.selectedDates.length > 0;
         const hasCheckOut = this.checkOutFp?.selectedDates.length > 0;
@@ -584,6 +597,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
 
         this.requiredFieldErrors.fullName = !fullName;
         this.requiredFieldErrors.email = !email;
+        this.requiredFieldErrors.phone = !phone;
         this.requiredFieldErrors.checkIn = !hasCheckIn;
         this.requiredFieldErrors.checkOut = !hasCheckOut;
         this.requiredFieldErrors.guests = !guests;
@@ -608,6 +622,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     private resetRequiredFieldErrors(): void {
         this.requiredFieldErrors.fullName = false;
         this.requiredFieldErrors.email = false;
+        this.requiredFieldErrors.phone = false;
         this.requiredFieldErrors.checkIn = false;
         this.requiredFieldErrors.checkOut = false;
         this.requiredFieldErrors.guests = false;

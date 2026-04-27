@@ -35,7 +35,7 @@
             class="nav-tab"
             [class.active]="activeTab === 'bookings'"
             (click)="switchTab('bookings')">
-            Bookings
+            {{ 'adminPanel.bookingsTab' | t : undefined : 'Bookings' }}
           </button>
         </div>
 
@@ -260,14 +260,14 @@
                 {{ inquiry.message || ('adminPanel.inquiries.noMessage' | t : undefined : 'No message') }}
               </span>
               <span [attr.data-label]="'adminPanel.inquiries.received' | t : undefined : 'Received'">{{ inquiry.createdAt | date: 'short' }}</span>
-              <span class="col-action" data-label="Action">
+              <span class="col-action" [attr.data-label]="'adminPanel.inquiries.action' | t : undefined : 'Action'">
                 <button
                   type="button"
                   class="confirm-booking-btn"
-                  title="Confirm as Booking"
+                  [attr.title]="'adminPanel.inquiries.confirmTitle' | t : undefined : 'Confirm as Booking'"
                   (click)="openConfirmBookingModal(inquiry)">
                   <span class="material-icons">check_circle</span>
-                  <span class="confirm-label">Confirm</span>
+                  <span class="confirm-label">{{ 'adminPanel.inquiries.confirmLabel' | t : undefined : 'Confirm' }}</span>
                 </button>
               </span>
             </article>
@@ -321,7 +321,7 @@
             class="search-input"
             [value]="bookingSearchTerm"
             (input)="onBookingSearchInput($any($event).target.value)"
-            placeholder="Search by name or email…"
+            [attr.placeholder]="'adminPanel.bookings.searchPlaceholder' | t : undefined : 'Search by name or email…'"
             autocomplete="off"
           >
           @if (bookingSearchTerm) {
@@ -333,12 +333,12 @@
 
         <div class="sort-wrapper">
           <select class="sort-select" (change)="onBookingSortFieldChange($event)">
-            <option value="checkIn"    [selected]="bookingSortField === 'checkIn'">Check-in</option>
-            <option value="createdAt"  [selected]="bookingSortField === 'createdAt'">Date added</option>
-            <option value="guestName"  [selected]="bookingSortField === 'guestName'">Name</option>
-            <option value="guestEmail" [selected]="bookingSortField === 'guestEmail'">Email</option>
-            <option value="guestCount" [selected]="bookingSortField === 'guestCount'">Guests</option>
-            <option value="source"     [selected]="bookingSortField === 'source'">Source</option>
+            <option value="checkIn"    [selected]="bookingSortField === 'checkIn'">{{ 'adminPanel.bookings.sortCheckIn' | t : undefined : 'Check-in' }}</option>
+            <option value="createdAt"  [selected]="bookingSortField === 'createdAt'">{{ 'adminPanel.bookings.sortDateAdded' | t : undefined : 'Date added' }}</option>
+            <option value="guestName"  [selected]="bookingSortField === 'guestName'">{{ 'adminPanel.bookings.sortName' | t : undefined : 'Name' }}</option>
+            <option value="guestEmail" [selected]="bookingSortField === 'guestEmail'">{{ 'adminPanel.bookings.sortEmail' | t : undefined : 'Email' }}</option>
+            <option value="guestCount" [selected]="bookingSortField === 'guestCount'">{{ 'adminPanel.bookings.sortGuests' | t : undefined : 'Guests' }}</option>
+            <option value="source"     [selected]="bookingSortField === 'source'">{{ 'adminPanel.bookings.sortSource' | t : undefined : 'Source' }}</option>
           </select>
           <button type="button" class="sort-dir-btn" (click)="onBookingSortDirToggle()">
             <span class="material-icons">{{ bookingSortDir === 'DESC' ? 'arrow_downward' : 'arrow_upward' }}</span>
@@ -348,16 +348,20 @@
         <div class="toolbar-actions">
           <button type="button" class="add-booking-btn" (click)="openAddBookingModal()">
             <span class="material-icons">add</span>
-            <span>Add Booking</span>
+            <span>{{ 'adminPanel.bookings.addBooking' | t : undefined : 'Add Booking' }}</span>
           </button>
-          <button type="button" class="refresh-btn" [disabled]="isBookingsLoading" (click)="refreshBookings()" title="Refresh">
+          <button type="button" class="refresh-btn" [disabled]="isBookingsLoading" (click)="refreshBookings()" [attr.title]="'adminPanel.bookings.refresh' | t : undefined : 'Refresh'">
             <span class="material-icons" [class.spinning]="isBookingsLoading">refresh</span>
           </button>
         </div>
       </div>
 
       @if (isBookingsLoading && !bookings.length) {
-        <p class="status loading">Loading bookings...</p>
+        <p class="status loading">{{ 'adminPanel.bookings.loading' | t : undefined : 'Loading bookings...' }}</p>
+      }
+
+      @if (bookingMessage) {
+        <p class="status ok">{{ bookingMessage }}</p>
       }
 
       @if (bookingsError) {
@@ -365,54 +369,54 @@
       }
 
       @if (!isBookingsLoading && !bookingsError && !bookings.length) {
-        <p class="status empty">No bookings yet. Use "Add Booking" or confirm an inquiry.</p>
+        <p class="status empty">{{ 'adminPanel.bookings.empty' | t : undefined : 'No bookings yet.' }}</p>
       }
 
       @if (bookings.length) {
-        <div class="inquiry-list booking-list" role="table" aria-label="Bookings">
+        <div class="inquiry-list booking-list" role="table" [attr.aria-label]="'adminPanel.bookingsTab' | t : undefined : 'Bookings'">
           <div class="inquiry-head booking-head" role="row">
             <span></span>
-            <span>Name</span>
-            <span>Email</span>
-            <span>Phone</span>
-            <span>Check-in</span>
-            <span>Check-out</span>
-            <span>Guests</span>
-            <span>Source</span>
-            <span>Notes</span>
-            <span>Added</span>
-            <span>Actions</span>
+            <span>{{ 'adminPanel.bookings.colName' | t : undefined : 'Name' }}</span>
+            <span>{{ 'adminPanel.bookings.colEmail' | t : undefined : 'Email' }}</span>
+            <span>{{ 'adminPanel.bookings.colPhone' | t : undefined : 'Phone' }}</span>
+            <span>{{ 'adminPanel.bookings.colCheckIn' | t : undefined : 'Check-in' }}</span>
+            <span>{{ 'adminPanel.bookings.colCheckOut' | t : undefined : 'Check-out' }}</span>
+            <span>{{ 'adminPanel.bookings.colGuests' | t : undefined : 'Guests' }}</span>
+            <span>{{ 'adminPanel.bookings.colSource' | t : undefined : 'Source' }}</span>
+            <span>{{ 'adminPanel.bookings.colNotes' | t : undefined : 'Notes' }}</span>
+            <span>{{ 'adminPanel.bookings.colAdded' | t : undefined : 'Added' }}</span>
+            <span>{{ 'adminPanel.bookings.colActions' | t : undefined : 'Actions' }}</span>
           </div>
 
           @for (booking of bookings; track booking.id) {
-            <article class="inquiry-row booking-row" role="row">
+            <article class="inquiry-row booking-row" role="row" [style.--booking-color]="booking.color">
               <span class="col-color-dot">
                 <span class="booking-color-dot" [style.background]="booking.color"></span>
               </span>
-              <span class="name" data-label="Name">{{ booking.guestName }}</span>
-              <span data-label="Email">{{ booking.guestEmail }}</span>
-              <span data-label="Phone">{{ booking.guestPhone || '—' }}</span>
-              <span data-label="Check-in">{{ booking.checkIn }}</span>
-              <span data-label="Check-out">{{ booking.checkOut }}</span>
-              <span data-label="Guests">{{ booking.guestCount }}</span>
-              <span data-label="Source">
+              <span class="name" [attr.data-label]="'adminPanel.bookings.colName' | t : undefined : 'Name'">{{ booking.guestName }}</span>
+              <span [attr.data-label]="'adminPanel.bookings.colEmail' | t : undefined : 'Email'">{{ booking.guestEmail }}</span>
+              <span [attr.data-label]="'adminPanel.bookings.colPhone' | t : undefined : 'Phone'">{{ booking.guestPhone || '—' }}</span>
+              <span [attr.data-label]="'adminPanel.bookings.colCheckIn' | t : undefined : 'Check-in'">{{ booking.checkIn }}</span>
+              <span [attr.data-label]="'adminPanel.bookings.colCheckOut' | t : undefined : 'Check-out'">{{ booking.checkOut }}</span>
+              <span [attr.data-label]="'adminPanel.bookings.colGuests' | t : undefined : 'Guests'">{{ booking.guestCount }}</span>
+              <span [attr.data-label]="'adminPanel.bookings.colSource' | t : undefined : 'Source'">
                 <span class="source-badge" [attr.data-source]="booking.source">{{ booking.source }}</span>
               </span>
               <span
                 class="booking-notes message"
                 [class.expanded]="isBookingNoteExpanded(booking.id)"
                 [class.has-message]="!!booking.notes"
-                data-label="Notes"
+                [attr.data-label]="'adminPanel.bookings.colNotes' | t : undefined : 'Notes'"
                 (click)="booking.notes ? toggleBookingNoteExpand(booking.id, $event) : null"
                 [title]="booking.notes ? (isBookingNoteExpanded(booking.id) ? 'Click to collapse' : 'Click to expand') : ''">
                 {{ booking.notes || '—' }}
               </span>
-              <span class="booking-date-added" data-label="Added">{{ booking.createdAt | date: 'dd/MM/yy' }}</span>
-              <span class="col-action booking-actions" data-label="Actions">
+              <span class="booking-date-added" [attr.data-label]="'adminPanel.bookings.colAdded' | t : undefined : 'Added'">{{ booking.createdAt | date: 'dd/MM/yy' }}</span>
+              <span class="col-action booking-actions" [attr.data-label]="'adminPanel.bookings.colActions' | t : undefined : 'Actions'">
                 <button type="button" class="edit-booking-btn" title="Edit" (click)="openEditBookingModal(booking)">
                   <span class="material-icons">edit</span>
                 </button>
-                <button type="button" class="delete-booking-btn" title="Delete" (click)="deleteBookingWithConfirm(booking)">
+                <button type="button" class="delete-booking-btn" title="Delete" (click)="openDeleteConfirm(booking)">
                   <span class="material-icons">delete</span>
                 </button>
               </span>
@@ -422,7 +426,7 @@
 
         <div class="pagination-row">
           <div class="page-size-wrapper">
-            <span class="page-size-label">Per page:</span>
+            <span class="page-size-label">{{ 'adminPanel.bookings.perPage' | t : undefined : 'Per page:' }}</span>
             <select class="page-size-select" (change)="onBookingPageSizeChange($event)">
               <option value="10"  [selected]="bookingPageSize === 10">10</option>
               <option value="20"  [selected]="bookingPageSize === 20">20</option>
@@ -436,17 +440,21 @@
             class="page-btn"
             [disabled]="!hasBookingPreviousPage() || isBookingsLoading"
             (click)="goToBookingPage(bookingPage - 1)">
-            Previous
+            {{ 'adminPanel.bookings.prev' | t : undefined : 'Previous' }}
           </button>
 
-          <p>Page {{ bookingPage }} / {{ bookingTotalPages }} · Total {{ bookingTotalItems }}</p>
+          <p>
+            {{ 'adminPanel.bookings.page' | t : undefined : 'Page' }} {{ bookingPage }} / {{ bookingTotalPages }}
+            ·
+            {{ 'adminPanel.bookings.total' | t : undefined : 'Total' }} {{ bookingTotalItems }}
+          </p>
 
           <button
             type="button"
             class="page-btn"
             [disabled]="!hasBookingNextPage() || isBookingsLoading"
             (click)="goToBookingPage(bookingPage + 1)">
-            Next
+            {{ 'adminPanel.bookings.next' | t : undefined : 'Next' }}
           </button>
         </div>
       }
@@ -463,7 +471,7 @@
   <div class="booking-modal-overlay" (click)="onModalOverlayClick($event)">
     <div class="booking-modal-card">
       <div class="booking-modal-header">
-        <h2>{{ isEditMode ? 'Edit Booking' : (bookingModalFromInquiryId ? 'Confirm Booking' : 'New Booking') }}</h2>
+        <h2>{{ isEditMode ? ('adminPanel.bookings.editBooking' | t : undefined : 'Edit Booking') : (bookingModalFromInquiryId ? ('adminPanel.bookings.confirmBooking' | t : undefined : 'Confirm Booking') : ('adminPanel.bookings.newBooking' | t : undefined : 'New Booking')) }}</h2>
         <button type="button" class="modal-close-btn" (click)="closeBookingModal()">
           <span class="material-icons">close</span>
         </button>
@@ -472,40 +480,43 @@
       <div class="booking-modal-body">
         <div class="bm-row">
           <div class="bm-field">
-            <label>Guest Name <span class="req">*</span></label>
-            <input type="text" [(ngModel)]="bookingModalData.guestName" placeholder="Full name" autocomplete="off">
+            <label>{{ 'adminPanel.bookings.guestName' | t : undefined : 'Guest Name' }} <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="bookingModalData.guestName" [attr.placeholder]="'adminPanel.bookings.guestNamePlaceholder' | t : undefined : 'Full name'" autocomplete="off">
           </div>
           <div class="bm-field">
-            <label>Email <span class="req">*</span></label>
+            <label>{{ 'adminPanel.bookings.email' | t : undefined : 'Email' }} <span class="req">*</span></label>
             <input type="email" [(ngModel)]="bookingModalData.guestEmail" placeholder="email@example.com" autocomplete="off">
           </div>
         </div>
 
         <div class="bm-row">
           <div class="bm-field">
-            <label>Phone</label>
-            <input type="text" [(ngModel)]="bookingModalData.guestPhone" placeholder="+30 6xx xxx xxxx" autocomplete="off">
+            <label>{{ 'adminPanel.bookings.phone' | t : undefined : 'Phone' }}</label>
+            <div class="bm-phone-wrapper">
+              <app-phone-country-select [value]="bookingModalData.guestPhoneCountryCode" (valueChange)="bookingModalData.guestPhoneCountryCode = $event"></app-phone-country-select>
+              <input type="tel" [(ngModel)]="bookingModalData.guestPhone" class="bm-phone-input" [attr.placeholder]="'adminPanel.bookings.phonePlaceholder' | t : undefined : 'Phone number'" autocomplete="off">
+            </div>
           </div>
           <div class="bm-field bm-field--small">
-            <label>Guests <span class="req">*</span></label>
+            <label>{{ 'adminPanel.bookings.guests' | t : undefined : 'Guests' }} <span class="req">*</span></label>
             <input type="number" [(ngModel)]="bookingModalData.guestCount" min="1" max="20">
           </div>
         </div>
 
         <div class="bm-row">
           <div class="bm-field">
-            <label>Check-in <span class="req">*</span></label>
-            <input type="text" id="modalCheckInInput" autocomplete="off" placeholder="Select date" readonly>
+            <label>{{ 'adminPanel.bookings.checkIn' | t : undefined : 'Check-in' }} <span class="req">*</span></label>
+            <input type="text" id="modalCheckInInput" autocomplete="off" [attr.placeholder]="'adminPanel.bookings.selectDate' | t : undefined : 'Select date'" readonly>
           </div>
           <div class="bm-field">
-            <label>Check-out <span class="req">*</span></label>
-            <input type="text" id="modalCheckOutInput" autocomplete="off" placeholder="Select date" readonly>
+            <label>{{ 'adminPanel.bookings.checkOut' | t : undefined : 'Check-out' }} <span class="req">*</span></label>
+            <input type="text" id="modalCheckOutInput" autocomplete="off" [attr.placeholder]="'adminPanel.bookings.selectDate' | t : undefined : 'Select date'" readonly>
           </div>
         </div>
 
         <div class="bm-row">
           <div class="bm-field">
-            <label>Source</label>
+            <label>{{ 'adminPanel.bookings.source' | t : undefined : 'Source' }}</label>
             <select [(ngModel)]="bookingModalData.source">
               <option value="Website">Website</option>
               <option value="Booking">Booking</option>
@@ -518,36 +529,65 @@
         </div>
 
         <div class="bm-field bm-field--full">
-          <label>Notes</label>
-          <textarea [(ngModel)]="bookingModalData.notes" placeholder="Optional notes…" rows="3"></textarea>
+          <label>{{ 'adminPanel.bookings.notes' | t : undefined : 'Notes' }}</label>
+          <textarea [(ngModel)]="bookingModalData.notes" [attr.placeholder]="'adminPanel.bookings.notesPlaceholder' | t : undefined : 'Optional notes…'" rows="3"></textarea>
         </div>
       </div>
 
       @if (bookingModalError) {
-        <p class="status error bm-error">{{ bookingModalError }}</p>
+        <p class="bm-error-text">{{ bookingModalError }}</p>
       }
 
       @if (bookingModalManualBlockConflict) {
         <div class="bm-conflict-warning">
           <span class="material-icons">warning</span>
           <div class="bm-conflict-text">
-            <strong>{{ bookingModalManualBlockConflict }} date(s) are manually blocked.</strong>
-            Assign them to this booking?
+            <strong>{{ bookingModalManualBlockConflict }} {{ 'adminPanel.bookings.conflictManualBlock' | t : undefined : 'date(s) are manually blocked.' }}</strong>
+            {{ 'adminPanel.bookings.conflictAssign' | t : undefined : 'Assign them to this booking?' }}
           </div>
           <div class="bm-conflict-actions">
-            <button type="button" class="bm-conflict-yes" (click)="confirmOverrideManualBlocks()">Yes, assign</button>
-            <button type="button" class="bm-conflict-no" (click)="bookingModalManualBlockConflict = null">Cancel</button>
+            <button type="button" class="bm-conflict-yes" (click)="confirmOverrideManualBlocks()">{{ 'adminPanel.bookings.conflictYes' | t : undefined : 'Yes, assign' }}</button>
+            <button type="button" class="bm-conflict-no" (click)="bookingModalManualBlockConflict = null">{{ 'adminPanel.bookings.conflictNo' | t : undefined : 'Cancel' }}</button>
           </div>
         </div>
       }
 
       <div class="booking-modal-footer">
-        <button type="button" class="bm-cancel-btn" (click)="closeBookingModal()">Cancel</button>
+        <button type="button" class="bm-cancel-btn" (click)="closeBookingModal()">{{ 'adminPanel.bookings.cancel' | t : undefined : 'Cancel' }}</button>
         <button type="button" class="bm-save-btn" [disabled]="isSavingBooking" (click)="saveBooking()">
           @if (isSavingBooking) {
             <span class="material-icons spinning">sync</span>
           }
-          {{ isSavingBooking ? 'Saving…' : (isEditMode ? 'Save Changes' : 'Create Booking') }}
+          {{ isSavingBooking ? ('adminPanel.bookings.saving' | t : undefined : 'Saving…') : (isEditMode ? ('adminPanel.bookings.saveChanges' | t : undefined : 'Save Changes') : ('adminPanel.bookings.createBooking' | t : undefined : 'Create Booking')) }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Delete confirmation modal ──────────────────────── -->
+@if (isDeleteConfirmModalOpen && deletingBooking) {
+  <div class="booking-modal-overlay" (click)="onDeleteModalOverlayClick($event)">
+    <div class="booking-modal-card delete-confirm-card">
+      <div class="booking-modal-header">
+        <h2>{{ 'adminPanel.bookings.deleteTitle' | t : undefined : 'Delete Booking?' }}</h2>
+        <button type="button" class="modal-close-btn" (click)="cancelDeleteBooking()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="booking-modal-body">
+        <p class="delete-confirm-text">
+          {{ 'adminPanel.bookings.deleteConfirmPrefix' | t : undefined : 'This will delete the booking for' }}
+          <strong>{{ deletingBooking.guestName }}</strong>
+          {{ 'adminPanel.bookings.deleteConfirmDates' | t : undefined : 'and release dates' }}
+          <strong>{{ deletingBooking.checkIn }} → {{ deletingBooking.checkOut }}</strong>.
+        </p>
+      </div>
+      <div class="booking-modal-footer">
+        <button type="button" class="bm-cancel-btn" (click)="cancelDeleteBooking()">{{ 'adminPanel.bookings.deleteCancel' | t : undefined : 'Cancel' }}</button>
+        <button type="button" class="bm-delete-btn" (click)="confirmDeleteBooking()">
+          <span class="material-icons">delete</span>
+          {{ 'adminPanel.bookings.deleteYes' | t : undefined : 'Yes, delete' }}
         </button>
       </div>
     </div>

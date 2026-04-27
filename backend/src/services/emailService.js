@@ -25,7 +25,7 @@ function formatDate(dateStr) {
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function buildConfirmationHtml({ fullName, email, checkIn, checkOut, guests, message }) {
+function buildConfirmationHtml({ fullName, email, phoneCountryCode, phone, checkIn, checkOut, guests, message }) {
   const checkInFormatted  = formatDate(checkIn);
   const checkOutFormatted = formatDate(checkOut);
 
@@ -33,6 +33,14 @@ function buildConfirmationHtml({ fullName, email, checkIn, checkOut, guests, mes
   const checkOutDate = new Date(checkOut);
   const nights = Math.round((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
   const nightsLabel = nights === 1 ? '1 night' : `${nights} nights`;
+
+  const phoneRow = phone
+    ? `
+      <tr>
+        <td style="padding:6px 0;color:#6b7280;font-size:14px;width:130px;">Phone</td>
+        <td style="padding:6px 0;color:#111827;font-size:14px;font-weight:600;">${phoneCountryCode || ''} ${phone.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</td>
+      </tr>`
+    : '';
 
   const messageRow = message
     ? `
@@ -97,7 +105,7 @@ function buildConfirmationHtml({ fullName, email, checkIn, checkOut, guests, mes
                       <tr>
                         <td style="padding:6px 0;color:#6b7280;font-size:14px;">Guests</td>
                         <td style="padding:6px 0;color:#111827;font-size:14px;font-weight:600;">${guests}</td>
-                      </tr>${messageRow}
+                      </tr>${phoneRow}${messageRow}
                     </table>
                   </td>
                 </tr>
@@ -135,11 +143,18 @@ function buildConfirmationHtml({ fullName, email, checkIn, checkOut, guests, mes
 </html>`;
 }
 
-function buildAdminNotificationHtml({ fullName, email, checkIn, checkOut, guests, message }) {
+function buildAdminNotificationHtml({ fullName, email, phoneCountryCode, phone, checkIn, checkOut, guests, message }) {
   const checkInFormatted = formatDate(checkIn);
   const checkOutFormatted = formatDate(checkOut);
   const nights = Math.round((new Date(checkOut) - new Date(checkIn)) / (1000 * 60 * 60 * 24));
   const nightsLabel = nights === 1 ? '1 night' : `${nights} nights`;
+
+  const phoneRow = phone
+    ? `<tr>
+        <td style="padding:10px 16px;color:#6b7280;font-size:14px;border-bottom:1px solid #f3f4f6;width:120px;">Phone</td>
+        <td style="padding:10px 16px;color:#111827;font-size:14px;font-weight:600;border-bottom:1px solid #f3f4f6;">${phoneCountryCode || ''} ${phone.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</td>
+      </tr>`
+    : '';
 
   const messageRow = message
     ? `<tr>
@@ -187,10 +202,10 @@ function buildAdminNotificationHtml({ fullName, email, checkIn, checkOut, guests
                   <td style="padding:10px 16px;color:#111827;font-size:14px;font-weight:600;border-bottom:1px solid #f3f4f6;">${nightsLabel}</td>
                 </tr>
                 <tr>
-                  <td style="padding:10px 16px;color:#6b7280;font-size:14px;${message ? 'border-bottom:1px solid #f3f4f6;' : ''}">Guests</td>
-                  <td style="padding:10px 16px;color:#111827;font-size:14px;font-weight:600;${message ? 'border-bottom:1px solid #f3f4f6;' : ''}">${guests}</td>
+                  <td style="padding:10px 16px;color:#6b7280;font-size:14px;${(phone || message) ? 'border-bottom:1px solid #f3f4f6;' : ''}">Guests</td>
+                  <td style="padding:10px 16px;color:#111827;font-size:14px;font-weight:600;${(phone || message) ? 'border-bottom:1px solid #f3f4f6;' : ''}">${guests}</td>
                 </tr>
-                ${messageRow}
+                ${phoneRow}${messageRow}
               </table>
               <p style="margin:0;font-size:13px;color:#9ca3af;text-align:center;">Log in to the admin panel to manage this inquiry.</p>
             </td>
@@ -233,17 +248,17 @@ async function sendEmail({ from, to, subject, html }) {
   await sendViaSmtp({ from, to, subject, html });
 }
 
-export async function sendInquiryConfirmation({ fullName, email, checkIn, checkOut, guests, message }) {
+export async function sendInquiryConfirmation({ fullName, email, phoneCountryCode, phone, checkIn, checkOut, guests, message }) {
   const from = process.env.EMAIL_FROM || `BlueQuartz Apartment <${process.env.SMTP_USER}>`;
   await sendEmail({
     from,
     to: email,
     subject: 'Inquiry Confirmation — Blue Quartz Apartment Limenas Thassos',
-    html: buildConfirmationHtml({ fullName, email, checkIn, checkOut, guests, message })
+    html: buildConfirmationHtml({ fullName, email, phoneCountryCode, phone, checkIn, checkOut, guests, message })
   });
 }
 
-export async function sendAdminNotification({ fullName, email, checkIn, checkOut, guests, message }) {
+export async function sendAdminNotification({ fullName, email, phoneCountryCode, phone, checkIn, checkOut, guests, message }) {
   const adminEmail = process.env.ADMIN_EMAIL;
   if (!adminEmail) return;
   const from = process.env.EMAIL_FROM || `BlueQuartz Apartment <${process.env.SMTP_USER}>`;
@@ -252,6 +267,6 @@ export async function sendAdminNotification({ fullName, email, checkIn, checkOut
     from,
     to: adminEmail,
     subject: `🔔 New Inquiry — ${fullName} (${checkInFormatted})`,
-    html: buildAdminNotificationHtml({ fullName, email, checkIn, checkOut, guests, message })
+    html: buildAdminNotificationHtml({ fullName, email, phoneCountryCode, phone, checkIn, checkOut, guests, message })
   });
 }

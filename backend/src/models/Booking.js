@@ -3,7 +3,7 @@ import sequelize from '../config/db.js';
 
 export const BOOKING_COLORS = [
   '#3B82F6', '#059669', '#D97706', '#DC2626',
-  '#7C3AED', '#0891B2', '#EA580C', '#DB2777'
+  '#7C3AED', '#081cb2', '#7a8c08', '#d50c66'
 ];
 
 export const Booking = sequelize.define('Booking', {
@@ -18,6 +18,10 @@ export const Booking = sequelize.define('Booking', {
   },
   guestPhone: {
     type: DataTypes.STRING,
+    allowNull: true
+  },
+  guestPhoneCountryCode: {
+    type: DataTypes.STRING(10),
     allowNull: true
   },
   checkIn: {

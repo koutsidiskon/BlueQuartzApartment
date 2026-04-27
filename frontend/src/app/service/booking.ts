@@ -9,6 +9,7 @@ export interface BookingListItem {
   guestName: string;
   guestEmail: string;
   guestPhone: string | null;
+  guestPhoneCountryCode: string | null;
   checkIn: string;
   checkOut: string;
   guestCount: number;
@@ -33,6 +34,7 @@ export interface CreateBookingData {
   guestName: string;
   guestEmail: string;
   guestPhone?: string;
+  guestPhoneCountryCode?: string;
   checkIn: string;
   checkOut: string;
   guestCount: number;
@@ -82,7 +84,7 @@ export class BookingService {
     return this.http.post(this.apiUrl, data, { withCredentials: true });
   }
 
-  createFromInquiry(inquiryId: number, data: { guestPhone?: string; notes?: string; force?: boolean }): Observable<any> {
+  createFromInquiry(inquiryId: number, data: { guestPhone?: string; guestPhoneCountryCode?: string; notes?: string; force?: boolean }): Observable<any> {
     return this.http.post(`${this.apiUrl}/from-inquiry/${inquiryId}`, data, { withCredentials: true });
   }
 

@@ -74,7 +74,7 @@ export class BookingController {
 
   async createBooking(req, res) {
     try {
-      const { guestName, guestEmail, guestPhone, checkIn, checkOut, guestCount, notes, source, inquiryId, force } = req.body;
+      const { guestName, guestEmail, guestPhone, guestPhoneCountryCode, checkIn, checkOut, guestCount, notes, source, inquiryId, force } = req.body;
 
       if (!guestName || !guestEmail || !checkIn || !checkOut) {
         return res.status(400).json({ success: false, message: 'guestName, guestEmail, checkIn and checkOut are required.' });
@@ -118,6 +118,7 @@ export class BookingController {
         guestName: String(guestName).trim(),
         guestEmail: String(guestEmail).trim(),
         guestPhone: guestPhone ? String(guestPhone).trim() : null,
+        guestPhoneCountryCode: guestPhoneCountryCode ? String(guestPhoneCountryCode).trim() : null,
         checkIn,
         checkOut,
         guestCount: Number(guestCount) || 1,
@@ -150,7 +151,7 @@ export class BookingController {
         return res.status(404).json({ success: false, message: 'Inquiry not found.' });
       }
 
-      const { guestPhone, notes, force } = req.body;
+      const { guestPhone, guestPhoneCountryCode, notes, force } = req.body;
       const { checkIn, checkOut } = inquiry;
 
       // Check for overlapping bookings
@@ -186,7 +187,8 @@ export class BookingController {
       const booking = await Booking.create({
         guestName: inquiry.fullName,
         guestEmail: inquiry.email,
-        guestPhone: guestPhone ? String(guestPhone).trim() : null,
+        guestPhone: guestPhone ? String(guestPhone).trim() : (inquiry.phone || null),
+        guestPhoneCountryCode: guestPhoneCountryCode ? String(guestPhoneCountryCode).trim() : (inquiry.phoneCountryCode || null),
         checkIn,
         checkOut,
         guestCount: inquiry.guests,
@@ -219,7 +221,7 @@ export class BookingController {
         return res.status(404).json({ success: false, message: 'Booking not found.' });
       }
 
-      const { guestName, guestEmail, guestPhone, checkIn, checkOut, guestCount, notes, source, force } = req.body;
+      const { guestName, guestEmail, guestPhone, guestPhoneCountryCode, checkIn, checkOut, guestCount, notes, source, force } = req.body;
 
       const newCheckIn = checkIn || booking.checkIn;
       const newCheckOut = checkOut || booking.checkOut;
@@ -279,6 +281,7 @@ export class BookingController {
         guestName: guestName !== undefined ? String(guestName).trim() : booking.guestName,
         guestEmail: guestEmail !== undefined ? String(guestEmail).trim() : booking.guestEmail,
         guestPhone: guestPhone !== undefined ? (guestPhone ? String(guestPhone).trim() : null) : booking.guestPhone,
+        guestPhoneCountryCode: guestPhoneCountryCode !== undefined ? (guestPhoneCountryCode ? String(guestPhoneCountryCode).trim() : null) : booking.guestPhoneCountryCode,
         checkIn: newCheckIn,
         checkOut: newCheckOut,
         guestCount: guestCount !== undefined ? (Number(guestCount) || 1) : booking.guestCount,

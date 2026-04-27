@@ -9,7 +9,7 @@ export class InquiryController {
     // it also performs validation on the input data recaptcha and honeypot, checks for blocked dates and sends a confirmation email to the user after successfully saving the inquiry
     async createInquiry(req, res) {
         try {
-        const { fullName, email, checkIn, checkOut, message, guests, botField, recaptchaToken } = req.body;
+        const { fullName, email, phoneCountryCode, phone, checkIn, checkOut, message, guests, botField, recaptchaToken } = req.body;
 
         const recaptchaSecret = process.env.RECAPTCHA_SECRET;
         if (recaptchaSecret) {
@@ -76,16 +76,18 @@ export class InquiryController {
         const newInquiry = await Inquiry.create({
             fullName,
             email,
+            phoneCountryCode: phoneCountryCode ? String(phoneCountryCode).trim() : '+30',
+            phone: phone ? String(phone).trim() : null,
             checkIn,
             checkOut,
             message,
             guests: guests || 1
         });
 
-        sendInquiryConfirmation({ fullName, email, checkIn, checkOut, guests: guests || 1, message })
+        sendInquiryConfirmation({ fullName, email, phoneCountryCode, phone, checkIn, checkOut, guests: guests || 1, message })
           .catch(err => console.error('Confirmation email failed:', err));
 
-        sendAdminNotification({ fullName, email, checkIn, checkOut, guests: guests || 1, message })
+        sendAdminNotification({ fullName, email, phoneCountryCode, phone, checkIn, checkOut, guests: guests || 1, message })
           .catch(err => console.error('Admin notification email failed:', err));
 
         return res.status(201).json({

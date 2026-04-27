@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 export interface InquiryData {
   fullName: string;
   email: string;
+  phoneCountryCode?: string;
+  phone?: string;
   checkIn: string;
   checkOut: string;
   guests?: number;
@@ -17,6 +19,8 @@ export interface InquiryListItem {
   id: number;
   fullName: string;
   email: string;
+  phoneCountryCode: string | null;
+  phone: string | null;
   checkIn: string;
   checkOut: string;
   guests: number;

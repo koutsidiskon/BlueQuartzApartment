@@ -9,7 +9,6 @@ import { Greek } from 'flatpickr/dist/l10n/gr.js';
 import { Romanian } from 'flatpickr/dist/l10n/ro.js';
 import { Serbian } from 'flatpickr/dist/l10n/sr.js';
 import { Turkish } from 'flatpickr/dist/l10n/tr.js';
-import Swal from 'sweetalert2';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { AdminAuthService } from '../../service/admin-auth';
 import { I18nService } from '../../service/i18n';
@@ -17,6 +16,7 @@ import { LanguageFacadeService } from '../../service/language-option';
 import { AvailabilityCalendarService } from '../../service/availability-calendar';
 import { InquiryListItem, InquiryService } from '../../service/inquiry';
 import { BookingService, BookingListItem, BookingCalendarItem, BookingSource, CreateBookingData } from '../../service/booking';
+import { PhoneCountrySelectComponent } from '../../shared/phone-country-select.component';
 
 const GREEK_LOCALE_NO_TONOS = {
   ...Greek,
@@ -42,7 +42,7 @@ const GREEK_LOCALE_NO_TONOS = {
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslatePipe, FormsModule],
+  imports: [CommonModule, RouterLink, TranslatePipe, FormsModule, PhoneCountrySelectComponent],
   templateUrl: './admin-panel.html',
   styleUrl: './admin-panel.scss'
 })
@@ -105,6 +105,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   bookingSortDir: 'ASC' | 'DESC' = 'DESC';
   isBookingsLoading = false;
   bookingsError = '';
+  bookingMessage = '';
   private bookingPageCache = new Map<number, BookingListItem[]>();
   private bookingTotalItemsCache = 0;
   private bookingTotalPagesCache = 1;
@@ -123,6 +124,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     guestName: '',
     guestEmail: '',
     guestPhone: '',
+    guestPhoneCountryCode: '+30',
     checkIn: '',
     checkOut: '',
     guestCount: 1,
@@ -131,12 +133,17 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   };
   isSavingBooking = false;
   bookingModalError = '';
-  bookingModalManualBlockConflict: number | null = null; // count of conflicting manual blocks
+  bookingModalManualBlockConflict: number | null = null;
   private modalCheckInFp: any;
   private modalCheckOutFp: any;
 
+  // ── Delete confirmation modal ─────────────────────────
+  isDeleteConfirmModalOpen = false;
+  deletingBooking: BookingListItem | null = null;
+
   // ── Booking notes expand ──────────────────────────────
   expandedBookingNoteIds = new Set<number>();
+
   private deferredCheckInMap = new Map<string, BookingCalendarItem>();
 
   constructor(
@@ -232,7 +239,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       return this.i18n.t('adminPanel.inquiriesTitle', undefined, 'Booking Inquiries');
     }
     if (this.activeTab === 'bookings') {
-      return 'Bookings';
+      return this.i18n.t('adminPanel.bookingsTab', undefined, 'Bookings');
     }
     return this.i18n.t('adminPanel.calendarTitle', undefined, 'Calendar Availability');
   }
@@ -420,7 +427,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.isEditMode = false;
     this.editingBookingId = null;
     this.bookingModalFromInquiryId = null;
-    this.bookingModalData = { guestName: '', guestEmail: '', guestPhone: '', checkIn: '', checkOut: '', guestCount: 1, notes: '', source: 'Website' };
+    this.bookingModalData = { guestName: '', guestEmail: '', guestPhone: '', guestPhoneCountryCode: '+30', checkIn: '', checkOut: '', guestCount: 1, notes: '', source: 'Website' };
     this.bookingModalError = '';
     this.isBookingModalOpen = true;
     this.cdr.detectChanges();
@@ -435,6 +442,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       guestName: booking.guestName,
       guestEmail: booking.guestEmail,
       guestPhone: booking.guestPhone ?? '',
+      guestPhoneCountryCode: booking.guestPhoneCountryCode ?? '+30',
       checkIn: booking.checkIn,
       checkOut: booking.checkOut,
       guestCount: booking.guestCount,
@@ -454,7 +462,8 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.bookingModalData = {
       guestName: inquiry.fullName,
       guestEmail: inquiry.email,
-      guestPhone: '',
+      guestPhone: inquiry.phone ?? '',
+      guestPhoneCountryCode: inquiry.phoneCountryCode ?? '+30',
       checkIn: inquiry.checkIn,
       checkOut: inquiry.checkOut,
       guestCount: inquiry.guests,
@@ -517,15 +526,15 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   saveBooking(force = false): void {
     if (this.isSavingBooking) return;
 
-    const { guestName, guestEmail, checkIn, checkOut, guestCount, source, guestPhone, notes } = this.bookingModalData;
+    const { guestName, guestEmail, checkIn, checkOut, guestCount, source, guestPhone, guestPhoneCountryCode, notes } = this.bookingModalData;
 
     if (!guestName.trim() || !guestEmail.trim() || !checkIn || !checkOut) {
-      this.bookingModalError = 'Please fill in all required fields: Name, Email, Check-in, Check-out.';
+      this.bookingModalError = this.i18n.t('adminPanel.bookings.requiredFields', undefined, 'Please fill in all required fields: Name, Email, Check-in, Check-out.');
       return;
     }
 
     if (checkOut <= checkIn) {
-      this.bookingModalError = 'Check-out must be after check-in.';
+      this.bookingModalError = this.i18n.t('adminPanel.bookings.invalidDateRange', undefined, 'Check-out must be after check-in.');
       return;
     }
 
@@ -537,6 +546,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       guestName: guestName.trim(),
       guestEmail: guestEmail.trim(),
       guestPhone: guestPhone.trim() || undefined,
+      guestPhoneCountryCode: guestPhoneCountryCode || undefined,
       checkIn,
       checkOut,
       guestCount: Number(guestCount) || 1,
@@ -547,7 +557,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
     let obs$;
     if (this.bookingModalFromInquiryId) {
-      obs$ = this.bookingService.createFromInquiry(this.bookingModalFromInquiryId, { guestPhone: data.guestPhone, notes: data.notes, force: data.force });
+      obs$ = this.bookingService.createFromInquiry(this.bookingModalFromInquiryId, { guestPhone: data.guestPhone, guestPhoneCountryCode: data.guestPhoneCountryCode, notes: data.notes, force: data.force });
     } else if (this.isEditMode && this.editingBookingId) {
       obs$ = this.bookingService.updateBooking(this.editingBookingId, data);
     } else {
@@ -561,11 +571,18 @@ export class AdminPanel implements AfterViewInit, DoCheck {
           this.cdr.detectChanges();
           return;
         }
+        const wasFromInquiry = !!this.bookingModalFromInquiryId;
         this.closeBookingModal();
         this.bookingPageCache.clear();
         this.loadBookings(1);
         this.loadCalendarBookings();
         this.loadBlockedDates();
+        if (wasFromInquiry) {
+          this.inquiryPageCache.clear();
+          this.loadInquiries(this.inquiryPage);
+          this.deleteMessage = this.i18n.t('adminPanel.inquiries.confirmSuccess', undefined, 'Inquiry confirmed and booking created.');
+          setTimeout(() => { this.ngZone.run(() => { this.deleteMessage = ''; this.cdr.detectChanges(); }); }, 4000);
+        }
         this.cdr.detectChanges();
       },
       error: (err: any) => {
@@ -573,7 +590,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
         const body = err?.error;
 
         if (status === 409 && body?.conflictType === 'booking') {
-          this.bookingModalError = `These dates conflict with an existing booking for ${body.guestName} (${body.checkIn} → ${body.checkOut}).`;
+          this.bookingModalError = this.i18n.t('adminPanel.bookings.conflictBooking', { guestName: body.guestName, checkIn: body.checkIn, checkOut: body.checkOut }, `These dates conflict with an existing booking for ${body.guestName} (${body.checkIn} → ${body.checkOut}).`);
           this.cdr.detectChanges();
           return;
         }
@@ -584,7 +601,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
           return;
         }
 
-        this.bookingModalError = body?.message || 'Could not save booking. Please try again.';
+        this.bookingModalError = body?.message || this.i18n.t('adminPanel.bookings.saveError', undefined, 'Could not save booking. Please try again.');
         this.cdr.detectChanges();
       }
     });
@@ -595,37 +612,51 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.saveBooking(true);
   }
 
-  deleteBookingWithConfirm(booking: BookingListItem): void {
-    Swal.fire({
-      title: 'Delete Booking?',
-      html: `This will delete the booking for <strong>${booking.guestName}</strong> and release dates <strong>${booking.checkIn} → ${booking.checkOut}</strong>.`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#8f1f1f',
-      cancelButtonColor: '#5c6370',
-      confirmButtonText: 'Yes, delete',
-      cancelButtonText: 'Cancel'
-    }).then((result) => {
-      if (!result.isConfirmed) return;
+  openDeleteConfirm(booking: BookingListItem): void {
+    this.deletingBooking = booking;
+    this.isDeleteConfirmModalOpen = true;
+  }
 
-      this.bookingService.deleteBooking(booking.id).subscribe({
-        next: (response: any) => {
-          this.ngZone.run(() => {
-            if (!response?.success) {
-              Swal.fire('Error', 'Could not delete booking.', 'error');
-              return;
-            }
-            this.bookingPageCache.clear();
-            this.loadBookings(1);
-            this.loadCalendarBookings();
-            this.loadBlockedDates();
+  cancelDeleteBooking(): void {
+    this.isDeleteConfirmModalOpen = false;
+    this.deletingBooking = null;
+  }
+
+  onDeleteModalOverlayClick(event: Event): void {
+    if ((event.target as HTMLElement).classList.contains('booking-modal-overlay')) {
+      this.cancelDeleteBooking();
+    }
+  }
+
+  confirmDeleteBooking(): void {
+    if (!this.deletingBooking) return;
+    const booking = this.deletingBooking;
+    this.isDeleteConfirmModalOpen = false;
+    this.deletingBooking = null;
+
+    this.bookingService.deleteBooking(booking.id).subscribe({
+      next: (response: any) => {
+        this.ngZone.run(() => {
+          if (!response?.success) {
+            this.bookingsError = this.i18n.t('adminPanel.bookings.deleteError', undefined, 'Could not delete booking.');
             this.cdr.detectChanges();
-          });
-        },
-        error: () => {
-          this.ngZone.run(() => Swal.fire('Error', 'Could not delete booking. Please try again.', 'error'));
-        }
-      });
+            return;
+          }
+          this.bookingPageCache.clear();
+          this.loadBookings(1);
+          this.loadCalendarBookings();
+          this.loadBlockedDates();
+          this.bookingMessage = this.i18n.t('adminPanel.bookings.deleteSuccess', undefined, 'Booking deleted successfully.');
+          this.cdr.detectChanges();
+          setTimeout(() => { this.ngZone.run(() => { this.bookingMessage = ''; this.cdr.detectChanges(); }); }, 4000);
+        });
+      },
+      error: () => {
+        this.ngZone.run(() => {
+          this.bookingsError = this.i18n.t('adminPanel.bookings.deleteError', undefined, 'Could not delete booking. Please try again.');
+          this.cdr.detectChanges();
+        });
+      }
     });
   }
 
@@ -821,6 +852,9 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       onChange: (dates: Date[]) => {
         this.ngZone.run(() => {
           this.bookingModalData.checkIn = dates[0] ? this.toDateKey(dates[0]) : '';
+          if (dates[0] && this.modalCheckOutFp) {
+            this.modalCheckOutFp.jumpToDate(dates[0], false);
+          }
         });
       }
     });
@@ -993,7 +1027,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
         if (requestToken !== this.bookingRequestToken) return;
 
         if (!response?.success) {
-          this.bookingsError = 'Could not load bookings.';
+          this.bookingsError = this.i18n.t('adminPanel.bookings.loadError', undefined, 'Could not load bookings.');
           this.cdr.detectChanges();
           return;
         }
@@ -1015,7 +1049,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       },
       error: () => {
         if (requestToken !== this.bookingRequestToken) return;
-        this.bookingsError = 'Could not load bookings.';
+        this.bookingsError = this.i18n.t('adminPanel.bookings.loadError', undefined, 'Could not load bookings.');
         this.cdr.detectChanges();
       }
     });
@@ -1102,6 +1136,13 @@ export class AdminPanel implements AfterViewInit, DoCheck {
         this.calendarMessage = blocked
           ? this.i18n.t('adminPanel.calendar.blockSuccess', undefined, 'Selected dates were reserved.')
           : this.i18n.t('adminPanel.calendar.unblockSuccess', undefined, 'Selected dates were released.');
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.ngZone.run(() => {
+            this.calendarMessage = '';
+            this.cdr.detectChanges();
+          });
+        }, 4000);
       },
       error: (err) => {
         this.calendarError = err?.error?.message || this.i18n.t('adminPanel.calendar.saveError', undefined, 'Could not update dates.');
@@ -1112,7 +1153,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   private handleCalendarChange(selectedDates: Date[]): void {
     if (this.isSyncingToCalendar) return;
 
-    this.calendarMessage = '';
+    if (selectedDates.length > 0) this.calendarMessage = '';
     this.calendarError = '';
 
     if (!selectedDates.length) {

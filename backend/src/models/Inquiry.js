@@ -26,8 +26,17 @@ export const Inquiry = sequelize.define('Inquiry', {
     defaultValue: 1,
     validate: { min: 1, max: 4 }
   },
+  phoneCountryCode: {
+    type: DataTypes.STRING(10),
+    allowNull: true,
+    defaultValue: '+30'
+  },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   message: {
-    type: DataTypes.TEXT, 
+    type: DataTypes.TEXT,
     allowNull: true
   },
   isRead: {

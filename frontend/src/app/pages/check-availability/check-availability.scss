@@ -148,6 +148,60 @@ $font-logo: 'Playfair Display', serif;
         box-shadow: 0 0 0 2px rgba(240, 68, 56, 0.12) !important;
       }
 
+      .phone-input-wrapper {
+        display: flex;
+        align-items: stretch;
+        gap: 0.5rem;
+        width: 100%;
+
+        &.has-error {
+          .phone-number-input {
+            border-color: #f04438 !important;
+            box-shadow: 0 0 0 2px rgba(240, 68, 56, 0.12) !important;
+          }
+        }
+      }
+
+      app-phone-country-select {
+        flex: 0 0 auto;
+        width: 110px;
+
+        ::ng-deep .pcs-trigger {
+          padding: 1rem 0.6rem;
+          border: 1px solid #e0e0e0;
+          border-radius: 4px;
+          background: #fafafa;
+          font-size: 1rem;
+          color: #333;
+          box-shadow: none;
+          box-sizing: border-box;
+
+          &:hover, &:focus {
+            border-color: $crystal-blue;
+            box-shadow: 0 0 0 3px rgba($crystal-blue, 0.1);
+          }
+        }
+      }
+
+      .phone-number-input {
+        flex: 1;
+        font-family: $font-body;
+        padding: 1rem 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 1rem;
+        color: #333;
+        background: #fafafa;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+
+        &:focus {
+          outline: none;
+          border-color: $crystal-blue;
+          box-shadow: 0 0 0 3px rgba($crystal-blue, 0.1);
+        }
+      }
+
       .date-input-wrapper {
         position: relative;
         display: flex;
@@ -349,6 +403,19 @@ $font-logo: 'Playfair Display', serif;
       .form-row {
         flex-direction: column;
         gap: 1.5rem;
+      }
+
+      .phone-input-wrapper {
+        flex-direction: column;
+
+        app-phone-country-select {
+          flex: 1 1 auto;
+          width: 100%;
+        }
+
+        .phone-number-input {
+          width: 100%;
+        }
       }
 
       .form-submit .btn-submit {
