@@ -197,7 +197,8 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       this.selectedDates.length > 0 &&
       !target?.closest('.admin-calendar-card') &&
       !target?.closest('.calendar-range-controls') &&
-      !target?.closest('.calendar-actions')
+      !target?.closest('.calendar-actions') &&
+      !target?.closest('.flatpickr-calendar')
     ) {
       this.clearSelection();
     }
@@ -932,6 +933,13 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
     this.rangeToFp = flatpickr(this.adminRangeToInput.nativeElement, {
       ...commonOptions,
+      onOpen: () => {
+        this.ngZone.run(() => {
+          if (this.selectedStartDate && this.rangeToFp) {
+            this.rangeToFp.jumpToDate(this.selectedStartDate, false);
+          }
+        });
+      },
       onChange: (selectedDates: Date[]) => {
         this.ngZone.run(() => this.handleToInputChange(selectedDates[0] ?? null));
       }
