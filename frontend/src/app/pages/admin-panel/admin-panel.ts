@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AfterViewInit, ChangeDetectorRef, Component, DoCheck, ElementRef, HostListener, NgZone, ViewChild } from '@angular/core';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import flatpickr from 'flatpickr';
@@ -144,6 +145,11 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   // ── Booking notes expand ──────────────────────────────
   expandedBookingNoteIds = new Set<number>();
 
+  // ── iCal feed ─────────────────────────────────────────
+  icalFeedUrl = '';
+  icalUrlLoading = false;
+  icalUrlError = '';
+
   private deferredCheckInMap = new Map<string, BookingCalendarItem>();
 
   constructor(
@@ -155,7 +161,8 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     private languageFacade: LanguageFacadeService,
     private availabilityCalendar: AvailabilityCalendarService,
     private inquiryService: InquiryService,
-    private bookingService: BookingService
+    private bookingService: BookingService,
+    private sanitizer: DomSanitizer
   ) {
     this.currentLanguage = this.languageFacade.getCurrentLanguage();
     this.languageOptions = this.languageFacade.languageOptions;
@@ -168,6 +175,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.loadCalendarBookings();
     this.loadInquiries(1);
     this.loadBookings(1);
+    this.loadIcalUrl();
     this.lastRenderedLanguage = this.i18n.getLanguage();
     this.updateCalendarLocale();
   }
@@ -496,6 +504,35 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
   isBookingNoteExpanded(id: number): boolean {
     return this.expandedBookingNoteIds.has(id);
+  }
+
+  // ── iCal feed ─────────────────────────────────────────
+
+  get icalIphoneUrl(): SafeUrl {
+    const webcal = this.icalFeedUrl.replace(/^https?:\/\//, 'webcal://');
+    return this.sanitizer.bypassSecurityTrustUrl(webcal);
+  }
+
+  get icalGoogleUrl(): string {
+    const webcal = this.icalFeedUrl.replace(/^https?:\/\//, 'webcal://');
+    return `https://www.google.com/calendar/render?cid=${encodeURIComponent(webcal)}`;
+  }
+
+  private loadIcalUrl(): void {
+    this.icalUrlLoading = true;
+    this.icalUrlError = '';
+    this.bookingService.getIcalUrl().subscribe({
+      next: (res) => {
+        this.icalFeedUrl = res?.url || '';
+        this.icalUrlLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.icalUrlError = 'Could not load calendar sync links.';
+        this.icalUrlLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   // ── Open edit modal from calendar click ───────────────

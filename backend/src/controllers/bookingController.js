@@ -3,6 +3,27 @@ import { Booking, BOOKING_COLORS } from '../models/Booking.js';
 import { BlockedDate } from '../models/BlockedDate.js';
 import { Inquiry } from '../models/Inquiry.js';
 
+function escapeIcal(str) {
+  return String(str || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+}
+
+function foldIcalLine(line) {
+  if (Buffer.byteLength(line, 'utf8') <= 75) return line;
+  const chars = [...line];
+  const result = [];
+  let current = '';
+  for (const ch of chars) {
+    if (Buffer.byteLength(current + ch, 'utf8') > 75) {
+      result.push(current);
+      current = ' ' + ch;
+    } else {
+      current += ch;
+    }
+  }
+  if (current) result.push(current);
+  return result.join('\r\n');
+}
+
 function generateDateRange(checkIn, checkOut) {
   const dates = [];
   const end = new Date(checkOut);
@@ -292,6 +313,71 @@ export class BookingController {
       return res.json({ success: true, data: booking });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  async getIcalUrl(req, res) {
+    const secret = process.env.ICAL_SECRET;
+    if (!secret) {
+      return res.status(503).json({ success: false, message: 'iCal feed not configured. Set ICAL_SECRET in environment.' });
+    }
+    const corsOrigin = (process.env.CORS_ORIGINS || '').split(',')[0].trim();
+    const baseUrl = corsOrigin || `${req.protocol}://${req.get('host')}`;
+    const url = `${baseUrl}/api/bookings/ical?token=${encodeURIComponent(secret)}`;
+    return res.json({ success: true, url });
+  }
+
+  async getIcal(req, res) {
+    const secret = process.env.ICAL_SECRET;
+    if (!secret || req.query.token !== secret) {
+      return res.status(401).send('Unauthorized');
+    }
+
+    try {
+      const bookings = await Booking.findAll({
+        attributes: ['id', 'guestName', 'guestEmail', 'checkIn', 'checkOut', 'guestCount', 'source', 'notes'],
+        order: [['checkIn', 'ASC']]
+      });
+
+      const dtstamp = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15) + 'Z';
+
+      const events = bookings.map(b => {
+        const dtstart = String(b.checkIn).replace(/-/g, '');
+        const dtend = String(b.checkOut).replace(/-/g, '');
+        const guests = b.guestCount;
+        const summary = `${b.guestName} (${guests} guest${guests !== 1 ? 's' : ''})`;
+        const descParts = [`Source: ${b.source}`];
+        if (b.notes) descParts.push(`Notes: ${b.notes}`);
+
+        return [
+          'BEGIN:VEVENT',
+          `UID:booking-${b.id}@bluequartz-apartment`,
+          `DTSTAMP:${dtstamp}`,
+          `DTSTART;VALUE=DATE:${dtstart}`,
+          `DTEND;VALUE=DATE:${dtend}`,
+          foldIcalLine(`SUMMARY:${escapeIcal(summary)}`),
+          foldIcalLine(`DESCRIPTION:${escapeIcal(descParts.join('\\n'))}`),
+          'END:VEVENT'
+        ].join('\r\n');
+      });
+
+      const ical = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//BlueQuartz Apartment//Bookings//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'X-WR-CALNAME:BlueQuartz Bookings',
+        'X-WR-TIMEZONE:Europe/Athens',
+        ...events,
+        'END:VCALENDAR'
+      ].join('\r\n');
+
+      res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+      return res.send(ical);
+    } catch (error) {
+      return res.status(500).send('Internal Server Error');
     }
   }
 

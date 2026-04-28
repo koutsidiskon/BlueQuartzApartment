@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.get('/', requireAdminAuth, (req, res) => bookingController.getAllBookings(req, res));
 router.get('/calendar', requireAdminAuth, (req, res) => bookingController.getAllBookingsForCalendar(req, res));
+router.get('/ical-url', requireAdminAuth, (req, res) => bookingController.getIcalUrl(req, res));
+router.get('/ical', (req, res) => bookingController.getIcal(req, res));
 router.post('/', requireAdminAuth, (req, res) => bookingController.createBooking(req, res));
 router.post('/from-inquiry/:id', requireAdminAuth, (req, res) => bookingController.createFromInquiry(req, res));
 router.put('/:id', requireAdminAuth, (req, res) => bookingController.updateBooking(req, res));

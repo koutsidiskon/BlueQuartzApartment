@@ -95,4 +95,8 @@ export class BookingService {
   deleteBooking(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
+
+  getIcalUrl(): Observable<{ success: boolean; url: string }> {
+    return this.http.get<{ success: boolean; url: string }>(`${this.apiUrl}/ical-url`, { withCredentials: true });
+  }
 }
