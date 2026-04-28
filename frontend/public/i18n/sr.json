@@ -338,6 +338,7 @@
       "loadError": "Nije moguće učitati upite.",
       "fullName": "Ime",
       "email": "Email",
+      "phone": "Telefon",
       "checkIn": "Prijava",
       "checkOut": "Odjava",
       "guests": "Gosti",

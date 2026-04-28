@@ -450,10 +450,10 @@ $deep-navy: #003366;
   .inquiry-head,
   .inquiry-row {
     display: grid;
-    grid-template-columns: 36px 1.1fr 1.45fr 0.9fr 0.9fr 0.56fr 2fr 0.9fr 110px;
+    grid-template-columns: 36px 1fr 1.25fr 0.9fr 0.8fr 0.8fr 0.5fr 1.8fr 0.85fr 110px;
     align-items: center;
     gap: 0.64rem;
-    min-width: 1100px;
+    min-width: 1180px;
   }
 
   .inquiry-head {

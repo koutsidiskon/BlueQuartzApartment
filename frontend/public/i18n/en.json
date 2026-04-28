@@ -338,6 +338,7 @@
       "loadError": "Could not load inquiries.",
       "fullName": "Name",
       "email": "Email",
+      "phone": "Phone",
       "checkIn": "Check-in",
       "checkOut": "Check-out",
       "guests": "Guests",

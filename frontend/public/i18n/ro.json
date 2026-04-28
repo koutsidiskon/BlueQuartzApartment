@@ -338,6 +338,7 @@
       "loadError": "Nu s-au putut încărca cererile.",
       "fullName": "Nume",
       "email": "Email",
+      "phone": "Telefon",
       "checkIn": "Check-in",
       "checkOut": "Check-out",
       "guests": "Oaspeți",

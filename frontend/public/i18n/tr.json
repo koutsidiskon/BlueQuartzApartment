@@ -338,6 +338,7 @@
       "loadError": "Talepler yüklenemedi.",
       "fullName": "Ad",
       "email": "E-posta",
+      "phone": "Telefon",
       "checkIn": "Giriş",
       "checkOut": "Çıkış",
       "guests": "Misafir",

@@ -255,6 +255,7 @@
             </span>
             <span>{{ 'adminPanel.inquiries.fullName' | t : undefined : 'Name' }}</span>
             <span>{{ 'adminPanel.inquiries.email' | t : undefined : 'Email' }}</span>
+            <span>{{ 'adminPanel.inquiries.phone' | t : undefined : 'Phone' }}</span>
             <span>{{ 'adminPanel.inquiries.checkIn' | t : undefined : 'Check-in' }}</span>
             <span>{{ 'adminPanel.inquiries.checkOut' | t : undefined : 'Check-out' }}</span>
             <span>{{ 'adminPanel.inquiries.guests' | t : undefined : 'Guests' }}</span>
@@ -274,6 +275,7 @@
               </span>
               <span class="name" [attr.data-label]="'adminPanel.inquiries.fullName' | t : undefined : 'Name'">{{ inquiry.fullName }}</span>
               <span [attr.data-label]="'adminPanel.inquiries.email' | t : undefined : 'Email'">{{ inquiry.email }}</span>
+              <span [attr.data-label]="'adminPanel.inquiries.phone' | t : undefined : 'Phone'">{{ inquiry.phoneCountryCode && inquiry.phone ? (inquiry.phoneCountryCode + ' ' + inquiry.phone) : (inquiry.phone || '—') }}</span>
               <span [attr.data-label]="'adminPanel.inquiries.checkIn' | t : undefined : 'Check-in'">{{ inquiry.checkIn }}</span>
               <span [attr.data-label]="'adminPanel.inquiries.checkOut' | t : undefined : 'Check-out'">{{ inquiry.checkOut }}</span>
               <span [attr.data-label]="'adminPanel.inquiries.guests' | t : undefined : 'Guests'">{{ inquiry.guests }}</span>
