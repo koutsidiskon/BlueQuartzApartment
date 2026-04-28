@@ -325,7 +325,12 @@
       "loadError": "Could not load reserved dates.",
       "saveError": "Could not update dates.",
       "blockSuccess": "Selected dates were reserved.",
-      "unblockSuccess": "Selected dates were released."
+      "unblockSuccess": "Selected dates were released.",
+      "syncLabel": "Sync with your phone calendar",
+      "syncApple": "Sync with Apple Calendar",
+      "syncGoogle": "Sync with Google Calendar",
+      "syncLoading": "Loading sync links…",
+      "syncError": "Could not load calendar sync links."
     },
     "inquiries": {
       "loading": "Loading inquiries...",

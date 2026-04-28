@@ -1459,18 +1459,20 @@ $deep-navy: #003366;
     justify-content: center;
     gap: 0.5rem;
     min-height: 44px;
-    padding: 0 1.25rem;
+    padding: 0.6rem 1.25rem;
     border-radius: 12px;
     border: none;
     font-family: $font-main;
     font-size: 0.88rem;
     font-weight: 700;
     text-decoration: none;
+    text-align: center;
     cursor: pointer;
     transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
-    white-space: nowrap;
-    flex: 1 1 auto;
-    max-width: 240px;
+    white-space: normal;
+    word-break: break-word;
+    flex: 1 1 180px;
+    max-width: 280px;
 
     .sync-icon {
       width: 18px;

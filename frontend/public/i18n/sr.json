@@ -325,7 +325,12 @@
       "loadError": "Nije moguće učitati blokirane datume.",
       "saveError": "Nije moguće sačuvati izmene datuma.",
       "blockSuccess": "Izabrani datumi su blokirani.",
-      "unblockSuccess": "Izabrani datumi su odblokirani."
+      "unblockSuccess": "Izabrani datumi su odblokirani.",
+      "syncLabel": "Sinhronizacija sa kalendarom telefona",
+      "syncApple": "Sinhronizacija sa Apple Calendar",
+      "syncGoogle": "Sinhronizacija sa Google Calendar",
+      "syncLoading": "Učitavanje veza…",
+      "syncError": "Nije moguće učitati veze za sinhronizaciju."
     },
     "inquiries": {
       "loading": "Učitavanje upita...",

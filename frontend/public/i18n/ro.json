@@ -325,7 +325,12 @@
       "loadError": "Nu s-au putut încărca datele blocate.",
       "saveError": "Nu s-au putut actualiza datele.",
       "blockSuccess": "Datele selectate au fost blocate.",
-      "unblockSuccess": "Datele selectate au fost deblocate."
+      "unblockSuccess": "Datele selectate au fost deblocate.",
+      "syncLabel": "Sincronizare cu calendarul telefonului",
+      "syncApple": "Sincronizare cu Apple Calendar",
+      "syncGoogle": "Sincronizare cu Google Calendar",
+      "syncLoading": "Se încarcă legăturile…",
+      "syncError": "Nu s-au putut încărca legăturile de sincronizare."
     },
     "inquiries": {
       "loading": "Se încarcă cererile...",

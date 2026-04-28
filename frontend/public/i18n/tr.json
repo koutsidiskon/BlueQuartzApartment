@@ -325,7 +325,12 @@
       "loadError": "Kapalı tarihler yüklenemedi.",
       "saveError": "Tarihler güncellenemedi.",
       "blockSuccess": "Seçili tarihler kapatıldı.",
-      "unblockSuccess": "Seçili tarihler açıldı."
+      "unblockSuccess": "Seçili tarihler açıldı.",
+      "syncLabel": "Telefon takvimiyle senkronize et",
+      "syncApple": "Apple Calendar ile Senkronize Et",
+      "syncGoogle": "Google Calendar ile Senkronize Et",
+      "syncLoading": "Bağlantılar yükleniyor…",
+      "syncError": "Senkronizasyon bağlantıları yüklenemedi."
     },
     "inquiries": {
       "loading": "Talepler yükleniyor...",

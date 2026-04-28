@@ -81,7 +81,7 @@
             <label for="phone">{{ 'checkAvailability.form.phone' | t }}</label>
             <div class="phone-input-wrapper" [class.has-error]="shouldShowFieldError('phone')">
               <app-phone-country-select [value]="phoneCountryCode" (valueChange)="phoneCountryCode = $event"></app-phone-country-select>
-              <input #phone type="tel" id="phone" class="phone-number-input" [attr.placeholder]="'checkAvailability.form.phonePlaceholder' | t" [class.input-error]="shouldShowFieldError('phone')" (input)="clearFieldError('phone')" required>
+              <input #phone type="tel" id="phone" class="phone-number-input" [attr.placeholder]="'checkAvailability.form.phonePlaceholder' | t" [class.input-error]="shouldShowFieldError('phone')" (input)="onPhoneInput($event)" required>
             </div>
             @if (shouldShowFieldError('phone')) {
               <p class="field-error">{{ 'checkAvailability.validation.requiredField' | t }}</p>

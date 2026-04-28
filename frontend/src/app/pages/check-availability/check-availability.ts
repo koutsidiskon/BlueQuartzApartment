@@ -575,6 +575,15 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
         this.resetRequiredFieldErrors();
     }
 
+    onPhoneInput(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        const digits = input.value.replace(/\D/g, '');
+        if (input.value !== digits) {
+            input.value = digits;
+        }
+        this.clearFieldError('phone');
+    }
+
     clearFieldError(field: RequiredFieldKey): void {
         this.requiredFieldErrors[field] = false;
         if (field === 'checkIn' || field === 'checkOut') {
