@@ -71,8 +71,8 @@
 - Inline expandable notes per booking
 
 #### 🔐 Security & Access
-- JWT-based session stored in HTTP-only cookies (8-hour TTL)
-- Rate-limited login (5 attempts / 15 min)
+- JWT-based session stored in HTTP-only cookies
+- Rate-limited login
 - Route guards — admin panel is inaccessible without an active session
 - Admin email notifications on every new inquiry
 
