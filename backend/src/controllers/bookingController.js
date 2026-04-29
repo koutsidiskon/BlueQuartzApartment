@@ -335,7 +335,7 @@ export class BookingController {
 
     try {
       const bookings = await Booking.findAll({
-        attributes: ['id', 'guestName', 'guestEmail', 'checkIn', 'checkOut', 'guestCount', 'source', 'notes'],
+        attributes: ['id', 'guestName', 'guestEmail', 'guestPhone', 'guestPhoneCountryCode', 'checkIn', 'checkOut', 'guestCount', 'source', 'notes'],
         order: [['checkIn', 'ASC']]
       });
 
@@ -346,8 +346,22 @@ export class BookingController {
         const dtend = String(b.checkOut).replace(/-/g, '');
         const guests = b.guestCount;
         const summary = `${b.guestName} (${guests} guest${guests !== 1 ? 's' : ''})`;
-        const descParts = [`Source: ${b.source}`];
-        if (b.notes) descParts.push(`Notes: ${b.notes}`);
+
+        const lines = [];
+        lines.push(`👤 ${b.guestName}`);
+        if (b.guestEmail) lines.push(`✉ ${b.guestEmail}`);
+        if (b.guestPhone) {
+          const phone = b.guestPhoneCountryCode
+            ? `${b.guestPhoneCountryCode} ${b.guestPhone}`
+            : b.guestPhone;
+          lines.push(`📞 ${phone}`);
+        }
+        lines.push(`👥 ${guests} guest${guests !== 1 ? 's' : ''}`);
+        if (b.source) lines.push(`🔖 ${b.source}`);
+        if (b.notes) {
+          lines.push('');
+          lines.push(`📝 ${b.notes}`);
+        }
 
         return [
           'BEGIN:VEVENT',
@@ -356,7 +370,8 @@ export class BookingController {
           `DTSTART;VALUE=DATE:${dtstart}`,
           `DTEND;VALUE=DATE:${dtend}`,
           foldIcalLine(`SUMMARY:${escapeIcal(summary)}`),
-          foldIcalLine(`DESCRIPTION:${escapeIcal(descParts.join('\\n'))}`),
+          foldIcalLine(`DESCRIPTION:${escapeIcal(lines.join('\n'))}`),
+          `LOCATION:${escapeIcal('Blue Quartz Apartment, Limenas, Thassos, Greece')}`,
           'END:VEVENT'
         ].join('\r\n');
       });
