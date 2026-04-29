@@ -18,6 +18,7 @@ import { AvailabilityCalendarService } from '../../service/availability-calendar
 import { InquiryListItem, InquiryService } from '../../service/inquiry';
 import { BookingService, BookingListItem, BookingCalendarItem, BookingSource, CreateBookingData } from '../../service/booking';
 import { PhoneCountrySelectComponent } from '../../shared/phone-country-select.component';
+import { COUNTRY_CODES } from '../../shared/phone-country-codes';
 
 const GREEK_LOCALE_NO_TONOS = {
   ...Greek,
@@ -770,6 +771,11 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
   getLanguageFlag(languageCode: string): string {
     return this.languageFacade.getFlag(languageCode);
+  }
+
+  getFlagForDialCode(code: string | null): string {
+    if (!code) return '';
+    return COUNTRY_CODES.find(c => c.code === code)?.flag ?? '';
   }
 
   // ── Calendar init ─────────────────────────────────────

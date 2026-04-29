@@ -1544,6 +1544,20 @@ $deep-navy: #003366;
   animation: spin 0.7s linear infinite;
 }
 
+.phone-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.phone-flag {
+  font-size: 1.05em;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .status {
   margin: 1rem 0 0;
   border-radius: 10px;
@@ -1856,6 +1870,20 @@ $deep-navy: #003366;
         letter-spacing: 0.04em;
       }
 
+      .phone-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        flex-wrap: wrap;
+      }
+
+      .phone-flag {
+        display: inline !important;
+        padding: 0 !important;
+        font-size: 1.05rem !important;
+        line-height: 1 !important;
+      }
+
       button span {
         display: inline !important;
         padding: 0 !important;
@@ -1972,6 +2000,20 @@ $deep-navy: #003366;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.04em;
+      }
+
+      .phone-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        flex-wrap: wrap;
+      }
+
+      .phone-flag {
+        display: inline !important;
+        padding: 0 !important;
+        font-size: 1.05rem !important;
+        line-height: 1 !important;
       }
 
       button span::before {

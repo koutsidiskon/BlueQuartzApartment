@@ -303,7 +303,13 @@
               </span>
               <span class="name" [attr.data-label]="'adminPanel.inquiries.fullName' | t : undefined : 'Name'">{{ inquiry.fullName }}</span>
               <span [attr.data-label]="'adminPanel.inquiries.email' | t : undefined : 'Email'">{{ inquiry.email }}</span>
-              <span [attr.data-label]="'adminPanel.inquiries.phone' | t : undefined : 'Phone'">{{ inquiry.phoneCountryCode && inquiry.phone ? (inquiry.phoneCountryCode + ' ' + inquiry.phone) : (inquiry.phone || '—') }}</span>
+              <span [attr.data-label]="'adminPanel.inquiries.phone' | t : undefined : 'Phone'" class="phone-cell">
+                @if (inquiry.phoneCountryCode && inquiry.phone) {
+                  <span class="phone-flag" aria-hidden="true">{{ getFlagForDialCode(inquiry.phoneCountryCode) }}</span>{{ inquiry.phoneCountryCode }} {{ inquiry.phone }}
+                } @else {
+                  {{ inquiry.phone || '—' }}
+                }
+              </span>
               <span [attr.data-label]="'adminPanel.inquiries.checkIn' | t : undefined : 'Check-in'">{{ inquiry.checkIn }}</span>
               <span [attr.data-label]="'adminPanel.inquiries.checkOut' | t : undefined : 'Check-out'">{{ inquiry.checkOut }}</span>
               <span [attr.data-label]="'adminPanel.inquiries.guests' | t : undefined : 'Guests'">{{ inquiry.guests }}</span>
@@ -452,7 +458,13 @@
               </span>
               <span class="name" [attr.data-label]="'adminPanel.bookings.colName' | t : undefined : 'Name'">{{ booking.guestName }}</span>
               <span [attr.data-label]="'adminPanel.bookings.colEmail' | t : undefined : 'Email'">{{ booking.guestEmail }}</span>
-              <span [attr.data-label]="'adminPanel.bookings.colPhone' | t : undefined : 'Phone'">{{ booking.guestPhone || '—' }}</span>
+              <span [attr.data-label]="'adminPanel.bookings.colPhone' | t : undefined : 'Phone'" class="phone-cell">
+                @if (booking.guestPhoneCountryCode && booking.guestPhone) {
+                  <span class="phone-flag" aria-hidden="true">{{ getFlagForDialCode(booking.guestPhoneCountryCode) }}</span>{{ booking.guestPhoneCountryCode }} {{ booking.guestPhone }}
+                } @else {
+                  {{ booking.guestPhone || '—' }}
+                }
+              </span>
               <span [attr.data-label]="'adminPanel.bookings.colCheckIn' | t : undefined : 'Check-in'">{{ booking.checkIn }}</span>
               <span [attr.data-label]="'adminPanel.bookings.colCheckOut' | t : undefined : 'Check-out'">{{ booking.checkOut }}</span>
               <span [attr.data-label]="'adminPanel.bookings.colGuests' | t : undefined : 'Guests'">{{ booking.guestCount }}</span>
