@@ -13,6 +13,13 @@
 
 *A complete, production-ready web application for showcasing and managing short-term apartment rentals — built with security, performance, and a beautiful multi-language guest experience in mind.*
 
+### 🌐 Live
+
+| | |
+|---|---|
+| **Guest site** | [bluequartzapartment.com](https://bluequartzapartment.com) |
+| **Admin panel** | [bluequartzapartment.com/admin/login](https://bluequartzapartment.com/admin/login) |
+
 </div>
 
 ---
