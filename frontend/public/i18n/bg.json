@@ -326,9 +326,9 @@
       "saveError": "Неуспешно обновяване на датите.",
       "blockSuccess": "Избраните дати са блокирани.",
       "unblockSuccess": "Избраните дати са отблокирани.",
-      "syncLabel": "Синхронизиране с телефонния календар",
-      "syncApple": "Синхронизиране с Apple Calendar",
-      "syncGoogle": "Синхронизиране с Google Calendar",
+      "syncLabel": "Синхронизиране с календар",
+      "syncApple": "Apple Calendar",
+      "syncGoogle": "Google Calendar",
       "syncLoading": "Зареждане на връзки…",
       "syncError": "Неуспешно зареждане на връзките за синхронизация."
     },

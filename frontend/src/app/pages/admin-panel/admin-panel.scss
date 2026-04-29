@@ -270,17 +270,87 @@ $deep-navy: #003366;
 }
 
 .admin-panel-header {
-  text-align: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.25rem;
   margin: 0 0 0.85rem;
+  min-height: 56px;
 
   h1 {
+    position: absolute;
+    left: 0;
+    right: 0;
     margin: 0;
+    text-align: center;
     font-family: $font-logo;
     color: $deep-navy;
     font-size: clamp(2rem, 3vw, 3rem);
     line-height: 1.1;
+    pointer-events: none;
   }
 }
+
+// ── Header sync (desktop only) ────────────────────────
+
+.header-calendar-sync {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+
+  .header-sync-label {
+    margin: 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba($deep-navy, 0.42);
+    text-align: right;
+  }
+
+  .header-sync-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .calendar-sync-btn {
+    min-height: 38px;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.82rem;
+    gap: 0.48rem;
+
+    .sync-icon {
+      width: 17px;
+      height: 17px;
+    }
+  }
+
+  .calendar-sync-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    color: rgba($deep-navy, 0.52);
+    .material-icons { font-size: 1rem; }
+  }
+
+  .calendar-sync-error {
+    font-size: 0.8rem;
+    color: #8d1b1b;
+  }
+}
+
+// ── Mobile sync (bottom of panel, hidden on desktop) ──
+
+.mobile-calendar-sync {
+  display: none;
+}
+
+// ── Admin panel header layout ─────────────────────────
 
 .tab-panel {
   border-radius: 16px;
@@ -1412,98 +1482,56 @@ $deep-navy: #003366;
   }
 }
 
-// ── Calendar sync ─────────────────────────────────────
+// ── Calendar sync buttons (shared styles) ─────────────
 
-.calendar-sync {
-  margin-top: 1.1rem;
-  padding: 0.9rem 1rem;
-  border: 1px solid rgba($blue-quartz, 0.22);
-  border-radius: 14px;
-  background: rgba($blue-quartz, 0.04);
-  text-align: center;
+.calendar-sync-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
+  border: none;
+  font-family: $font-main;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+  white-space: nowrap;
 
-  .calendar-sync-label {
-    margin: 0 0 0.7rem;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba($deep-navy, 0.55);
+  .sync-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
   }
 
-  .calendar-sync-buttons {
-    display: flex;
-    gap: 0.65rem;
-    justify-content: center;
-    flex-wrap: wrap;
+  &.apple {
+    background: linear-gradient(135deg, #1c1c1e, #3a3a3c);
+    color: #ffffff;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+    }
   }
 
-  .calendar-sync-loading {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.84rem;
-    color: rgba($deep-navy, 0.55);
+  &.google {
+    background: #ffffff;
+    color: #3c4043;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 
-    .material-icons { font-size: 1rem; }
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.13);
+      border-color: rgba(0, 0, 0, 0.22);
+    }
   }
 
-  .calendar-sync-error {
-    font-size: 0.84rem;
-    color: #8d1b1b;
-  }
-
-  .calendar-sync-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    min-height: 44px;
-    padding: 0.6rem 1.25rem;
-    border-radius: 12px;
-    border: none;
-    font-family: $font-main;
-    font-size: 0.88rem;
-    font-weight: 700;
-    text-decoration: none;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
-    white-space: normal;
-    word-break: break-word;
-    flex: 1 1 180px;
-    max-width: 280px;
-
-    .sync-icon {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-    }
-
-    &.apple {
-      background: linear-gradient(135deg, #1c1c1e, #3a3a3c);
-      color: #ffffff;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
-      }
-    }
-
-    &.google {
-      background: linear-gradient(135deg, #1a73e8, #34a853);
-      color: #ffffff;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 24px rgba(26, 115, 232, 0.34);
-      }
-    }
-
-    &:active {
-      transform: translateY(0);
-      opacity: 0.88;
-    }
+  &:active {
+    transform: translateY(0);
+    opacity: 0.88;
   }
 }
 
@@ -1692,6 +1720,54 @@ $deep-navy: #003366;
   .logout-btn {
     align-self: center;
     margin-top: 1rem;
+  }
+
+  .admin-panel-header {
+    min-height: auto;
+    justify-content: center;
+
+    h1 {
+      position: static;
+      pointer-events: auto;
+      font-size: clamp(1.6rem, 5vw, 2.4rem);
+    }
+  }
+
+  .header-calendar-sync {
+    display: none;
+  }
+
+  .mobile-calendar-sync {
+    display: block;
+    margin-top: 1.1rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid rgba($blue-quartz, 0.22);
+    border-radius: 14px;
+    background: rgba($blue-quartz, 0.04);
+    text-align: center;
+
+    .mobile-sync-label {
+      margin: 0 0 0.7rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba($deep-navy, 0.52);
+    }
+
+    .mobile-sync-buttons {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .calendar-sync-btn {
+      flex: 1 1 150px;
+      max-width: 240px;
+      justify-content: center;
+      min-height: 44px;
+    }
   }
 
   .admin-calendar-card {

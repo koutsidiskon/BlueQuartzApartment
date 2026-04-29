@@ -326,9 +326,9 @@
       "saveError": "Could not update dates.",
       "blockSuccess": "Selected dates were reserved.",
       "unblockSuccess": "Selected dates were released.",
-      "syncLabel": "Sync with your phone calendar",
-      "syncApple": "Sync with Apple Calendar",
-      "syncGoogle": "Sync with Google Calendar",
+      "syncLabel": "Sync with your calendar",
+      "syncApple": "Apple Calendar",
+      "syncGoogle": "Google Calendar",
       "syncLoading": "Loading sync links…",
       "syncError": "Could not load calendar sync links."
     },

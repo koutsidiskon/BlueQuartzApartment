@@ -326,9 +326,9 @@
       "saveError": "Δεν ήταν δυνατή η ενημέρωση των ημερομηνιών.",
       "blockSuccess": "Οι επιλεγμένες ημερομηνίες κλείστηκαν.",
       "unblockSuccess": "Οι επιλεγμένες ημερομηνίες άνοιξαν.",
-      "syncLabel": "Συγχρονισμός με το ημερολόγιο κινητού",
-      "syncApple": "Συγχρονισμός με Apple Calendar",
-      "syncGoogle": "Συγχρονισμός με Google Calendar",
+      "syncLabel": "Συγχρονισμός ημερολογίου",
+      "syncApple": "Apple Calendar",
+      "syncGoogle": "Google Calendar",
       "syncLoading": "Φόρτωση συνδέσμων…",
       "syncError": "Αδύνατη η φόρτωση συνδέσμων συγχρονισμού."
     },

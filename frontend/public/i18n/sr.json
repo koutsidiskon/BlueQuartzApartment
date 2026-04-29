@@ -326,9 +326,9 @@
       "saveError": "Nije moguće sačuvati izmene datuma.",
       "blockSuccess": "Izabrani datumi su blokirani.",
       "unblockSuccess": "Izabrani datumi su odblokirani.",
-      "syncLabel": "Sinhronizacija sa kalendarom telefona",
-      "syncApple": "Sinhronizacija sa Apple Calendar",
-      "syncGoogle": "Sinhronizacija sa Google Calendar",
+      "syncLabel": "Sinhronizacija kalendara",
+      "syncApple": "Apple Calendar",
+      "syncGoogle": "Google Calendar",
       "syncLoading": "Učitavanje veza…",
       "syncError": "Nije moguće učitati veze za sinhronizaciju."
     },

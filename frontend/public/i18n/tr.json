@@ -326,9 +326,9 @@
       "saveError": "Tarihler güncellenemedi.",
       "blockSuccess": "Seçili tarihler kapatıldı.",
       "unblockSuccess": "Seçili tarihler açıldı.",
-      "syncLabel": "Telefon takvimiyle senkronize et",
-      "syncApple": "Apple Calendar ile Senkronize Et",
-      "syncGoogle": "Google Calendar ile Senkronize Et",
+      "syncLabel": "Takvim senkronizasyonu",
+      "syncApple": "Apple Calendar",
+      "syncGoogle": "Google Calendar",
       "syncLoading": "Bağlantılar yükleniyor…",
       "syncError": "Senkronizasyon bağlantıları yüklenemedi."
     },

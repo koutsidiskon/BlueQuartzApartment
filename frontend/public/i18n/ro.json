@@ -326,9 +326,9 @@
       "saveError": "Nu s-au putut actualiza datele.",
       "blockSuccess": "Datele selectate au fost blocate.",
       "unblockSuccess": "Datele selectate au fost deblocate.",
-      "syncLabel": "Sincronizare cu calendarul telefonului",
-      "syncApple": "Sincronizare cu Apple Calendar",
-      "syncGoogle": "Sincronizare cu Google Calendar",
+      "syncLabel": "Sincronizare cu calendarul",
+      "syncApple": "Apple Calendar",
+      "syncGoogle": "Google Calendar",
       "syncLoading": "Se încarcă legăturile…",
       "syncError": "Nu s-au putut încărca legăturile de sincronizare."
     },
