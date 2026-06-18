@@ -35,7 +35,12 @@ export class CalendarController {
       ]);
 
       const merged = new Set(blockedDates.map(entry => entry.date));
+      const checkInDates = new Set();
       for (const booking of bookings) {
+        const checkInStr = typeof booking.checkIn === 'string'
+          ? booking.checkIn
+          : booking.checkIn.toISOString().slice(0, 10);
+        checkInDates.add(checkInStr);
         for (const date of generateDateRange(booking.checkIn, booking.checkOut)) {
           merged.add(date);
         }
@@ -43,7 +48,8 @@ export class CalendarController {
 
       return res.json({
         success: true,
-        data: Array.from(merged).sort()
+        data: Array.from(merged).sort(),
+        checkInDates: Array.from(checkInDates).sort()
       });
     } catch (error) {
       console.error('Error fetching blocked dates:', error);

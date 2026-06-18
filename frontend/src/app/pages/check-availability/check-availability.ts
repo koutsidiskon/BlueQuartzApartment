@@ -86,6 +86,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     private inlineFp: any;
     private isSyncingFromInline = false;
     private blockedDateSet = new Set<string>();
+    private checkInDateSet = new Set<string>();
     private lastRenderedLanguage = '';
     readonly minStayNights = MIN_STAY_NIGHTS;
     minStayError = false;
@@ -149,7 +150,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
             monthSelectorType: 'static',
             shorthandCurrentMonth: false,
             locale,
-            disable: [(date: Date) => this.isBlockedDate(date)],
+            disable: [(date: Date) => this.isBlockedForCheckOut(date)],
             altInput: true,
             altFormat: 'F j, Y',
             disableMobile: true,
@@ -300,6 +301,17 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
             takeUntilDestroyed(this.destroyRef)
         ).subscribe(dates => this.applyBlockedDates(dates));
 
+        this.availabilityCalendar.checkInDates$.pipe(
+            filter((dates): dates is string[] => dates !== null),
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(dates => {
+            this.checkInDateSet = new Set(dates);
+            if (this.checkOutFp) {
+                this.checkOutFp.set('disable', [(date: Date) => this.isBlockedForCheckOut(date)]);
+                this.checkOutFp.redraw();
+            }
+        });
+
         this.availabilityCalendar.getBlockedDates().subscribe({
             error: (error) => console.error('Could not load blocked dates:', error)
         });
@@ -312,14 +324,14 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
 
         this.blockedDateSet = new Set(normalizedDates);
 
-        const applyDisableRule = (fp: any): void => {
-            if (!fp) return;
-            fp.set('disable', [(date: Date) => this.isBlockedDate(date)]);
-            fp.redraw();
-        };
-
-        applyDisableRule(this.checkInFp);
-        applyDisableRule(this.checkOutFp);
+        if (this.checkInFp) {
+            this.checkInFp.set('disable', [(date: Date) => this.isBlockedDate(date)]);
+            this.checkInFp.redraw();
+        }
+        if (this.checkOutFp) {
+            this.checkOutFp.set('disable', [(date: Date) => this.isBlockedForCheckOut(date)]);
+            this.checkOutFp.redraw();
+        }
 
         if (this.inlineFp) {
             this.inlineFp.redraw();
@@ -328,6 +340,11 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
 
     private isBlockedDate(date: Date): boolean {
         return this.blockedDateSet.has(this.toDateKey(date));
+    }
+
+    private isBlockedForCheckOut(date: Date): boolean {
+        const key = this.toDateKey(date);
+        return this.blockedDateSet.has(key) && !this.checkInDateSet.has(key);
     }
 
     private toDateKey(date: Date): string {

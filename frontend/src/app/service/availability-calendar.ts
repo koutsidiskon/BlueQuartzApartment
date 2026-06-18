@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 export interface BlockedDatesResponse {
   success: boolean;
   data: string[];
+  checkInDates?: string[];
   message?: string;
 }
 
@@ -15,6 +16,9 @@ export class AvailabilityCalendarService {
   private blockedDatesSubject = new BehaviorSubject<string[] | null>(null);
   readonly blockedDates$ = this.blockedDatesSubject.asObservable();
 
+  private checkInDatesSubject = new BehaviorSubject<string[] | null>(null);
+  readonly checkInDates$ = this.checkInDatesSubject.asObservable();
+
   constructor(private http: HttpClient) {}
 
   getBlockedDates(): Observable<BlockedDatesResponse> {
@@ -22,6 +26,7 @@ export class AvailabilityCalendarService {
       tap(response => {
         if (response?.success) {
           this.blockedDatesSubject.next(Array.isArray(response.data) ? response.data : []);
+          this.checkInDatesSubject.next(Array.isArray(response.checkInDates) ? response.checkInDates : []);
         }
       })
     );
