@@ -52,7 +52,7 @@ type RequiredFieldKey = 'fullName' | 'email' | 'phone' | 'checkIn' | 'checkOut' 
 // Replace with your Google reCAPTCHA v3 SITE key.
 // This must match the key used in frontend/src/index.html script URL.
 const RECAPTCHA_SITE_KEY: string = '6Ld6vqwsAAAAAEaQhbmrjCwTAxTNqH64GCr0qMmZ';
-const MIN_STAY_NIGHTS = 5;
+const DEFAULT_MIN_STAY_NIGHTS = 5;
 
 @Component({
   selector: 'app-check-availability',
@@ -86,9 +86,10 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     private inlineFp: any;
     private isSyncingFromInline = false;
     private blockedDateSet = new Set<string>();
+    private minimumStayByDate = new Map<string, number>();
     private checkInDateSet = new Set<string>();
     private lastRenderedLanguage = '';
-    readonly minStayNights = MIN_STAY_NIGHTS;
+    minStayNights = DEFAULT_MIN_STAY_NIGHTS;
     minStayError = false;
     blockedRangeError = false;
     isSubmitting = false;
@@ -210,8 +211,8 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
 
                 if (this.checkOutFp && selectedDates.length > 0) {
                     const startDate = selectedDates[0];
-
-                    this.checkOutFp.set('minDate', startDate);
+                    this.minStayNights = this.getMinimumStayNightsForDate(startDate);
+                    this.checkOutFp.set('minDate', this.getMinimumCheckOutDate(startDate));
 
                     const currentCheckOut = this.checkOutFp?.selectedDates?.[0];
                     if (currentCheckOut && !this.isMinimumStayValid(startDate, currentCheckOut)) {
@@ -313,6 +314,10 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
         });
 
         this.availabilityCalendar.getBlockedDates().subscribe({
+            next: (response) => {
+                this.applyBlockedDates(response?.data || []);
+                this.applyMinimumStayDates(response?.minimumStayDates || []);
+            },
             error: (error) => console.error('Could not load blocked dates:', error)
         });
     }
@@ -338,6 +343,17 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
         }
     }
 
+    private applyMinimumStayDates(dates: { date: string; minStayNights: number }[]): void {
+        const normalizedDates = dates
+            .map((entry) => ({
+                date: String(entry?.date || '').trim(),
+                minStayNights: Number(entry?.minStayNights)
+            }))
+            .filter((entry) => /^\d{4}-\d{2}-\d{2}$/.test(entry.date) && Number.isInteger(entry.minStayNights) && entry.minStayNights > 0);
+
+        this.minimumStayByDate = new Map(normalizedDates.map((entry) => [entry.date, entry.minStayNights]));
+    }
+
     private isBlockedDate(date: Date): boolean {
         return this.blockedDateSet.has(this.toDateKey(date));
     }
@@ -345,6 +361,16 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
     private isBlockedForCheckOut(date: Date): boolean {
         const key = this.toDateKey(date);
         return this.blockedDateSet.has(key) && !this.checkInDateSet.has(key);
+    }
+
+    private getMinimumStayNightsForDate(date: Date): number {
+        return this.minimumStayByDate.get(this.toDateKey(date)) ?? DEFAULT_MIN_STAY_NIGHTS;
+    }
+
+    private getMinimumCheckOutDate(checkInDate: Date): Date {
+        const result = new Date(checkInDate.getFullYear(), checkInDate.getMonth(), checkInDate.getDate());
+        result.setDate(result.getDate() + this.getMinimumStayNightsForDate(checkInDate));
+        return result;
     }
 
     private toDateKey(date: Date): string {
@@ -419,6 +445,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
             if (selectedDates.length === 0) {
                 this.checkInFp.clear();
                 this.checkOutFp.clear();
+                this.minStayNights = DEFAULT_MIN_STAY_NIGHTS;
                 this.minStayError = false;
                 this.blockedRangeError = false;
                 return;
@@ -429,7 +456,8 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
             if (!endDate) {
                 this.checkInFp.setDate(startDate, true);
                 this.clearFieldError('checkIn');
-                this.checkOutFp.set('minDate', startDate);
+                this.minStayNights = this.getMinimumStayNightsForDate(startDate);
+                this.checkOutFp.set('minDate', this.getMinimumCheckOutDate(startDate));
                 this.checkOutFp.clear();
                 this.clearFieldError('checkOut');
                 this.minStayError = false;
@@ -439,7 +467,8 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
 
             this.checkInFp.setDate(startDate, true);
             this.clearFieldError('checkIn');
-            this.checkOutFp.set('minDate', startDate);
+            this.minStayNights = this.getMinimumStayNightsForDate(startDate);
+            this.checkOutFp.set('minDate', this.getMinimumCheckOutDate(startDate));
             this.checkOutFp.setDate(endDate, true);
             this.clearFieldError('checkOut');
             this.minStayError = !this.isMinimumStayValid(startDate, endDate);
@@ -471,7 +500,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
         const end = new Date(checkOutDate.getFullYear(), checkOutDate.getMonth(), checkOutDate.getDate());
         const millisecondsPerDay = 24 * 60 * 60 * 1000;
         const nights = Math.round((end.getTime() - start.getTime()) / millisecondsPerDay);
-        return nights >= MIN_STAY_NIGHTS;
+        return nights >= this.getMinimumStayNightsForDate(start);
     }
 
     openPrivacyPolicy(event: Event): void {
@@ -527,7 +556,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
           checkOut: this.checkOutFp.formatDate(this.checkOutFp.selectedDates[0], 'Y-m-d')
       };
 
-      this.inquiryService.createInquiry(inquiryData).subscribe({
+    this.inquiryService.createInquiry(inquiryData).subscribe({
           next: (_) => {
               this.isSubmitting = false;
               Swal.fire({
@@ -589,6 +618,7 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
         if (this.checkInFp) this.checkInFp.clear();
         if (this.checkOutFp) this.checkOutFp.clear();
         if (this.inlineFp) this.inlineFp.clear();
+        this.minStayNights = DEFAULT_MIN_STAY_NIGHTS;
         this.resetRequiredFieldErrors();
     }
 
@@ -632,9 +662,11 @@ export class CheckAvailability implements AfterViewInit, DoCheck {
         if (hasCheckIn && hasCheckOut) {
             const startDate = this.checkInFp.selectedDates[0];
             const endDate = this.checkOutFp.selectedDates[0];
+            this.minStayNights = this.getMinimumStayNightsForDate(startDate);
             this.minStayError = !this.isMinimumStayValid(startDate, endDate);
             this.blockedRangeError = this.hasBlockedDateInRange(startDate, endDate);
         } else {
+            this.minStayNights = DEFAULT_MIN_STAY_NIGHTS;
             this.minStayError = false;
             this.blockedRangeError = false;
         }

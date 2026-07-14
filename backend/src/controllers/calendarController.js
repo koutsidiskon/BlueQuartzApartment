@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import { BlockedDate } from '../models/BlockedDate.js';
 import { Booking } from '../models/Booking.js';
+import { MinimumStayDate } from '../models/MinimumStayDate.js';
 
 function normalizeDateList(inputDates) {
   if (!Array.isArray(inputDates)) return [];
@@ -29,9 +30,10 @@ export class CalendarController {
   // Returns the union of manually blocked dates and confirmed booking date ranges
   async getBlockedDates(_req, res) {
     try {
-      const [blockedDates, bookings] = await Promise.all([
+      const [blockedDates, bookings, minimumStayDates] = await Promise.all([
         BlockedDate.findAll({ attributes: ['date'] }),
-        Booking.findAll({ attributes: ['checkIn', 'checkOut'] })
+        Booking.findAll({ attributes: ['checkIn', 'checkOut'] }),
+        MinimumStayDate.findAll({ attributes: ['date', 'minStayNights'] })
       ]);
 
       const merged = new Set(blockedDates.map(entry => entry.date));
@@ -49,7 +51,10 @@ export class CalendarController {
       return res.json({
         success: true,
         data: Array.from(merged).sort(),
-        checkInDates: Array.from(checkInDates).sort()
+        checkInDates: Array.from(checkInDates).sort(),
+        minimumStayDates: minimumStayDates
+          .map((entry) => ({ date: entry.date, minStayNights: entry.minStayNights }))
+          .sort((left, right) => left.date.localeCompare(right.date))
       });
     } catch (error) {
       console.error('Error fetching blocked dates:', error);
@@ -98,6 +103,69 @@ export class CalendarController {
       return res.status(500).json({
         success: false,
         message: 'Failed to update blocked dates.'
+      });
+    }
+  }
+
+  async updateMinimumStayDates(req, res) {
+    try {
+      const dates = normalizeDateList(req.body?.dates);
+      const minStayNights = Number.parseInt(String(req.body?.minStayNights || ''), 10);
+
+      if (!dates.length) {
+        return res.status(400).json({
+          success: false,
+          message: 'At least one valid date is required.'
+        });
+      }
+
+      if (!Number.isInteger(minStayNights) || minStayNights < 1 || minStayNights > 30) {
+        return res.status(400).json({
+          success: false,
+          message: 'Minimum stay must be a whole number between 1 and 30 nights.'
+        });
+      }
+
+      const conflictCount = await BlockedDate.count({
+        where: { date: { [Op.in]: dates } }
+      });
+
+      if (conflictCount > 0) {
+        return res.status(409).json({
+          success: false,
+          message: 'Selected dates must be free before assigning a minimum stay rule.',
+          conflictCount
+        });
+      }
+
+      if (minStayNights === 5) {
+        await MinimumStayDate.destroy({
+          where: { date: { [Op.in]: dates } }
+        });
+      } else {
+        await MinimumStayDate.bulkCreate(
+          dates.map((date) => ({ date, minStayNights })),
+          { updateOnDuplicate: ['minStayNights'] }
+        );
+      }
+
+      const minimumStayDates = await MinimumStayDate.findAll({
+        attributes: ['date', 'minStayNights'],
+        order: [['date', 'ASC']]
+      });
+
+      return res.json({
+        success: true,
+        data: minimumStayDates.map((entry) => ({
+          date: entry.date,
+          minStayNights: entry.minStayNights
+        }))
+      });
+    } catch (error) {
+      console.error('Error updating minimum stay dates:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to update minimum stay dates.'
       });
     }
   }

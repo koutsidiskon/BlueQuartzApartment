@@ -14,7 +14,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { AdminAuthService } from '../../service/admin-auth';
 import { I18nService } from '../../service/i18n';
 import { LanguageFacadeService } from '../../service/language-option';
-import { AvailabilityCalendarService } from '../../service/availability-calendar';
+import { AvailabilityCalendarService, MinimumStayDateItem } from '../../service/availability-calendar';
 import { InquiryListItem, InquiryService } from '../../service/inquiry';
 import { BookingService, BookingListItem, BookingCalendarItem, BookingSource, CreateBookingData } from '../../service/booking';
 import { PhoneCountrySelectComponent } from '../../shared/phone-country-select.component';
@@ -64,6 +64,8 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   selectedDates: string[] = [];
   calendarMessage = '';
   calendarError = '';
+  minimumStayNights = 5;
+  showMinimumStayInfo = false;
   inquiriesError = '';
   error = '';
   inquiries: InquiryListItem[] = [];
@@ -76,6 +78,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   private rangeFromFp: any;
   private rangeToFp: any;
   private blockedDateSet = new Set<string>();
+  private minimumStayDateMap = new Map<string, number>();
   private selectedStartDate: Date | null = null;
   private selectedEndDate: Date | null = null;
   private isSyncingToCalendar = false;
@@ -199,9 +202,14 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       !target?.closest('.admin-calendar-card') &&
       !target?.closest('.calendar-range-controls') &&
       !target?.closest('.calendar-actions') &&
+      !target?.closest('.minimum-stay-controls') &&
       !target?.closest('.flatpickr-calendar')
     ) {
       this.clearSelection();
+    }
+
+    if (!target?.closest('.minimum-stay-info')) {
+      this.showMinimumStayInfo = false;
     }
   }
 
@@ -268,6 +276,69 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
   canReleaseSelection(): boolean {
     return !!this.selectedDates.length && !this.isCalendarSaving && !this.isCalendarLoading;
+  }
+
+  canSaveMinimumStayRule(): boolean {
+    if (!this.selectedDates.length || this.isCalendarSaving || this.isCalendarLoading) return false;
+    if (this.selectedDates.some(date => this.blockedDateSet.has(date))) return false;
+    const nights = Number(this.minimumStayNights);
+    return Number.isInteger(nights) && nights >= 1 && nights <= 30;
+  }
+
+  toggleMinimumStayInfo(event: Event): void {
+    event.stopPropagation();
+    this.showMinimumStayInfo = !this.showMinimumStayInfo;
+  }
+
+  increaseMinimumStay(): void {
+    const current = Number(this.minimumStayNights);
+    const nextValue = Number.isInteger(current) ? Math.min(30, current + 1) : 5;
+    this.minimumStayNights = nextValue;
+  }
+
+  decreaseMinimumStay(): void {
+    const current = Number(this.minimumStayNights);
+    const nextValue = Number.isInteger(current) ? Math.max(1, current - 1) : 5;
+    this.minimumStayNights = nextValue;
+  }
+
+  saveMinimumStayRule(): void {
+    if (!this.canSaveMinimumStayRule()) return;
+
+    const conflictingDates = this.selectedDates.filter(date => this.blockedDateSet.has(date));
+    if (conflictingDates.length > 0) {
+      this.calendarError = `${conflictingDates.length} selected date(s) are already reserved and cannot be assigned a minimum stay.`;
+      return;
+    }
+
+    const savedNights = Number(this.minimumStayNights);
+    this.minimumStayNights = savedNights;
+    this.isCalendarSaving = true;
+    this.calendarError = '';
+    this.calendarMessage = '';
+
+    this.availabilityCalendar.updateMinimumStayDates(this.selectedDates, savedNights).pipe(
+      finalize(() => {
+        this.isCalendarSaving = false;
+      })
+    ).subscribe({
+      next: (response) => {
+        this.applyMinimumStayDates(response?.data || []);
+        this.calendarMessage = savedNights === 5
+          ? this.i18n.t('adminPanel.calendar.minStayResetSuccess', undefined, 'Selected dates were reset to the default minimum stay.')
+          : this.i18n.t('adminPanel.calendar.minStaySaveSuccess', { nights: savedNights }, `Selected dates now require a minimum stay of ${savedNights} nights.`);
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.ngZone.run(() => {
+            this.calendarMessage = '';
+            this.cdr.detectChanges();
+          });
+        }, 4000);
+      },
+      error: (err) => {
+        this.calendarError = err?.error?.message || this.i18n.t('adminPanel.calendar.saveError', undefined, 'Could not update dates.');
+      }
+    });
   }
 
   // ── Inquiry tab ───────────────────────────────────────
@@ -840,6 +911,10 @@ export class AdminPanel implements AfterViewInit, DoCheck {
             label.textContent = '↪ in';
             label.title = `${bookingInfo.guestName} (${bookingInfo.source})\n${bookingInfo.checkIn} → ${bookingInfo.checkOut}`;
             dayElem.appendChild(label);
+            const minimumStayNights = this.minimumStayDateMap.get(dateKey);
+            if (minimumStayNights) {
+              this.appendMinimumStayBadge(dayElem, minimumStayNights);
+            }
           } else if (isCheckOut) {
             dayElem.classList.add('booking-check-out');
             if (this.isBlockedDate(dayDate)) dayElem.classList.add('booking-checkout-blocked');
@@ -848,6 +923,10 @@ export class AdminPanel implements AfterViewInit, DoCheck {
             label.textContent = '↩ out';
             label.title = `${bookingInfo.guestName} (${bookingInfo.source})\n${bookingInfo.checkIn} → ${bookingInfo.checkOut}`;
             dayElem.appendChild(label);
+            const minimumStayNights = this.minimumStayDateMap.get(dateKey);
+            if (minimumStayNights && !this.isBlockedDate(dayDate)) {
+              this.appendMinimumStayBadge(dayElem, minimumStayNights);
+            }
           } else {
             // Mid day: show deferred check-in name if this is the first day after a combined day
             dayElem.classList.add('booking-mid');
@@ -870,11 +949,18 @@ export class AdminPanel implements AfterViewInit, DoCheck {
           return;
         }
 
+        if (this.isBlockedDate(dayDate)) {
+          dayElem.classList.add('booked-day');
+          return;
+        }
+
+        const minimumStayNights = this.minimumStayDateMap.get(dateKey);
+        if (minimumStayNights) {
+          this.appendMinimumStayBadge(dayElem, minimumStayNights);
+        }
+
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        if (dayDate >= today && this.isBlockedDate(dayDate)) {
-          dayElem.classList.add('booked-day');
-        }
       }
     });
   }
@@ -1128,6 +1214,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     ).subscribe({
       next: (response) => {
         this.applyBlockedDates(response?.data || []);
+        this.applyMinimumStayDates(response?.minimumStayDates || []);
       },
       error: () => {
         this.calendarError = this.i18n.t('adminPanel.calendar.loadError', undefined, 'Could not load reserved dates.');
@@ -1224,6 +1311,8 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       this.selectedDates = this.enumerateDateRange(startDate, endDate);
     }
 
+    this.syncMinimumStayInput();
+
     this.syncRangeInputs();
     this.cdr.detectChanges();
   }
@@ -1263,6 +1352,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.selectedStartDate = normStart;
     this.selectedEndDate = normEnd;
     this.selectedDates = normEnd ? this.enumerateDateRange(normStart, normEnd) : [this.toDateKey(normStart)];
+    this.syncMinimumStayInput();
 
     if (this.inlineFp) {
       this.isSyncingToCalendar = true;
@@ -1290,6 +1380,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.selectedDates = [];
     this.selectedStartDate = null;
     this.selectedEndDate = null;
+    this.minimumStayNights = 5;
   }
 
   private clearSelection(clearInlineCalendar = true): void {
@@ -1330,6 +1421,49 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     if (this.inlineFp) {
       this.inlineFp.redraw();
     }
+  }
+
+  private applyMinimumStayDates(dates: MinimumStayDateItem[]): void {
+    const normalized = dates
+      .map((entry) => ({
+        date: String(entry?.date || '').trim(),
+        minStayNights: Number(entry?.minStayNights)
+      }))
+      .filter((entry) => /^\d{4}-\d{2}-\d{2}$/.test(entry.date) && Number.isInteger(entry.minStayNights) && entry.minStayNights > 0);
+
+    this.minimumStayDateMap = new Map(normalized.map((entry) => [entry.date, entry.minStayNights]));
+    this.syncMinimumStayInput();
+  }
+
+  private appendMinimumStayBadge(dayElem: HTMLElement, minimumStayNights: number): void {
+    dayElem.classList.add('minimum-stay-day');
+    dayElem.style.setProperty('--minimum-stay-color', minimumStayNights > 5 ? '#b26b00' : '#1f5c8f');
+    const label = document.createElement('span');
+    label.className = 'minimum-stay-day-label';
+    label.textContent = String(minimumStayNights);
+    label.title = `Minimum stay: ${minimumStayNights} nights`;
+    dayElem.appendChild(label);
+  }
+
+  private syncMinimumStayInput(): void {
+    if (!this.selectedDates.length) {
+      this.minimumStayNights = 5;
+      return;
+    }
+
+    const uniqueValues = new Set<number>();
+    for (const dateKey of this.selectedDates) {
+      const minStay = this.minimumStayDateMap.get(dateKey);
+      if (typeof minStay === 'number') {
+        uniqueValues.add(minStay);
+      }
+    }
+
+    this.minimumStayNights = uniqueValues.size === 1 ? Array.from(uniqueValues)[0] : 5;
+  }
+
+  isDefaultMinimumStaySelection(): boolean {
+    return this.minimumStayNights === 5;
   }
 
   private isBlockedDate(date: Date): boolean {

@@ -6,6 +6,18 @@ export interface BlockedDatesResponse {
   success: boolean;
   data: string[];
   checkInDates?: string[];
+  minimumStayDates?: MinimumStayDateItem[];
+  message?: string;
+}
+
+export interface MinimumStayDateItem {
+  date: string;
+  minStayNights: number;
+}
+
+export interface MinimumStayDatesResponse {
+  success: boolean;
+  data: MinimumStayDateItem[];
   message?: string;
 }
 
@@ -43,6 +55,14 @@ export class AvailabilityCalendarService {
           this.blockedDatesSubject.next(Array.isArray(response.data) ? response.data : []);
         }
       })
+    );
+  }
+
+  updateMinimumStayDates(dates: string[], minStayNights: number): Observable<MinimumStayDatesResponse> {
+    return this.http.put<MinimumStayDatesResponse>(
+      `/api/calendar/minimum-stay-dates`,
+      { dates, minStayNights },
+      { withCredentials: true }
     );
   }
 }
