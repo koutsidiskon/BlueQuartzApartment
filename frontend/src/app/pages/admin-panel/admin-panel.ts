@@ -16,7 +16,7 @@ import { I18nService } from '../../service/i18n';
 import { LanguageFacadeService } from '../../service/language-option';
 import { AvailabilityCalendarService, MinimumStayDateItem } from '../../service/availability-calendar';
 import { InquiryListItem, InquiryService } from '../../service/inquiry';
-import { BookingService, BookingListItem, BookingCalendarItem, BookingSource, CreateBookingData, BookingFinancialSummary } from '../../service/booking';
+import { BookingService, BookingListItem, BookingCalendarItem, BookingSource, CreateBookingData, BookingFinancialSummary, BookingYearStatistic } from '../../service/booking';
 import { PhoneCountrySelectComponent } from '../../shared/phone-country-select.component';
 import { COUNTRY_CODES } from '../../shared/phone-country-codes';
 
@@ -53,7 +53,14 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   @ViewChild('adminRangeFromInput') adminRangeFromInput!: ElementRef<HTMLInputElement>;
   @ViewChild('adminRangeToInput') adminRangeToInput!: ElementRef<HTMLInputElement>;
 
-  activeTab: 'calendar' | 'inquiries' | 'bookings' = 'calendar';
+  activeTab: 'calendar' | 'inquiries' | 'bookings' | 'statistics' = 'calendar';
+  selectedSeasonYear = new Date().getFullYear();
+  seasonYears = [new Date().getFullYear()];
+  statistics: BookingYearStatistic[] = [];
+  statisticsPage = 1;
+  statisticsPageSize = 5;
+  isStatisticsLoading = false;
+  statisticsError = '';
   menuOpen = false;
   currentLanguage = 'en';
   desktopLanguageMenuOpen = false;
@@ -219,6 +226,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.loadInquiries(1);
     this.loadBookings(1);
     this.loadIcalUrl();
+    this.loadStatistics();
     this.lastRenderedLanguage = this.i18n.getLanguage();
     this.updateCalendarLocale();
   }
@@ -267,7 +275,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.updateCalendarLocale();
   }
 
-  switchTab(tab: 'calendar' | 'inquiries' | 'bookings'): void {
+  switchTab(tab: 'calendar' | 'inquiries' | 'bookings' | 'statistics'): void {
     this.activeTab = tab;
     this.menuOpen = false;
     this.desktopLanguageMenuOpen = false;
@@ -282,6 +290,11 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       return;
     }
 
+    if (tab === 'statistics') {
+      this.loadStatistics();
+      return;
+    }
+
     setTimeout(() => {
       if (!this.inlineFp) {
         this.rebuildCalendar();
@@ -292,6 +305,9 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   }
 
   get panelTitle(): string {
+    if (this.activeTab === 'statistics') {
+      return this.i18n.t('adminPanel.statisticsTitle', undefined, 'Season Statistics');
+    }
     if (this.activeTab === 'inquiries') {
       return this.i18n.t('adminPanel.inquiriesTitle', undefined, 'Booking Inquiries');
     }
@@ -768,6 +784,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
         this.closeBookingModal();
         this.bookingPageCache.clear();
         this.loadBookings(1);
+        this.loadStatistics();
         this.loadCalendarBookings();
         this.loadBlockedDates();
         if (wasFromInquiry) {
@@ -837,6 +854,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
           }
           this.bookingPageCache.clear();
           this.loadBookings(1);
+          this.loadStatistics();
           this.loadCalendarBookings();
           this.loadBlockedDates();
           this.bookingMessage = this.i18n.t('adminPanel.bookings.deleteSuccess', undefined, 'Booking deleted successfully.');
@@ -907,6 +925,198 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     clearTimeout(this.bookingSearchDebounceTimer);
     this.bookingPageCache.clear();
     this.loadBookings(1);
+    this.loadStatistics();
+  }
+
+  onSeasonYearChange(event: Event): void {
+    this.selectedSeasonYear = Number((event.target as HTMLSelectElement).value);
+    this.inquiryPageCache.clear();
+    this.bookingPageCache.clear();
+    this.loadInquiries(1);
+    this.loadBookings(1);
+    if (this.activeTab === 'statistics') this.loadStatistics();
+  }
+
+  private loadStatistics(): void {
+    this.isStatisticsLoading = true;
+    this.statisticsError = '';
+    this.bookingService.getStatistics().pipe(finalize(() => {
+      this.isStatisticsLoading = false;
+      this.cdr.detectChanges();
+    })).subscribe({
+      next: (response) => {
+        this.statistics = Array.isArray(response?.data) ? response.data : [];
+        this.statisticsPage = Math.min(this.statisticsPage, Math.max(1, Math.ceil(this.statistics.length / this.statisticsPageSize)));
+        const years = this.statistics.map((item) => item.year);
+        this.seasonYears = Array.from(new Set([new Date().getFullYear(), ...years])).sort((left, right) => right - left);
+      },
+      error: () => {
+        this.statisticsError = this.i18n.t('adminPanel.statisticsLoadError', undefined, 'Could not load season statistics.');
+      }
+    });
+  }
+
+  getStatisticBarWidth(value: number, field: keyof BookingYearStatistic): number {
+    const max = Math.max(...this.statistics.map((item) => Number(item[field]) || 0), 1);
+    return Math.max(3, Math.round((Number(value) / max) * 100));
+  }
+
+  get pagedStatistics(): BookingYearStatistic[] {
+    const start = (this.statisticsPage - 1) * this.statisticsPageSize;
+    return this.statistics.slice(start, start + this.statisticsPageSize);
+  }
+
+  get statisticsTotalPages(): number {
+    return Math.max(1, Math.ceil(this.statistics.length / this.statisticsPageSize));
+  }
+
+  hasStatisticsPreviousPage(): boolean { return this.statisticsPage > 1; }
+  hasStatisticsNextPage(): boolean { return this.statisticsPage < this.statisticsTotalPages; }
+
+  goToStatisticsPage(page: number): void {
+    if (page < 1 || page > this.statisticsTotalPages) return;
+    this.statisticsPage = page;
+  }
+
+  onStatisticsPageSizeChange(event: Event): void {
+    this.statisticsPageSize = Number((event.target as HTMLSelectElement).value);
+    this.statisticsPage = 1;
+  }
+
+  async exportStatisticsExcel(): Promise<void> {
+    const XLSX = await import('xlsx');
+    const rows = this.statistics.map((item) => ({
+      Season: item.year,
+      Bookings: item.bookings,
+      Nights: item.nights,
+      Turnover: item.turnover,
+      'Booking fees': item.bookingFees,
+      'Environmental fees': item.environmentalFees,
+      'Booking net profit': item.bookingNetProfit,
+      Cash: item.cashRevenue,
+      'Total profit': item.totalProfit
+    }));
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(rows), 'Season Summary');
+    const observations = this.buildStatisticsObservations();
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([
+      ['Season report observations'],
+      ...observations.map((observation) => [observation])
+    ]), 'Observations');
+    XLSX.writeFile(workbook, `blue-quartz-season-report-${new Date().getFullYear()}.xlsx`);
+  }
+
+  async exportStatisticsPdf(): Promise<void> {
+    const { jsPDF } = await import('jspdf');
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    pdf.setFillColor(0, 51, 102);
+    pdf.rect(0, 0, pageWidth, 28, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(21);
+    pdf.text('Blue Quartz Apartment', 14, 12);
+    pdf.setFontSize(11);
+    pdf.text('Season performance report', 14, 20);
+    pdf.setFontSize(9);
+    pdf.text(`Generated ${new Date().toLocaleDateString()}`, pageWidth - 14, 20, { align: 'right' });
+
+    const totals = this.statistics.reduce((summary, item) => ({
+      profit: summary.profit + item.totalProfit,
+      turnover: summary.turnover + item.turnover,
+      nights: summary.nights + item.nights,
+      bookings: summary.bookings + item.bookings
+    }), { profit: 0, turnover: 0, nights: 0, bookings: 0 });
+
+    const cards = [
+      ['Total profit', totals.profit],
+      ['Turnover', totals.turnover],
+      ['Nights', totals.nights],
+      ['Bookings', totals.bookings]
+    ];
+    cards.forEach(([label, value], index) => {
+      const x = 14 + index * 68;
+      pdf.setFillColor(239, 247, 253);
+      pdf.roundedRect(x, 36, 61, 20, 3, 3, 'F');
+      pdf.setTextColor(75, 105, 135);
+      pdf.setFontSize(8);
+      pdf.text(String(label), x + 4, 43);
+      pdf.setTextColor(0, 51, 102);
+      pdf.setFontSize(13);
+      pdf.text(index > 1 ? String(value) : `${Number(value).toLocaleString()} EUR`, x + 4, 51);
+    });
+
+    pdf.setTextColor(0, 51, 102);
+    pdf.setFontSize(14);
+    pdf.text('Season comparison', 14, 68);
+    const tableHeaders = ['Season', 'Bookings', 'Nights', 'Turnover', 'Booking fees', 'Environmental', 'Booking net', 'Cash', 'Total profit'];
+    const columnX = [14, 38, 58, 80, 112, 145, 180, 215, 244];
+    pdf.setFillColor(0, 51, 102);
+    pdf.rect(12, 73, pageWidth - 24, 8, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(7.5);
+    tableHeaders.forEach((header, index) => pdf.text(header, columnX[index], 78));
+    pdf.setTextColor(0, 51, 102);
+    pdf.setFontSize(8);
+    this.statistics.forEach((item, rowIndex) => {
+      const y = 89 + rowIndex * 8;
+      if (rowIndex % 2 === 0) {
+        pdf.setFillColor(246, 250, 253);
+        pdf.rect(12, y - 5, pageWidth - 24, 8, 'F');
+      }
+      [item.year, item.bookings, item.nights, item.turnover, item.bookingFees, item.environmentalFees, item.bookingNetProfit, item.cashRevenue, item.totalProfit]
+        .forEach((value, index) => pdf.text(index > 2 ? `${Number(value).toLocaleString()} €` : String(value), columnX[index], y));
+    });
+
+    pdf.addPage();
+    pdf.setFillColor(0, 51, 102);
+    pdf.rect(0, 0, pageWidth, 22, 'F');
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(16);
+    pdf.text('Season comparison charts', 14, 14);
+    const chartTop = 36;
+    this.drawPdfChart(pdf, 'Total profit by season', this.statistics, 'totalProfit', 14, chartTop);
+    this.drawPdfChart(pdf, 'Nights by season', this.statistics, 'nights', 155, chartTop);
+    pdf.setTextColor(70, 70, 70);
+    pdf.setFontSize(8);
+    pdf.setTextColor(0, 51, 102);
+    pdf.setFontSize(12);
+    pdf.text('Observations', 14, 105);
+    pdf.setTextColor(70, 70, 70);
+    pdf.setFontSize(9);
+    this.buildStatisticsObservations().forEach((observation, index) => pdf.text(`• ${observation}`, 18, 114 + index * 7));
+    pdf.save(`blue-quartz-season-report-${new Date().getFullYear()}.pdf`);
+  }
+
+  private drawPdfChart(pdf: { setTextColor: Function; setFontSize: Function; text: Function; setFillColor: Function; roundedRect: Function }, title: string, rows: BookingYearStatistic[], field: keyof BookingYearStatistic, x: number, y: number): void {
+    const width = 116;
+    const max = Math.max(...rows.map((row) => Number(row[field]) || 0), 1);
+    pdf.setTextColor(0, 51, 102);
+    pdf.setFontSize(10);
+    pdf.text(title, x, y);
+    rows.forEach((row, index) => {
+      const value = Number(row[field]) || 0;
+      const rowY = y + 9 + index * 10;
+      pdf.setFontSize(7);
+      pdf.text(String(row.year), x, rowY + 3);
+      pdf.setFillColor(225, 235, 243);
+      pdf.roundedRect(x + 20, rowY, 78, 5, 2, 2, 'F');
+      pdf.setFillColor(field === 'nights' ? 45 : 143, field === 'nights' ? 120 : 203, field === 'nights' ? 185 : 241);
+      pdf.roundedRect(x + 20, rowY, Math.max(2, 78 * value / max), 5, 2, 2, 'F');
+      pdf.setTextColor(0, 51, 102);
+      pdf.setFontSize(8);
+      pdf.text(String(value), x + 105, rowY + 4);
+    });
+  }
+
+  private buildStatisticsObservations(): string[] {
+    if (!this.statistics.length) return ['No season data available.'];
+    const bestProfit = [...this.statistics].sort((left, right) => right.totalProfit - left.totalProfit)[0];
+    const bestNights = [...this.statistics].sort((left, right) => right.nights - left.nights)[0];
+    return [
+      `Best profit season: ${bestProfit.year} (${bestProfit.totalProfit.toLocaleString()} EUR).`,
+      `Highest occupancy by nights: ${bestNights.year} (${bestNights.nights} nights).`,
+      `Average profit per night: ${(this.statistics.reduce((sum, item) => sum + item.totalProfit, 0) / Math.max(1, this.statistics.reduce((sum, item) => sum + item.nights, 0))).toFixed(2)} EUR.`
+    ];
   }
 
   // ── Language ──────────────────────────────────────────
@@ -1178,7 +1388,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.cdr.detectChanges();
     const requestToken = ++this.inquiryRequestToken;
 
-    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir).pipe(
+    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir, this.selectedSeasonYear).pipe(
       finalize(() => {
         if (requestToken === this.inquiryRequestToken) {
           this.isInquiriesLoading = false;
@@ -1226,7 +1436,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     if (this.inquiryTotalPagesCache && page > this.inquiryTotalPagesCache) return;
     if (this.inquiryPageCache.has(page)) return;
 
-    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir).subscribe({
+    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir, this.selectedSeasonYear).subscribe({
       next: (response) => {
         if (!response?.success) return;
         const rows = Array.isArray(response.data) ? response.data : [];
@@ -1258,7 +1468,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.cdr.detectChanges();
     const requestToken = ++this.bookingRequestToken;
 
-    this.bookingService.getBookings(page, this.bookingPageSize, this.bookingSearchTerm || undefined, this.bookingSortField, this.bookingSortDir).pipe(
+    this.bookingService.getBookings(page, this.bookingPageSize, this.bookingSearchTerm || undefined, this.bookingSortField, this.bookingSortDir, this.selectedSeasonYear).pipe(
       finalize(() => {
         if (requestToken === this.bookingRequestToken) {
           this.isBookingsLoading = false;

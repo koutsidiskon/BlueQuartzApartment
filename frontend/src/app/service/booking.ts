@@ -88,6 +88,18 @@ export interface BookingListResponse {
   financialSummary: BookingFinancialSummary;
 }
 
+export interface BookingYearStatistic {
+  year: number;
+  bookings: number;
+  nights: number;
+  turnover: number;
+  cashRevenue: number;
+  bookingNetProfit: number;
+  bookingFees: number;
+  environmentalFees: number;
+  totalProfit: number;
+}
+
 export interface BookingCalendarResponse {
   success: boolean;
   data: BookingCalendarItem[];
@@ -99,12 +111,17 @@ export class BookingService {
 
   constructor(private http: HttpClient) {}
 
-  getBookings(page: number, pageSize: number, search?: string, sortField?: string, sortDir?: string): Observable<BookingListResponse> {
+  getBookings(page: number, pageSize: number, search?: string, sortField?: string, sortDir?: string, year?: number | null): Observable<BookingListResponse> {
     const params: Record<string, string> = { page: String(page), pageSize: String(pageSize) };
     if (search) params['search'] = search;
     if (sortField) params['sortField'] = sortField;
     if (sortDir) params['sortDir'] = sortDir;
+    if (year) params['year'] = String(year);
     return this.http.get<BookingListResponse>(this.apiUrl, { withCredentials: true, params });
+  }
+
+  getStatistics(): Observable<{ success: boolean; data: BookingYearStatistic[] }> {
+    return this.http.get<{ success: boolean; data: BookingYearStatistic[] }>(`${this.apiUrl}/statistics`, { withCredentials: true });
   }
 
   getBookingsForCalendar(): Observable<BookingCalendarResponse> {

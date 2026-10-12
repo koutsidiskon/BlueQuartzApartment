@@ -122,8 +122,12 @@ export class InquiryController {
       const allowedSortFields = ['createdAt', 'fullName', 'email', 'checkIn', 'checkOut', 'guests'];
       const sortField = allowedSortFields.includes(req.query?.sortField) ? req.query.sortField : 'createdAt';
       const sortDir = req.query?.sortDir === 'ASC' ? 'ASC' : 'DESC';
+      const selectedYear = Number.parseInt(String(req.query?.year || ''), 10);
 
       const where = {};
+      if (Number.isInteger(selectedYear) && selectedYear >= 2000 && selectedYear <= 2100) {
+        where.checkIn = { [Op.gte]: `${selectedYear}-01-01`, [Op.lt]: `${selectedYear + 1}-01-01` };
+      }
       if (search) {
         where[Op.or] = [
           { email: { [Op.like]: `%${search}%` } },

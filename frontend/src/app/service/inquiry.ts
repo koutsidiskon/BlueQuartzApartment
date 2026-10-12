@@ -59,7 +59,7 @@ export class InquiryService {
     return this.http.post(this.apiUrl, data);
   }
 
-  getInquiries(page: number, pageSize: number, search?: string, sortField?: string, sortDir?: string): Observable<InquiryListResponse> {
+  getInquiries(page: number, pageSize: number, search?: string, sortField?: string, sortDir?: string, year?: number | null): Observable<InquiryListResponse> {
     const params: Record<string, string> = {
       page: String(page),
       pageSize: String(pageSize)
@@ -67,6 +67,7 @@ export class InquiryService {
     if (search) params['search'] = search;
     if (sortField) params['sortField'] = sortField;
     if (sortDir) params['sortDir'] = sortDir;
+    if (year) params['year'] = String(year);
 
     return this.http.get<InquiryListResponse>(this.apiUrl, {
       withCredentials: true,

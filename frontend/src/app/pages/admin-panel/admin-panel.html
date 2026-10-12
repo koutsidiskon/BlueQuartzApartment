@@ -37,6 +37,13 @@
             (click)="switchTab('bookings')">
             {{ 'adminPanel.bookingsTab' | t : undefined : 'Bookings' }}
           </button>
+          <button
+            type="button"
+            class="nav-tab"
+            [class.active]="activeTab === 'statistics'"
+            (click)="switchTab('statistics')">
+            {{ 'adminPanel.statisticsTab' | t : undefined : 'Statistics' }}
+          </button>
         </div>
 
         <div class="lang-switcher" [attr.aria-label]="'language.switcherAria' | t">
@@ -252,6 +259,12 @@
     <section class="tab-panel inquiries-panel" [class.hidden-panel]="activeTab !== 'inquiries'" [attr.aria-hidden]="activeTab !== 'inquiries'">
 
       <div class="inquiry-toolbar">
+        <div class="season-filter">
+          <label for="inquirySeasonYear">{{ 'adminPanel.season' | t : undefined : 'Season' }}</label>
+          <select id="inquirySeasonYear" (change)="onSeasonYearChange($event)">
+            @for (year of seasonYears; track year) { <option [value]="year" [selected]="year === selectedSeasonYear">{{ year }}</option> }
+          </select>
+        </div>
         <div class="search-wrapper">
           <span class="material-icons search-icon">search</span>
           <input
@@ -435,6 +448,12 @@
     <section class="tab-panel bookings-panel" [class.hidden-panel]="activeTab !== 'bookings'" [attr.aria-hidden]="activeTab !== 'bookings'">
 
       <div class="inquiry-toolbar booking-toolbar">
+        <div class="season-filter">
+          <label for="bookingSeasonYear">{{ 'adminPanel.season' | t : undefined : 'Season' }}</label>
+          <select id="bookingSeasonYear" (change)="onSeasonYearChange($event)">
+            @for (year of seasonYears; track year) { <option [value]="year" [selected]="year === selectedSeasonYear">{{ year }}</option> }
+          </select>
+        </div>
         <div class="search-wrapper">
           <span class="material-icons search-icon">search</span>
           <input
@@ -590,6 +609,69 @@
             class="page-btn"
             [disabled]="!hasBookingNextPage() || isBookingsLoading"
             (click)="goToBookingPage(bookingPage + 1)">
+            {{ 'adminPanel.bookings.next' | t : undefined : 'Next' }}
+          </button>
+        </div>
+      }
+    </section>
+
+    <section class="tab-panel statistics-panel" [class.hidden-panel]="activeTab !== 'statistics'" [attr.aria-hidden]="activeTab !== 'statistics'">
+      <div class="statistics-toolbar">
+        <div>
+          <span class="statistics-kicker">{{ 'adminPanel.statisticsComparison' | t : undefined : 'Season comparison' }}</span>
+          <h2>{{ 'adminPanel.statisticsTitle' | t : undefined : 'Season Statistics' }}</h2>
+        </div>
+        <div class="statistics-export-actions">
+          <button type="button" class="report-export-btn excel" (click)="exportStatisticsExcel()">
+            <span class="material-icons">table_view</span>
+            {{ 'adminPanel.exportExcel' | t : undefined : 'Export Excel' }}
+          </button>
+          <button type="button" class="report-export-btn pdf" (click)="exportStatisticsPdf()">
+            <span class="material-icons">picture_as_pdf</span>
+            {{ 'adminPanel.exportPdf' | t : undefined : 'Export PDF' }}
+          </button>
+        </div>
+      </div>
+
+      @if (isStatisticsLoading) { <p class="status loading">{{ 'adminPanel.statisticsLoading' | t : undefined : 'Loading statistics...' }}</p> }
+      @if (statisticsError) { <p class="status error">{{ statisticsError }}</p> }
+      @if (!isStatisticsLoading && !statisticsError && !statistics.length) { <p class="status empty">{{ 'adminPanel.statisticsEmpty' | t : undefined : 'No booking seasons yet.' }}</p> }
+
+      @if (statistics.length) {
+        <div class="statistics-chart">
+          @for (item of pagedStatistics; track item.year) {
+            <article class="season-stat-row" [class.current-season]="item.year === selectedSeasonYear">
+              <strong>{{ item.year }}</strong>
+              <div class="season-statistics-grid">
+                <div><span>{{ 'adminPanel.bookings.turnover' | t : undefined : 'Turnover' }}</span><b>{{ item.turnover | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+                <div><span>{{ 'adminPanel.bookings.bookingFees' | t : undefined : 'Booking fees' }}</span><b>{{ item.bookingFees | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+                <div><span>{{ 'adminPanel.bookings.environmentalFees' | t : undefined : 'Environmental fees' }}</span><b>{{ item.environmentalFees | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+                <div><span>{{ 'adminPanel.bookings.bookingNetProfit' | t : undefined : 'Booking net profit' }}</span><b>{{ item.bookingNetProfit | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+                <div><span>{{ 'adminPanel.bookings.cashRevenue' | t : undefined : 'Cash' }}</span><b>{{ item.cashRevenue | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+                <div class="highlight"><span>{{ 'adminPanel.bookings.totalProfit' | t : undefined : 'Total profit' }}</span><b>{{ item.totalProfit | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+              </div>
+              <div class="season-stat-meta">
+                <span><b>{{ item.bookings }}</b> {{ 'adminPanel.bookingsTab' | t : undefined : 'bookings' }}</span>
+                <span><b>{{ item.nights }}</b> {{ 'adminPanel.nights' | t : undefined : 'nights' }}</span>
+              </div>
+            </article>
+          }
+        </div>
+
+        <div class="pagination-row statistics-pagination">
+          <div class="page-size-wrapper">
+            <span class="page-size-label">{{ 'adminPanel.bookings.perPage' | t : undefined : 'Per page:' }}</span>
+            <select class="page-size-select" (change)="onStatisticsPageSizeChange($event)">
+              <option value="5" [selected]="statisticsPageSize === 5">5</option>
+              <option value="10" [selected]="statisticsPageSize === 10">10</option>
+              <option value="20" [selected]="statisticsPageSize === 20">20</option>
+            </select>
+          </div>
+          <button type="button" class="page-btn" [disabled]="!hasStatisticsPreviousPage()" (click)="goToStatisticsPage(statisticsPage - 1)">
+            {{ 'adminPanel.bookings.prev' | t : undefined : 'Previous' }}
+          </button>
+          <p>{{ 'adminPanel.bookings.page' | t : undefined : 'Page' }} {{ statisticsPage }} / {{ statisticsTotalPages }} · {{ 'adminPanel.bookings.total' | t : undefined : 'Total' }} {{ statistics.length }}</p>
+          <button type="button" class="page-btn" [disabled]="!hasStatisticsNextPage()" (click)="goToStatisticsPage(statisticsPage + 1)">
             {{ 'adminPanel.bookings.next' | t : undefined : 'Next' }}
           </button>
         </div>

@@ -5,6 +5,7 @@ import { requireAdminAuth } from '../middleware/adminAuth.js';
 const router = express.Router();
 
 router.get('/', requireAdminAuth, (req, res) => bookingController.getAllBookings(req, res));
+router.get('/statistics', requireAdminAuth, (req, res) => bookingController.getStatistics(req, res));
 router.get('/calendar', requireAdminAuth, (req, res) => bookingController.getAllBookingsForCalendar(req, res));
 router.get('/ical-url', requireAdminAuth, (req, res) => bookingController.getIcalUrl(req, res));
 router.get('/ical', (req, res) => bookingController.getIcal(req, res));

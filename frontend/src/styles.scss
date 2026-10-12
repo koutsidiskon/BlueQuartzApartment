@@ -69,6 +69,42 @@ html, body {
   .booking-financial-summary .financial-stat strong { font-size: 0.98rem; }
 }
 
+.season-filter { display: inline-flex; align-items: center; gap: .45rem; flex: 0 0 auto; }
+.season-filter label { color: rgba(0, 51, 102, .64); font-size: .72rem; font-weight: 700; text-transform: uppercase; }
+.season-filter select { min-width: 92px; padding: .52rem .62rem; border: 1px solid rgba(45, 120, 185, .3); border-radius: 8px; background: #fff; color: #003366; font-weight: 700; }
+.statistics-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin: .3rem 0 1.1rem; }
+.statistics-kicker { color: rgba(45, 120, 185, .72); font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.statistics-toolbar h2 { margin: .2rem 0 0; color: #003366; font-size: 1.35rem; }
+.statistics-export-actions { display: flex; gap: .55rem; }
+.report-export-btn { display: inline-flex; align-items: center; gap: .35rem; padding: .58rem .78rem; border: 1px solid transparent; border-radius: 8px; color: #fff; font-size: .75rem; font-weight: 700; cursor: pointer; }
+.report-export-btn .material-icons { font-size: 1rem; }
+.report-export-btn.excel { background: #16805c; }
+.report-export-btn.pdf { background: #b73535; }
+.report-export-btn:hover { filter: brightness(.94); transform: translateY(-1px); }
+.statistics-chart { display: grid; gap: .7rem; }
+.season-stat-row { display: grid; grid-template-columns: 58px minmax(0, 1fr) 150px; align-items: center; gap: .8rem; padding: .9rem 1rem; border: 1px solid rgba(0, 51, 102, .1); border-radius: 12px; background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(241,248,253,.9)); box-shadow: 0 4px 14px rgba(0, 51, 102, .045); }
+.season-stat-row.current-season { border-color: rgba(143, 203, 241, .7); box-shadow: 0 4px 14px rgba(45, 120, 185, .1); }
+.season-stat-row > strong { color: #003366; font-size: 1.1rem; }
+.season-stat-meta { display: grid; gap: .35rem; }
+.season-stat-meta span { display: flex; justify-content: space-between; gap: .45rem; padding: .3rem .45rem; border-radius: 6px; background: rgba(143,203,241,.14); color: rgba(0,51,102,.62); font-size: .68rem; white-space: nowrap; }
+.season-stat-meta span:last-child { background: rgba(45,120,185,.08); }
+.season-stat-meta b { color: #003366; font-size: .8rem; }
+.season-statistics-grid { display: grid; grid-template-columns: repeat(6, minmax(90px, 1fr)); gap: .45rem; }
+.season-statistics-grid > div { padding: .45rem .55rem; border-left: 1px solid rgba(0, 51, 102, .08); }
+.season-statistics-grid span, .season-statistics-grid b { display: block; }
+.season-statistics-grid span { min-height: 2.2em; color: rgba(0, 51, 102, .62); font-size: .63rem; line-height: 1.25; }
+.season-statistics-grid b { margin-top: .25rem; color: #003366; font-size: .82rem; white-space: nowrap; }
+.season-statistics-grid .highlight { border-radius: 6px; background: #ecfdf5; }
+
+@media (max-width: 700px) {
+  .statistics-toolbar { align-items: stretch; flex-direction: column; }
+  .statistics-export-actions { width: 100%; }
+  .report-export-btn { flex: 1; justify-content: center; }
+  .season-stat-row { grid-template-columns: 42px minmax(0, 1fr); }
+  .season-stat-meta { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .season-statistics-grid { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* --- Stable Flatpickr Theme (keeps month/year visible and grid intact) --- */
 .flatpickr-calendar {
   box-sizing: border-box;

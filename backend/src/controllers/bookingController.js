@@ -52,6 +52,11 @@ function normalizeMoney(value) {
   return Number.isFinite(amount) && amount >= 0 ? amount.toFixed(2) : '0.00';
 }
 
+function toDateOnly(value) {
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  return String(value || '').slice(0, 10);
+}
+
 export class BookingController {
 
   async getAllBookings(req, res) {
@@ -67,8 +72,12 @@ export class BookingController {
       const allowedSortFields = ['createdAt', 'guestName', 'guestEmail', 'checkIn', 'checkOut', 'guestCount', 'source'];
       const sortField = allowedSortFields.includes(req.query?.sortField) ? req.query.sortField : 'checkIn';
       const sortDir = req.query?.sortDir === 'ASC' ? 'ASC' : 'DESC';
+      const selectedYear = Number.parseInt(String(req.query?.year || ''), 10);
 
       const where = {};
+      if (Number.isInteger(selectedYear) && selectedYear >= 2000 && selectedYear <= 2100) {
+        where.checkIn = { [Op.gte]: `${selectedYear}-01-01`, [Op.lt]: `${selectedYear + 1}-01-01` };
+      }
       if (search) {
         where[Op.or] = [
           { guestName: { [Op.like]: `%${search}%` } },
@@ -116,6 +125,48 @@ export class BookingController {
           netProfit: totalProfit
         }
       });
+    } catch (error) {
+      return res.status(500).json({ success: false, error: error.message });
+    }
+  }
+
+  async getStatistics(_req, res) {
+    try {
+      const bookings = await Booking.findAll({
+        attributes: ['checkIn', 'checkOut', 'source', 'totalAmount', 'commissionAmount', 'environmentalTaxAmount', 'bankFeeAmount'],
+        order: [['checkIn', 'ASC']]
+      });
+      const byYear = new Map();
+      for (const booking of bookings) {
+        const checkIn = toDateOnly(booking.checkIn);
+        const checkOut = toDateOnly(booking.checkOut);
+        const year = Number.parseInt(checkIn.slice(0, 4), 10);
+        if (!Number.isInteger(year)) continue;
+        const checkInTime = Date.parse(`${checkIn}T00:00:00Z`);
+        const checkOutTime = Date.parse(`${checkOut}T00:00:00Z`);
+        const nights = Number.isFinite(checkInTime) && Number.isFinite(checkOutTime) && checkOutTime > checkInTime
+          ? Math.round((checkOutTime - checkInTime) / 86400000)
+          : 0;
+        const current = byYear.get(year) || { year, bookings: 0, nights: 0, turnover: 0, cashRevenue: 0, bookingNetProfit: 0, bookingFees: 0, environmentalFees: 0, totalProfit: 0 };
+        const total = Number(booking.totalAmount || 0);
+        const commission = Number(booking.commissionAmount || 0);
+        const environmental = Number(booking.environmentalTaxAmount || 0);
+        const bankFee = Number(booking.bankFeeAmount || 0);
+        const bookingProfit = total - commission - environmental - bankFee;
+        current.bookings += 1;
+        current.nights += nights;
+        current.turnover += total;
+        current.environmentalFees += environmental;
+        if (booking.source === 'Booking') {
+          current.bookingNetProfit += bookingProfit;
+          current.bookingFees += commission + bankFee;
+        } else {
+          current.cashRevenue += total;
+        }
+        current.totalProfit = current.cashRevenue + current.bookingNetProfit;
+        byYear.set(year, current);
+      }
+      return res.json({ success: true, data: Array.from(byYear.values()).sort((a, b) => a.year - b.year) });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });
     }
