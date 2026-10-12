@@ -966,6 +966,28 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     return this.statistics.slice(start, start + this.statisticsPageSize);
   }
 
+  get statisticsPageTotals(): Omit<BookingYearStatistic, 'year'> {
+    return this.pagedStatistics.reduce((totals, item) => ({
+      bookings: totals.bookings + item.bookings,
+      nights: totals.nights + item.nights,
+      turnover: totals.turnover + item.turnover,
+      cashRevenue: totals.cashRevenue + item.cashRevenue,
+      bookingNetProfit: totals.bookingNetProfit + item.bookingNetProfit,
+      bookingFees: totals.bookingFees + item.bookingFees,
+      environmentalFees: totals.environmentalFees + item.environmentalFees,
+      totalProfit: totals.totalProfit + item.totalProfit
+    }), {
+      bookings: 0,
+      nights: 0,
+      turnover: 0,
+      cashRevenue: 0,
+      bookingNetProfit: 0,
+      bookingFees: 0,
+      environmentalFees: 0,
+      totalProfit: 0
+    });
+  }
+
   get statisticsTotalPages(): number {
     return Math.max(1, Math.ceil(this.statistics.length / this.statisticsPageSize));
   }
@@ -985,29 +1007,44 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
   async exportStatisticsExcel(): Promise<void> {
     const XLSX = await import('xlsx');
+    const text = (key: string, fallback: string) => this.reportText(key, fallback);
+    const totals = this.statisticsPageTotalsForExport();
     const rows = this.statistics.map((item) => ({
-      Season: item.year,
-      Bookings: item.bookings,
-      Nights: item.nights,
-      Turnover: item.turnover,
-      'Booking fees': item.bookingFees,
-      'Environmental fees': item.environmentalFees,
-      'Booking net profit': item.bookingNetProfit,
-      Cash: item.cashRevenue,
-      'Total profit': item.totalProfit
+      [text('season', 'Season')]: item.year,
+      [text('bookings', 'Bookings')]: item.bookings,
+      [text('nights', 'Nights')]: item.nights,
+      [text('turnover', 'Turnover')]: item.turnover,
+      [text('bookingFees', 'Booking fees')]: item.bookingFees,
+      [text('environmentalFees', 'Environmental fees')]: item.environmentalFees,
+      [text('bookingNetProfit', 'Booking net profit')]: item.bookingNetProfit,
+      [text('cash', 'Cash')]: item.cashRevenue,
+      [text('totalProfit', 'Total profit')]: item.totalProfit
     }));
+    rows.push({
+      [text('seasonTotal', 'Total')]: text('allSeasons', 'All seasons'),
+      [text('bookings', 'Bookings')]: totals.bookings,
+      [text('nights', 'Nights')]: totals.nights,
+      [text('turnover', 'Turnover')]: totals.turnover,
+      [text('bookingFees', 'Booking fees')]: totals.bookingFees,
+      [text('environmentalFees', 'Environmental fees')]: totals.environmentalFees,
+      [text('bookingNetProfit', 'Booking net profit')]: totals.bookingNetProfit,
+      [text('cash', 'Cash')]: totals.cashRevenue,
+      [text('totalProfit', 'Total profit')]: totals.totalProfit
+    } as typeof rows[number]);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(rows), 'Season Summary');
+    XLSX.utils.book_append_sheet(workbook, XLSX.utils.json_to_sheet(rows), text('seasonSummary', 'Season Summary'));
     const observations = this.buildStatisticsObservations();
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([
-      ['Season report observations'],
+      [text('observations', 'Season report observations')],
       ...observations.map((observation) => [observation])
-    ]), 'Observations');
+    ]), text('observations', 'Observations'));
     XLSX.writeFile(workbook, `blue-quartz-season-report-${new Date().getFullYear()}.xlsx`);
   }
 
   async exportStatisticsPdf(): Promise<void> {
     const { jsPDF } = await import('jspdf');
+    // Keep the PDF in ASCII English because jsPDF's built-in font cannot render all locale alphabets.
+    const text = (_key: string, fallback: string) => fallback;
     const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
     const pageWidth = pdf.internal.pageSize.getWidth();
     pdf.setFillColor(0, 51, 102);
@@ -1016,7 +1053,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     pdf.setFontSize(21);
     pdf.text('Blue Quartz Apartment', 14, 12);
     pdf.setFontSize(11);
-    pdf.text('Season performance report', 14, 20);
+    pdf.text(text('performanceReport', 'Season performance report'), 14, 20);
     pdf.setFontSize(9);
     pdf.text(`Generated ${new Date().toLocaleDateString()}`, pageWidth - 14, 20, { align: 'right' });
 
@@ -1028,10 +1065,10 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     }), { profit: 0, turnover: 0, nights: 0, bookings: 0 });
 
     const cards = [
-      ['Total profit', totals.profit],
-      ['Turnover', totals.turnover],
-      ['Nights', totals.nights],
-      ['Bookings', totals.bookings]
+      [text('totalProfit', 'Total profit'), totals.profit],
+      [text('turnover', 'Turnover'), totals.turnover],
+      [text('nights', 'Nights'), totals.nights],
+      [text('bookings', 'Bookings'), totals.bookings]
     ];
     cards.forEach(([label, value], index) => {
       const x = 14 + index * 68;
@@ -1047,8 +1084,8 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
     pdf.setTextColor(0, 51, 102);
     pdf.setFontSize(14);
-    pdf.text('Season comparison', 14, 68);
-    const tableHeaders = ['Season', 'Bookings', 'Nights', 'Turnover', 'Booking fees', 'Environmental', 'Booking net', 'Cash', 'Total profit'];
+    pdf.text(text('seasonComparison', 'Season comparison'), 14, 68);
+    const tableHeaders = [text('season', 'Season'), text('bookings', 'Bookings'), text('nights', 'Nights'), text('turnover', 'Turnover'), text('bookingFees', 'Booking fees'), text('environmentalFees', 'Environmental'), text('bookingNetProfit', 'Booking net'), text('cash', 'Cash'), text('totalProfit', 'Total profit')];
     const columnX = [14, 38, 58, 80, 112, 145, 180, 215, 244];
     pdf.setFillColor(0, 51, 102);
     pdf.rect(12, 73, pageWidth - 24, 8, 'F');
@@ -1066,24 +1103,30 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       [item.year, item.bookings, item.nights, item.turnover, item.bookingFees, item.environmentalFees, item.bookingNetProfit, item.cashRevenue, item.totalProfit]
         .forEach((value, index) => pdf.text(index > 2 ? `${Number(value).toLocaleString()} €` : String(value), columnX[index], y));
     });
+    const exportTotals = this.statisticsPageTotalsForExport();
+    const totalY = 89 + this.statistics.length * 8;
+    pdf.setFillColor(226, 243, 234);
+    pdf.rect(12, totalY - 5, pageWidth - 24, 8, 'F');
+    [text('allSeasons', 'All seasons'), exportTotals.bookings, exportTotals.nights, exportTotals.turnover, exportTotals.bookingFees, exportTotals.environmentalFees, exportTotals.bookingNetProfit, exportTotals.cashRevenue, exportTotals.totalProfit]
+      .forEach((value, index) => pdf.text(index > 2 ? `${Number(value).toLocaleString()} €` : String(value), columnX[index], totalY));
 
     pdf.addPage();
     pdf.setFillColor(0, 51, 102);
     pdf.rect(0, 0, pageWidth, 22, 'F');
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(16);
-    pdf.text('Season comparison charts', 14, 14);
+    pdf.text(text('seasonComparisonCharts', 'Season comparison charts'), 14, 14);
     const chartTop = 36;
-    this.drawPdfChart(pdf, 'Total profit by season', this.statistics, 'totalProfit', 14, chartTop);
-    this.drawPdfChart(pdf, 'Nights by season', this.statistics, 'nights', 155, chartTop);
+    this.drawPdfChart(pdf, text('profitBySeason', 'Total profit by season'), this.statistics, 'totalProfit', 14, chartTop);
+    this.drawPdfChart(pdf, text('nightsBySeason', 'Nights by season'), this.statistics, 'nights', 155, chartTop);
     pdf.setTextColor(70, 70, 70);
     pdf.setFontSize(8);
     pdf.setTextColor(0, 51, 102);
     pdf.setFontSize(12);
-    pdf.text('Observations', 14, 105);
+    pdf.text(text('observations', 'Observations'), 14, 105);
     pdf.setTextColor(70, 70, 70);
     pdf.setFontSize(9);
-    this.buildStatisticsObservations().forEach((observation, index) => pdf.text(`• ${observation}`, 18, 114 + index * 7));
+    this.buildEnglishStatisticsObservations().forEach((observation, index) => pdf.text(`- ${observation}`, 18, 114 + index * 7));
     pdf.save(`blue-quartz-season-report-${new Date().getFullYear()}.pdf`);
   }
 
@@ -1109,14 +1152,45 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   }
 
   private buildStatisticsObservations(): string[] {
-    if (!this.statistics.length) return ['No season data available.'];
+    const text = (key: string, fallback: string, params?: Record<string, string | number>) => this.i18n.t(`adminPanel.reports.${key}`, params, fallback);
+    if (!this.statistics.length) return [text('noData', 'No season data available.')];
     const bestProfit = [...this.statistics].sort((left, right) => right.totalProfit - left.totalProfit)[0];
     const bestNights = [...this.statistics].sort((left, right) => right.nights - left.nights)[0];
     return [
+      text('bestProfit', 'Best profit season: {{year}} ({{value}} EUR).', { year: bestProfit.year, value: bestProfit.totalProfit.toLocaleString() }),
+      text('bestNights', 'Highest occupancy by nights: {{year}} ({{value}} nights).', { year: bestNights.year, value: bestNights.nights }),
+      text('averageProfit', 'Average profit per night: {{value}} EUR.', { value: (this.statistics.reduce((sum, item) => sum + item.totalProfit, 0) / Math.max(1, this.statistics.reduce((sum, item) => sum + item.nights, 0))).toFixed(2) })
+    ];
+  }
+
+  private buildEnglishStatisticsObservations(): string[] {
+    if (!this.statistics.length) return ['No season data available.'];
+    const bestProfit = [...this.statistics].sort((left, right) => right.totalProfit - left.totalProfit)[0];
+    const bestNights = [...this.statistics].sort((left, right) => right.nights - left.nights)[0];
+    const totalNights = this.statistics.reduce((sum, item) => sum + item.nights, 0);
+    const totalProfit = this.statistics.reduce((sum, item) => sum + item.totalProfit, 0);
+    return [
       `Best profit season: ${bestProfit.year} (${bestProfit.totalProfit.toLocaleString()} EUR).`,
       `Highest occupancy by nights: ${bestNights.year} (${bestNights.nights} nights).`,
-      `Average profit per night: ${(this.statistics.reduce((sum, item) => sum + item.totalProfit, 0) / Math.max(1, this.statistics.reduce((sum, item) => sum + item.nights, 0))).toFixed(2)} EUR.`
+      `Average profit per night: ${(totalProfit / Math.max(1, totalNights)).toFixed(2)} EUR.`
     ];
+  }
+
+  private reportText(key: string, fallback: string): string {
+    return this.i18n.t(`adminPanel.reports.${key}`, undefined, fallback);
+  }
+
+  private statisticsPageTotalsForExport(): Omit<BookingYearStatistic, 'year'> {
+    return this.statistics.reduce((totals, item) => ({
+      bookings: totals.bookings + item.bookings,
+      nights: totals.nights + item.nights,
+      turnover: totals.turnover + item.turnover,
+      cashRevenue: totals.cashRevenue + item.cashRevenue,
+      bookingNetProfit: totals.bookingNetProfit + item.bookingNetProfit,
+      bookingFees: totals.bookingFees + item.bookingFees,
+      environmentalFees: totals.environmentalFees + item.environmentalFees,
+      totalProfit: totals.totalProfit + item.totalProfit
+    }), { bookings: 0, nights: 0, turnover: 0, cashRevenue: 0, bookingNetProfit: 0, bookingFees: 0, environmentalFees: 0, totalProfit: 0 });
   }
 
   // ── Language ──────────────────────────────────────────

@@ -95,12 +95,15 @@ html, body {
 .season-statistics-grid span { min-height: 2.2em; color: rgba(0, 51, 102, .62); font-size: .63rem; line-height: 1.25; }
 .season-statistics-grid b { margin-top: .25rem; color: #003366; font-size: .82rem; white-space: nowrap; }
 .season-statistics-grid .highlight { border-radius: 6px; background: #ecfdf5; }
+.season-stat-total { display: grid; grid-template-columns: 58px minmax(0, 1fr) 150px; align-items: center; gap: .8rem; margin-top: .7rem; padding: .9rem 1rem; border: 2px solid rgba(45, 120, 185, .28); border-radius: 12px; background: rgba(232, 244, 252, .72); }
+.season-stat-total > strong { color: #003366; font-size: .82rem; text-transform: uppercase; }
 
 @media (max-width: 700px) {
   .statistics-toolbar { align-items: stretch; flex-direction: column; }
   .statistics-export-actions { width: 100%; }
   .report-export-btn { flex: 1; justify-content: center; }
   .season-stat-row { grid-template-columns: 42px minmax(0, 1fr); }
+  .season-stat-total { grid-template-columns: 1fr; gap: .65rem; }
   .season-stat-meta { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .season-statistics-grid { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

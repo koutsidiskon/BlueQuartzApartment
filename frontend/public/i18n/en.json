@@ -322,6 +322,8 @@
     "exportExcel": "Export Excel",
     "exportPdf": "Export PDF",
     "season": "Season",
+    "statisticsPageTotal": "TOTAL",
+    "reports": { "season": "Season", "bookings": "Bookings", "nights": "Nights", "turnover": "Turnover", "bookingFees": "Booking fees", "environmentalFees": "Environmental fees", "bookingNetProfit": "Booking net profit", "cash": "Cash", "totalProfit": "Total profit", "seasonTotal": "TOTAL", "allSeasons": "TOTAL", "seasonSummary": "Season Summary", "observations": "Observations", "performanceReport": "Season performance report", "seasonComparison": "Season comparison", "seasonComparisonCharts": "Season comparison charts", "profitBySeason": "Total profit by season", "nightsBySeason": "Nights by season", "noData": "No season data available.", "bestProfit": "Best profit season: {{year}} ({{value}} EUR).", "bestNights": "Highest occupancy by nights: {{year}} ({{value}} nights).", "averageProfit": "Average profit per night: {{value}} EUR." },
     "nights": "Nights",
     "calendarTitle": "Calendar Availability",
     "inquiriesTitle": "Booking Inquiries",

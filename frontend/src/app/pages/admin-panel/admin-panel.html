@@ -658,6 +658,22 @@
           }
         </div>
 
+        <div class="season-stat-total">
+          <strong>{{ 'adminPanel.statisticsPageTotal' | t : undefined : 'TOTAL' }}</strong>
+          <div class="season-statistics-grid">
+            <div><span>{{ 'adminPanel.bookings.turnover' | t : undefined : 'Turnover' }}</span><b>{{ statisticsPageTotals.turnover | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+            <div><span>{{ 'adminPanel.bookings.bookingFees' | t : undefined : 'Booking fees' }}</span><b>{{ statisticsPageTotals.bookingFees | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+            <div><span>{{ 'adminPanel.bookings.environmentalFees' | t : undefined : 'Environmental fees' }}</span><b>{{ statisticsPageTotals.environmentalFees | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+            <div><span>{{ 'adminPanel.bookings.bookingNetProfit' | t : undefined : 'Booking net profit' }}</span><b>{{ statisticsPageTotals.bookingNetProfit | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+            <div><span>{{ 'adminPanel.bookings.cashRevenue' | t : undefined : 'Cash' }}</span><b>{{ statisticsPageTotals.cashRevenue | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+            <div class="highlight"><span>{{ 'adminPanel.bookings.totalProfit' | t : undefined : 'Total profit' }}</span><b>{{ statisticsPageTotals.totalProfit | currency:'EUR':'symbol':'0.0-0' }}</b></div>
+          </div>
+          <div class="season-stat-meta">
+            <span><b>{{ statisticsPageTotals.bookings }}</b> {{ 'adminPanel.bookingsTab' | t : undefined : 'bookings' }}</span>
+            <span><b>{{ statisticsPageTotals.nights }}</b> {{ 'adminPanel.nights' | t : undefined : 'Nights' }}</span>
+          </div>
+        </div>
+
         <div class="pagination-row statistics-pagination">
           <div class="page-size-wrapper">
             <span class="page-size-label">{{ 'adminPanel.bookings.perPage' | t : undefined : 'Per page:' }}</span>

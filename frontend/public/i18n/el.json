@@ -322,6 +322,8 @@
     "exportExcel": "Εξαγωγή Excel",
     "exportPdf": "Εξαγωγή PDF",
     "season": "Σεζόν",
+    "statisticsPageTotal": "ΣΥΝΟΛΟ",
+    "reports": { "season": "Σεζόν", "bookings": "Κρατήσεις", "nights": "Νύχτες", "turnover": "Τζίρος", "bookingFees": "Προμήθειες Booking", "environmentalFees": "Περιβαλλοντικά τέλη", "bookingNetProfit": "Καθαρό κέρδος Booking", "cash": "Μετρητά", "totalProfit": "Συνολικά κέρδη", "seasonTotal": "ΣΥΝΟΛΟ", "allSeasons": "Όλες οι σεζόν", "seasonSummary": "Σύνοψη σεζόν", "observations": "Παρατηρήσεις", "performanceReport": "Αναφορά απόδοσης σεζόν", "seasonComparison": "Σύγκριση σεζόν", "seasonComparisonCharts": "Διαγράμματα σύγκρισης σεζών", "profitBySeason": "Συνολικά κέρδη ανά σεζόν", "nightsBySeason": "Νύχτες ανά σεζόν", "noData": "Δεν υπάρχουν δεδομένα σεζόν.", "bestProfit": "Καλύτερη σεζόν σε κέρδη: {{year}} ({{value}} EUR).", "bestNights": "Περισσότερες νύχτες: {{year}} ({{value}} νύχτες).", "averageProfit": "Μέσο κέρδος ανά νύχτα: {{value}} EUR." },
     "nights": "νύχτες",
     "calendarTitle": "Διαθεσιμότητα Ημερολογίου",
     "inquiriesTitle": "Αιτήματα Κρατήσεων",

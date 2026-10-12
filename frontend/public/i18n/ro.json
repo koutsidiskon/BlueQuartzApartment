@@ -322,6 +322,8 @@
     "exportExcel": "Export Excel",
     "exportPdf": "Export PDF",
     "season": "Sezon",
+    "statisticsPageTotal": "TOTAL",
+    "reports": { "season": "Sezon", "bookings": "Rezervări", "nights": "Nopți", "turnover": "Cifră de afaceri", "bookingFees": "Comisioane Booking", "environmentalFees": "Taxe de mediu", "bookingNetProfit": "Profit net Booking", "cash": "Numerar", "totalProfit": "Profit total", "seasonTotal": "TOTAL", "allSeasons": "Toate sezoanele", "seasonSummary": "Rezumat sezon", "observations": "Observații", "performanceReport": "Raport de performanță sezonieră", "seasonComparison": "Comparație sezoane", "seasonComparisonCharts": "Grafice comparație sezoane", "profitBySeason": "Profit total pe sezon", "nightsBySeason": "Nopți pe sezon", "noData": "Nu există date pentru sezoane.", "bestProfit": "Cel mai bun sezon ca profit: {{year}} ({{value}} EUR).", "bestNights": "Cele mai multe nopți: {{year}} ({{value}} nopți).", "averageProfit": "Profit mediu pe noapte: {{value}} EUR." },
     "nights": "nopți",
     "calendarTitle": "Disponibilitate Calendar",
     "inquiriesTitle": "Cereri de rezervare",
