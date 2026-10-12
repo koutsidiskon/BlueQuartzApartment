@@ -15,6 +15,12 @@ export interface BookingListItem {
   guestCount: number;
   notes: string | null;
   source: BookingSource;
+  totalAmount: number;
+  commissionAmount: number;
+  environmentalTaxAmount: number;
+  bankTransferAmount: number;
+  bankFeeAmount: number;
+  cashDepositAmount: number;
   inquiryId: number | null;
   color: string;
   createdAt: string;
@@ -30,6 +36,24 @@ export interface BookingCalendarItem {
   color: string;
 }
 
+export interface BookingFinancialSummary {
+  totalAmount: number;
+  commissionAmount: number;
+  environmentalTaxAmount: number;
+  bankTransferAmount: number;
+  netProfit: number;
+  bankFeeAmount: number;
+  cashDepositAmount: number;
+  cashRemainingAmount: number;
+  cashRevenue: number;
+  bookingRevenue: number;
+  bookingNetProfit: number;
+  bookingFees: number;
+  totalProfit: number;
+  turnover: number;
+  netWorth: number;
+}
+
 export interface CreateBookingData {
   guestName: string;
   guestEmail: string;
@@ -40,6 +64,12 @@ export interface CreateBookingData {
   guestCount: number;
   notes?: string;
   source: BookingSource;
+  totalAmount?: number;
+  commissionAmount?: number;
+  environmentalTaxAmount?: number;
+  bankTransferAmount?: number;
+  bankFeeAmount?: number;
+  cashDepositAmount?: number;
   inquiryId?: number;
   force?: boolean;
 }
@@ -55,6 +85,7 @@ export interface BookingListResponse {
   success: boolean;
   data: BookingListItem[];
   pagination: BookingPagination;
+  financialSummary: BookingFinancialSummary;
 }
 
 export interface BookingCalendarResponse {
@@ -84,7 +115,7 @@ export class BookingService {
     return this.http.post(this.apiUrl, data, { withCredentials: true });
   }
 
-  createFromInquiry(inquiryId: number, data: { guestPhone?: string; guestPhoneCountryCode?: string; notes?: string; force?: boolean }): Observable<any> {
+  createFromInquiry(inquiryId: number, data: { guestPhone?: string; guestPhoneCountryCode?: string; notes?: string; totalAmount?: number; commissionAmount?: number; environmentalTaxAmount?: number; bankTransferAmount?: number; bankFeeAmount?: number; cashDepositAmount?: number; force?: boolean }): Observable<any> {
     return this.http.post(`${this.apiUrl}/from-inquiry/${inquiryId}`, data, { withCredentials: true });
   }
 

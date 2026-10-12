@@ -1443,6 +1443,11 @@ $deep-navy: #003366;
     color: var(--booking-color, #3B82F6);
     text-align: center;
   }
+
+  ::ng-deep .flatpickr-day.past-calendar-day {
+    opacity: 0.48 !important;
+    filter: saturate(0.55);
+  }
 }
 
 // ── Booking modal ─────────────────────────────────────

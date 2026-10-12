@@ -16,7 +16,7 @@ import { I18nService } from '../../service/i18n';
 import { LanguageFacadeService } from '../../service/language-option';
 import { AvailabilityCalendarService, MinimumStayDateItem } from '../../service/availability-calendar';
 import { InquiryListItem, InquiryService } from '../../service/inquiry';
-import { BookingService, BookingListItem, BookingCalendarItem, BookingSource, CreateBookingData } from '../../service/booking';
+import { BookingService, BookingListItem, BookingCalendarItem, BookingSource, CreateBookingData, BookingFinancialSummary } from '../../service/booking';
 import { PhoneCountrySelectComponent } from '../../shared/phone-country-select.component';
 import { COUNTRY_CODES } from '../../shared/phone-country-codes';
 
@@ -116,6 +116,23 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   private bookingTotalPagesCache = 1;
   private bookingRequestToken = 0;
   private bookingSearchDebounceTimer: any = null;
+  financialSummary: BookingFinancialSummary = {
+    totalAmount: 0,
+    commissionAmount: 0,
+    environmentalTaxAmount: 0,
+    bankTransferAmount: 0,
+    bankFeeAmount: 0,
+    cashDepositAmount: 0,
+    cashRemainingAmount: 0,
+    cashRevenue: 0,
+    bookingRevenue: 0,
+    bookingNetProfit: 0,
+    bookingFees: 0,
+    totalProfit: 0,
+    turnover: 0,
+    netProfit: 0,
+    netWorth: 0
+  };
 
   // ── Calendar booking overlay ──────────────────────────
   calendarBookings: BookingCalendarItem[] = [];
@@ -125,7 +142,23 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   isEditMode = false;
   editingBookingId: number | null = null;
   bookingModalFromInquiryId: number | null = null;
-  bookingModalData = {
+  bookingModalData: {
+    guestName: string;
+    guestEmail: string;
+    guestPhone: string;
+    guestPhoneCountryCode: string;
+    checkIn: string;
+    checkOut: string;
+    guestCount: number;
+    notes: string;
+    source: BookingSource;
+    totalAmount: number;
+    commissionAmount: number;
+    environmentalTaxAmount: number;
+    bankTransferAmount: number;
+    bankFeeAmount: number;
+    cashDepositAmount: number;
+  } = {
     guestName: '',
     guestEmail: '',
     guestPhone: '',
@@ -134,7 +167,13 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     checkOut: '',
     guestCount: 1,
     notes: '',
-    source: 'Website' as BookingSource
+    source: 'Website' as BookingSource,
+    totalAmount: 0,
+    commissionAmount: 0,
+    environmentalTaxAmount: 0,
+    bankTransferAmount: 0,
+    bankFeeAmount: 0,
+    cashDepositAmount: 0
   };
   isSavingBooking = false;
   bookingModalError = '';
@@ -508,7 +547,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.isEditMode = false;
     this.editingBookingId = null;
     this.bookingModalFromInquiryId = null;
-    this.bookingModalData = { guestName: '', guestEmail: '', guestPhone: '', guestPhoneCountryCode: '+30', checkIn: '', checkOut: '', guestCount: 1, notes: '', source: 'Website' };
+    this.bookingModalData = { guestName: '', guestEmail: '', guestPhone: '', guestPhoneCountryCode: '+30', checkIn: '', checkOut: '', guestCount: 1, notes: '', source: 'Website', totalAmount: 0, commissionAmount: 0, environmentalTaxAmount: 0, bankTransferAmount: 0, bankFeeAmount: 0, cashDepositAmount: 0 };
     this.bookingModalError = '';
     this.isBookingModalOpen = true;
     this.cdr.detectChanges();
@@ -528,7 +567,13 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       checkOut: booking.checkOut,
       guestCount: booking.guestCount,
       notes: booking.notes ?? '',
-      source: booking.source
+      source: booking.source,
+      totalAmount: Number(booking.totalAmount || 0),
+      commissionAmount: Number(booking.commissionAmount || 0),
+      environmentalTaxAmount: Number(booking.environmentalTaxAmount || 0),
+      bankTransferAmount: Number(booking.bankTransferAmount || 0),
+      bankFeeAmount: Number(booking.bankFeeAmount || 0),
+      cashDepositAmount: Number(booking.cashDepositAmount || 0)
     };
     this.bookingModalError = '';
     this.isBookingModalOpen = true;
@@ -549,7 +594,13 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       checkOut: inquiry.checkOut,
       guestCount: inquiry.guests,
       notes: '',
-      source: 'Website'
+      source: 'Website',
+      totalAmount: 0,
+      commissionAmount: 0,
+      environmentalTaxAmount: 0,
+      bankTransferAmount: 0,
+      bankFeeAmount: 0,
+      cashDepositAmount: 0
     };
     this.bookingModalError = '';
     this.isBookingModalOpen = true;
@@ -577,6 +628,21 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
   isBookingNoteExpanded(id: number): boolean {
     return this.expandedBookingNoteIds.has(id);
+  }
+
+  getCashRemainingAmount(): number {
+    return Math.max(0, Number(this.bookingModalData.totalAmount || 0) - Number(this.bookingModalData.cashDepositAmount || 0));
+  }
+
+  onBookingSourceChange(): void {
+    if (this.bookingModalData.source === 'Booking') {
+      this.bookingModalData.cashDepositAmount = 0;
+      return;
+    }
+
+    this.bookingModalData.commissionAmount = 0;
+    this.bookingModalData.environmentalTaxAmount = 0;
+    this.bookingModalData.bankFeeAmount = 0;
   }
 
   // ── iCal feed ─────────────────────────────────────────
@@ -636,7 +702,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   saveBooking(force = false): void {
     if (this.isSavingBooking) return;
 
-    const { guestName, guestEmail, checkIn, checkOut, guestCount, source, guestPhone, guestPhoneCountryCode, notes } = this.bookingModalData;
+    const { guestName, guestEmail, checkIn, checkOut, guestCount, source, guestPhone, guestPhoneCountryCode, notes, totalAmount, commissionAmount, environmentalTaxAmount, bankTransferAmount, bankFeeAmount, cashDepositAmount } = this.bookingModalData;
 
     if (!guestName.trim() || !guestEmail.trim() || !checkIn || !checkOut) {
       this.bookingModalError = this.i18n.t('adminPanel.bookings.requiredFields', undefined, 'Please fill in all required fields: Name, Email, Check-in, Check-out.');
@@ -662,12 +728,29 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       guestCount: Number(guestCount) || 1,
       source,
       notes: notes.trim() || undefined,
+      totalAmount: Number(totalAmount) || 0,
+      commissionAmount: Number(commissionAmount) || 0,
+      environmentalTaxAmount: Number(environmentalTaxAmount) || 0,
+      bankTransferAmount: Number(bankTransferAmount) || 0,
+      bankFeeAmount: Number(bankFeeAmount) || 0,
+      cashDepositAmount: Number(cashDepositAmount) || 0,
       force: force || undefined
     };
 
     let obs$;
     if (this.bookingModalFromInquiryId) {
-      obs$ = this.bookingService.createFromInquiry(this.bookingModalFromInquiryId, { guestPhone: data.guestPhone, guestPhoneCountryCode: data.guestPhoneCountryCode, notes: data.notes, force: data.force });
+      obs$ = this.bookingService.createFromInquiry(this.bookingModalFromInquiryId, {
+        guestPhone: data.guestPhone,
+        guestPhoneCountryCode: data.guestPhoneCountryCode,
+        notes: data.notes,
+        totalAmount: data.totalAmount,
+        commissionAmount: data.commissionAmount,
+        environmentalTaxAmount: data.environmentalTaxAmount,
+        bankTransferAmount: data.bankTransferAmount,
+        bankFeeAmount: data.bankFeeAmount,
+        cashDepositAmount: data.cashDepositAmount,
+        force: data.force
+      });
     } else if (this.isEditMode && this.editingBookingId) {
       obs$ = this.bookingService.updateBooking(this.editingBookingId, data);
     } else {
@@ -849,6 +932,21 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     return COUNTRY_CODES.find(c => c.code === code)?.flag ?? '';
   }
 
+  getBookingSourceLabel(source: BookingSource): string {
+    const key = source === 'Booking'
+      ? 'sourceBooking'
+      : source === 'Airbnb'
+        ? 'sourceAirbnb'
+        : source === 'Email'
+          ? 'sourceEmail'
+          : source === 'WhatsApp'
+            ? 'sourceWhatsApp'
+            : source === 'Other'
+              ? 'sourceOther'
+              : 'sourceWebsite';
+    return this.i18n.t(`adminPanel.bookings.${key}`, undefined, source);
+  }
+
   // ── Calendar init ─────────────────────────────────────
 
   private initCalendar(): void {
@@ -857,7 +955,6 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     const locale = this.getFlatpickrLocaleByLanguage(this.i18n.getLanguage());
     this.inlineFp = flatpickr(this.adminInlineCalendar.nativeElement, {
       inline: true,
-      minDate: 'today',
       showMonths: 1,
       mode: 'range',
       dateFormat: 'Y-m-d',
@@ -877,6 +974,8 @@ export class AdminPanel implements AfterViewInit, DoCheck {
         if (!dayDate) return;
 
         const dateKey = this.toDateKey(dayDate);
+        const isPastDate = this.isPastCalendarDate(dayDate);
+        if (isPastDate) dayElem.classList.add('past-calendar-day');
         const checkOutBooking = this.calendarBookings.find(b => b.checkOut === dateKey);
         const checkInBooking  = this.calendarBookings.find(b => b.checkIn  === dateKey);
 
@@ -898,6 +997,13 @@ export class AdminPanel implements AfterViewInit, DoCheck {
         const bookingInfo = checkInBooking ?? checkOutBooking ?? midBooking;
 
         if (bookingInfo) {
+          if (isPastDate) {
+            dayElem.addEventListener('click', (event: Event) => {
+              event.stopImmediatePropagation();
+              event.preventDefault();
+              this.ngZone.run(() => this.openEditBookingFromCalendar(bookingInfo.id));
+            }, true);
+          }
           const isCheckIn  = dateKey === bookingInfo.checkIn;
           const isCheckOut = dateKey === bookingInfo.checkOut;
 
@@ -1182,6 +1288,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
         this.bookingPage = currentPage;
         this.bookingTotalPages = totalPages;
         this.bookingTotalItems = totalItems;
+        this.financialSummary = response.financialSummary || this.financialSummary;
         this.cdr.detectChanges();
       },
       error: () => {
@@ -1232,6 +1339,14 @@ export class AdminPanel implements AfterViewInit, DoCheck {
       }
     }
     return null;
+  }
+
+  private isPastCalendarDate(date: Date): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const calendarDate = new Date(date);
+    calendarDate.setHours(0, 0, 0, 0);
+    return calendarDate < today;
   }
 
   private rebuildDeferredCheckInMap(): void {

@@ -169,12 +169,12 @@
         <div class="minimum-stay-controls">
           <div class="range-field">
             <div class="minimum-stay-label-row">
-              <label for="minimumStayNights">Minimum stay nights</label>
+              <label for="minimumStayNights">{{ 'adminPanel.calendar.minimumStayNights' | t : undefined : 'Minimum stay nights' }}</label>
               <button
                 type="button"
                 class="minimum-stay-info"
-                [attr.aria-label]="'More info about minimum stay'"
-                [attr.title]="'More info about minimum stay'"
+                [attr.aria-label]="'adminPanel.calendar.minimumStayInfoAria' | t : undefined : 'More info about minimum stay'"
+                [attr.title]="'adminPanel.calendar.minimumStayInfoAria' | t : undefined : 'More info about minimum stay'"
                 (click)="toggleMinimumStayInfo($event)">
                 <span class="material-icons">help_outline</span>
               </button>
@@ -191,17 +191,17 @@
                 autocomplete="off"
               >
               <div class="minimum-stay-stepper">
-                <button type="button" class="stepper-btn up" [disabled]="minimumStayNights >= 30" (click)="increaseMinimumStay()" aria-label="Increase minimum stay nights">
+                <button type="button" class="stepper-btn up" [disabled]="minimumStayNights >= 30" (click)="increaseMinimumStay()" [attr.aria-label]="'adminPanel.calendar.increaseMinimumStay' | t : undefined : 'Increase minimum stay nights'">
                   <span class="material-icons">keyboard_arrow_up</span>
                 </button>
-                <button type="button" class="stepper-btn down" [disabled]="minimumStayNights <= 1" (click)="decreaseMinimumStay()" aria-label="Decrease minimum stay nights">
+                <button type="button" class="stepper-btn down" [disabled]="minimumStayNights <= 1" (click)="decreaseMinimumStay()" [attr.aria-label]="'adminPanel.calendar.decreaseMinimumStay' | t : undefined : 'Decrease minimum stay nights'">
                   <span class="material-icons">keyboard_arrow_down</span>
                 </button>
               </div>
             </div>
             @if (showMinimumStayInfo) {
               <div class="minimum-stay-popover" (click)="$event.stopPropagation()">
-                This applies to the free dates you selected. Default stay is 5 nights.
+                {{ 'adminPanel.calendar.minimumStayInfo' | t : undefined : 'This applies to the free dates you selected. Default stay is 5 nights.' }}
               </div>
             }
           </div>
@@ -211,7 +211,7 @@
             class="action-btn minimum-stay-save"
             [disabled]="!canSaveMinimumStayRule()"
             (click)="saveMinimumStayRule()">
-            Set minimum stay
+            {{ 'adminPanel.calendar.setMinimumStay' | t : undefined : 'Set minimum stay' }}
           </button>
         </div>
       </div>
@@ -276,10 +276,10 @@
             <option value="email" [selected]="sortField === 'email'">{{ 'adminPanel.inquiries.sortEmail' | t : undefined : 'Email' }}</option>
             <option value="checkIn" [selected]="sortField === 'checkIn'">{{ 'adminPanel.inquiries.sortCheckIn' | t : undefined : 'Check-in' }}</option>
               <div class="minimum-stay-stepper" aria-hidden="true">
-                <button type="button" class="stepper-btn up" [disabled]="minimumStayNights >= 30" (click)="increaseMinimumStay()" aria-label="Increase minimum stay nights">
+                <button type="button" class="stepper-btn up" [disabled]="minimumStayNights >= 30" (click)="increaseMinimumStay()" [attr.aria-label]="'adminPanel.calendar.increaseMinimumStay' | t : undefined : 'Increase minimum stay nights'">
                   <span class="material-icons">keyboard_arrow_up</span>
                 </button>
-                <button type="button" class="stepper-btn down" [disabled]="minimumStayNights <= 1" (click)="decreaseMinimumStay()" aria-label="Decrease minimum stay nights">
+                <button type="button" class="stepper-btn down" [disabled]="minimumStayNights <= 1" (click)="decreaseMinimumStay()" [attr.aria-label]="'adminPanel.calendar.decreaseMinimumStay' | t : undefined : 'Decrease minimum stay nights'">
                   <span class="material-icons">keyboard_arrow_down</span>
                 </button>
               </div>
@@ -477,6 +477,15 @@
         </div>
       </div>
 
+      <div class="booking-financial-summary" [attr.aria-label]="'adminPanel.bookings.financialSummary' | t : undefined : 'Financial summary'">
+        <div class="financial-stat"><span>{{ 'adminPanel.bookings.turnover' | t : undefined : 'Turnover' }}</span><strong>{{ financialSummary.turnover | currency:'EUR':'symbol':'1.2-2' }}</strong></div>
+        <div class="financial-stat"><span>{{ 'adminPanel.bookings.bookingFees' | t : undefined : 'Booking fees' }}</span><strong>{{ financialSummary.bookingFees | currency:'EUR':'symbol':'1.2-2' }}</strong></div>
+        <div class="financial-stat"><span>{{ 'adminPanel.bookings.environmentalTaxes' | t : undefined : 'Environmental fees' }}</span><strong>{{ financialSummary.environmentalTaxAmount | currency:'EUR':'symbol':'1.2-2' }}</strong></div>
+        <div class="financial-stat"><span>{{ 'adminPanel.bookings.bookingNetProfit' | t : undefined : 'Booking net profit' }}</span><strong>{{ financialSummary.bookingNetProfit | currency:'EUR':'symbol':'1.2-2' }}</strong></div>
+        <div class="financial-stat"><span>{{ 'adminPanel.bookings.cashRevenue' | t : undefined : 'Cash' }}</span><strong>{{ financialSummary.cashRevenue | currency:'EUR':'symbol':'1.2-2' }}</strong></div>
+        <div class="financial-stat net"><span>{{ 'adminPanel.bookings.totalProfit' | t : undefined : 'Total profit' }}</span><strong>{{ financialSummary.totalProfit | currency:'EUR':'symbol':'1.2-2' }}</strong></div>
+      </div>
+
       @if (isBookingsLoading && !bookings.length) {
         <p class="status loading">{{ 'adminPanel.bookings.loading' | t : undefined : 'Loading bookings...' }}</p>
       }
@@ -527,7 +536,7 @@
               <span [attr.data-label]="'adminPanel.bookings.colCheckOut' | t : undefined : 'Check-out'">{{ booking.checkOut }}</span>
               <span [attr.data-label]="'adminPanel.bookings.colGuests' | t : undefined : 'Guests'">{{ booking.guestCount }}</span>
               <span [attr.data-label]="'adminPanel.bookings.colSource' | t : undefined : 'Source'">
-                <span class="source-badge" [attr.data-source]="booking.source">{{ booking.source }}</span>
+                <span class="source-badge" [attr.data-source]="booking.source">{{ getBookingSourceLabel(booking.source) }}</span>
               </span>
               <span
                 class="booking-notes message"
@@ -644,15 +653,45 @@
         <div class="bm-row">
           <div class="bm-field">
             <label>{{ 'adminPanel.bookings.source' | t : undefined : 'Source' }}</label>
-            <select [(ngModel)]="bookingModalData.source">
-              <option value="Website">Website</option>
-              <option value="Booking">Booking</option>
-              <option value="Airbnb">Airbnb</option>
-              <option value="Email">Email</option>
-              <option value="WhatsApp">WhatsApp</option>
-              <option value="Other">Other</option>
+            <select [(ngModel)]="bookingModalData.source" (ngModelChange)="onBookingSourceChange()">
+              <option value="Website">{{ 'adminPanel.bookings.sourceWebsite' | t : undefined : 'Website' }}</option>
+              <option value="Booking">{{ 'adminPanel.bookings.sourceBooking' | t : undefined : 'Booking' }}</option>
+              <option value="Airbnb">{{ 'adminPanel.bookings.sourceAirbnb' | t : undefined : 'Airbnb' }}</option>
+              <option value="Email">{{ 'adminPanel.bookings.sourceEmail' | t : undefined : 'Email' }}</option>
+              <option value="WhatsApp">{{ 'adminPanel.bookings.sourceWhatsApp' | t : undefined : 'WhatsApp' }}</option>
+              <option value="Other">{{ 'adminPanel.bookings.sourceOther' | t : undefined : 'Other' }}</option>
             </select>
           </div>
+        </div>
+
+        <div class="bm-row bm-financial-row">
+          <div class="bm-field">
+            <label>{{ 'adminPanel.bookings.totalRevenue' | t : undefined : 'Total revenue' }} (€)</label>
+            <input type="number" [(ngModel)]="bookingModalData.totalAmount" min="0" step="0.01">
+          </div>
+          @if (bookingModalData.source === 'Booking') {
+            <div class="bm-field">
+              <label>{{ 'adminPanel.bookings.commission' | t : undefined : 'Platform commission' }} (€)</label>
+              <input type="number" [(ngModel)]="bookingModalData.commissionAmount" min="0" step="0.01">
+            </div>
+            <div class="bm-field">
+              <label>{{ 'adminPanel.bookings.environmentalTax' | t : undefined : 'Environmental fee' }} (€)</label>
+              <input type="number" [(ngModel)]="bookingModalData.environmentalTaxAmount" min="0" step="0.01">
+            </div>
+            <div class="bm-field">
+              <label>{{ 'adminPanel.bookings.bankFee' | t : undefined : 'Bank fee' }} (€)</label>
+              <input type="number" [(ngModel)]="bookingModalData.bankFeeAmount" min="0" step="0.01">
+            </div>
+          } @else {
+            <div class="bm-field">
+              <label>{{ 'adminPanel.bookings.cashDeposit' | t : undefined : 'Cash deposit' }} (€)</label>
+              <input type="number" [(ngModel)]="bookingModalData.cashDepositAmount" min="0" step="0.01">
+            </div>
+            <div class="bm-field">
+              <label>{{ 'adminPanel.bookings.cashRemaining' | t : undefined : 'Cash remaining' }} (€)</label>
+              <input type="number" [value]="getCashRemainingAmount()" readonly>
+            </div>
+          }
         </div>
 
         <div class="bm-field bm-field--full">

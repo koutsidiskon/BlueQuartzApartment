@@ -47,6 +47,11 @@ function validateDates(checkIn, checkOut) {
   return !Number.isNaN(ci.getTime()) && !Number.isNaN(co.getTime()) && co > ci;
 }
 
+function normalizeMoney(value) {
+  const amount = Number(value);
+  return Number.isFinite(amount) && amount >= 0 ? amount.toFixed(2) : '0.00';
+}
+
 export class BookingController {
 
   async getAllBookings(req, res) {
@@ -71,11 +76,46 @@ export class BookingController {
         ];
       }
 
-      const result = await Booking.findAndCountAll({ where, order: [[sortField, sortDir]], limit: pageSize, offset });
+      const directWhere = { ...where, source: { [Op.ne]: 'Booking' } };
+      const platformWhere = { ...where, source: 'Booking' };
+      const [result, totals, directTotal, platformTotals] = await Promise.all([
+        Booking.findAndCountAll({ where, order: [[sortField, sortDir]], limit: pageSize, offset }),
+        Promise.all(['totalAmount', 'commissionAmount', 'environmentalTaxAmount', 'bankTransferAmount', 'bankFeeAmount', 'cashDepositAmount']
+          .map((field) => Booking.sum(field, { where }))),
+        Booking.sum('totalAmount', { where: directWhere }),
+        Promise.all(['totalAmount', 'commissionAmount', 'environmentalTaxAmount', 'bankFeeAmount']
+          .map((field) => Booking.sum(field, { where: platformWhere })))
+      ]);
       const totalItems = Number(result.count || 0);
       const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+      const [totalAmount, commissionAmount, environmentalTaxAmount, bankTransferAmount, bankFeeAmount, cashDepositAmount] = totals.map((value) => Number(value || 0));
+      const directRevenue = Number(directTotal || 0);
+      const [bookingRevenue, bookingCommission, bookingEnvironmentalTax, bookingBankFee] = platformTotals.map((value) => Number(value || 0));
+      const bookingNetProfit = bookingRevenue - bookingCommission - bookingEnvironmentalTax - bookingBankFee;
+      const totalProfit = directRevenue + bookingNetProfit;
 
-      return res.json({ success: true, data: result.rows, pagination: { page, pageSize, totalItems, totalPages } });
+      return res.json({
+        success: true,
+        data: result.rows,
+        pagination: { page, pageSize, totalItems, totalPages },
+        financialSummary: {
+          totalAmount,
+          commissionAmount,
+          environmentalTaxAmount,
+          bankTransferAmount,
+          bankFeeAmount,
+          cashDepositAmount,
+          cashRemainingAmount: Math.max(0, directRevenue - cashDepositAmount),
+          cashRevenue: directRevenue,
+          bookingRevenue,
+          bookingNetProfit,
+          bookingFees: bookingCommission + bookingBankFee,
+          totalProfit,
+          turnover: totalAmount,
+          netWorth: totalProfit,
+          netProfit: totalProfit
+        }
+      });
     } catch (error) {
       return res.status(500).json({ success: false, error: error.message });
     }
@@ -95,7 +135,7 @@ export class BookingController {
 
   async createBooking(req, res) {
     try {
-      const { guestName, guestEmail, guestPhone, guestPhoneCountryCode, checkIn, checkOut, guestCount, notes, source, inquiryId, force } = req.body;
+      const { guestName, guestEmail, guestPhone, guestPhoneCountryCode, checkIn, checkOut, guestCount, notes, source, inquiryId, force, totalAmount, commissionAmount, environmentalTaxAmount, bankTransferAmount, bankFeeAmount, cashDepositAmount } = req.body;
 
       if (!guestName || !guestEmail || !checkIn || !checkOut) {
         return res.status(400).json({ success: false, message: 'guestName, guestEmail, checkIn and checkOut are required.' });
@@ -145,6 +185,12 @@ export class BookingController {
         guestCount: Number(guestCount) || 1,
         notes: notes ? String(notes).trim() : null,
         source: source || 'Website',
+        totalAmount: normalizeMoney(totalAmount),
+        commissionAmount: normalizeMoney(commissionAmount),
+        environmentalTaxAmount: normalizeMoney(environmentalTaxAmount),
+        bankTransferAmount: normalizeMoney(bankTransferAmount),
+        bankFeeAmount: normalizeMoney(bankFeeAmount),
+        cashDepositAmount: normalizeMoney(cashDepositAmount),
         inquiryId: inquiryId || null,
         color
       });
@@ -172,7 +218,7 @@ export class BookingController {
         return res.status(404).json({ success: false, message: 'Inquiry not found.' });
       }
 
-      const { guestPhone, guestPhoneCountryCode, notes, force } = req.body;
+      const { guestPhone, guestPhoneCountryCode, notes, force, totalAmount, commissionAmount, environmentalTaxAmount, bankTransferAmount, bankFeeAmount, cashDepositAmount } = req.body;
       const { checkIn, checkOut } = inquiry;
 
       // Check for overlapping bookings
@@ -215,6 +261,12 @@ export class BookingController {
         guestCount: inquiry.guests,
         notes: notes ? String(notes).trim() : null,
         source: 'Website',
+        totalAmount: normalizeMoney(totalAmount),
+        commissionAmount: normalizeMoney(commissionAmount),
+        environmentalTaxAmount: normalizeMoney(environmentalTaxAmount),
+        bankTransferAmount: normalizeMoney(bankTransferAmount),
+        bankFeeAmount: normalizeMoney(bankFeeAmount),
+        cashDepositAmount: normalizeMoney(cashDepositAmount),
         inquiryId,
         color
       });
@@ -242,7 +294,7 @@ export class BookingController {
         return res.status(404).json({ success: false, message: 'Booking not found.' });
       }
 
-      const { guestName, guestEmail, guestPhone, guestPhoneCountryCode, checkIn, checkOut, guestCount, notes, source, force } = req.body;
+      const { guestName, guestEmail, guestPhone, guestPhoneCountryCode, checkIn, checkOut, guestCount, notes, source, force, totalAmount, commissionAmount, environmentalTaxAmount, bankTransferAmount, bankFeeAmount, cashDepositAmount } = req.body;
 
       const newCheckIn = checkIn || booking.checkIn;
       const newCheckOut = checkOut || booking.checkOut;
@@ -307,7 +359,13 @@ export class BookingController {
         checkOut: newCheckOut,
         guestCount: guestCount !== undefined ? (Number(guestCount) || 1) : booking.guestCount,
         notes: notes !== undefined ? (notes ? String(notes).trim() : null) : booking.notes,
-        source: source || booking.source
+        source: source || booking.source,
+        totalAmount: totalAmount !== undefined ? normalizeMoney(totalAmount) : booking.totalAmount,
+        commissionAmount: commissionAmount !== undefined ? normalizeMoney(commissionAmount) : booking.commissionAmount,
+        environmentalTaxAmount: environmentalTaxAmount !== undefined ? normalizeMoney(environmentalTaxAmount) : booking.environmentalTaxAmount,
+        bankTransferAmount: bankTransferAmount !== undefined ? normalizeMoney(bankTransferAmount) : booking.bankTransferAmount
+        ,bankFeeAmount: bankFeeAmount !== undefined ? normalizeMoney(bankFeeAmount) : booking.bankFeeAmount
+        ,cashDepositAmount: cashDepositAmount !== undefined ? normalizeMoney(cashDepositAmount) : booking.cashDepositAmount
       });
 
       return res.json({ success: true, data: booking });
@@ -335,7 +393,11 @@ export class BookingController {
 
     try {
       const bookings = await Booking.findAll({
-        attributes: ['id', 'guestName', 'guestEmail', 'guestPhone', 'guestPhoneCountryCode', 'checkIn', 'checkOut', 'guestCount', 'source', 'notes'],
+        attributes: [
+          'id', 'guestName', 'guestEmail', 'guestPhone', 'guestPhoneCountryCode',
+          'checkIn', 'checkOut', 'guestCount', 'source', 'notes', 'totalAmount',
+          'commissionAmount', 'environmentalTaxAmount', 'bankFeeAmount', 'cashDepositAmount'
+        ],
         order: [['checkIn', 'ASC']]
       });
 
@@ -346,6 +408,14 @@ export class BookingController {
         const dtend = String(b.checkOut).replace(/-/g, '');
         const guests = b.guestCount;
         const summary = `${b.guestName} (${guests} guest${guests !== 1 ? 's' : ''})`;
+        const totalAmount = Number(b.totalAmount || 0);
+        const commissionAmount = Number(b.commissionAmount || 0);
+        const environmentalTaxAmount = Number(b.environmentalTaxAmount || 0);
+        const bankFeeAmount = Number(b.bankFeeAmount || 0);
+        const cashDepositAmount = Number(b.cashDepositAmount || 0);
+        const bookingNetProfit = totalAmount - commissionAmount - environmentalTaxAmount - bankFeeAmount;
+        const cashRemainingAmount = Math.max(0, totalAmount - cashDepositAmount);
+        const money = (amount) => `${amount.toFixed(2)} EUR`;
 
         const lines = [];
         lines.push(`👤 ${b.guestName}`);
@@ -358,6 +428,17 @@ export class BookingController {
         }
         lines.push(`👥 ${guests} guest${guests !== 1 ? 's' : ''}`);
         if (b.source) lines.push(`🔖 ${b.source}`);
+        lines.push('');
+        lines.push(`💶 Total amount: ${money(totalAmount)}`);
+        if (b.source === 'Booking') {
+          lines.push(`💳 Platform commission: ${money(commissionAmount)}`);
+          lines.push(`🌿 Environmental fees: ${money(environmentalTaxAmount)}`);
+          lines.push(`🏦 Bank fees: ${money(bankFeeAmount)}`);
+          lines.push(`✅ Booking net profit: ${money(bookingNetProfit)}`);
+        } else {
+          lines.push(`💵 Cash deposit: ${money(cashDepositAmount)}`);
+          lines.push(`📌 Cash remaining: ${money(cashRemainingAmount)}`);
+        }
         if (b.notes) {
           lines.push('');
           lines.push(`📝 ${b.notes}`);

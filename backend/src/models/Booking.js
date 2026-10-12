@@ -47,6 +47,41 @@ export const Booking = sequelize.define('Booking', {
     defaultValue: 'Website',
     allowNull: false
   },
+  paymentMethod: {
+    type: DataTypes.ENUM('Cash', 'Bank transfer', 'Platform', 'Other'),
+    defaultValue: 'Bank transfer',
+    allowNull: false
+  },
+  totalAmount: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+    allowNull: false
+  },
+  commissionAmount: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+    allowNull: false
+  },
+  environmentalTaxAmount: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+    allowNull: false
+  },
+  bankTransferAmount: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+    allowNull: false
+  },
+  bankFeeAmount: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+    allowNull: false
+  },
+  cashDepositAmount: {
+    type: DataTypes.DECIMAL(10, 2),
+    defaultValue: 0,
+    allowNull: false
+  },
   inquiryId: {
     type: DataTypes.INTEGER,
     allowNull: true

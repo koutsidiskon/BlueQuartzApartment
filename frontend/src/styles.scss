@@ -17,6 +17,58 @@ html, body {
   overflow-x: hidden; // Απαραίτητο για το 100vw
 }
 
+// Admin financial summary cards
+.booking-financial-summary {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 0.8rem 0 1rem;
+}
+
+.booking-financial-summary .financial-stat {
+  min-width: 0;
+  padding: 0.8rem 0.85rem;
+  border: 1px solid rgba(0, 51, 102, 0.11);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 3px 12px rgba(0, 51, 102, 0.055);
+}
+
+.booking-financial-summary .financial-stat span {
+  display: block;
+  min-height: 2.1em;
+  color: rgba(0, 51, 102, 0.62);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.booking-financial-summary .financial-stat strong {
+  display: block;
+  margin-top: 0.35rem;
+  color: #003366;
+  font-size: 1.08rem;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.booking-financial-summary .financial-stat.net {
+  border-color: rgba(5, 150, 105, 0.34);
+  background: #ecfdf5;
+}
+
+@media (max-width: 1100px) {
+  .booking-financial-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .booking-financial-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+  .booking-financial-summary .financial-stat { padding: 0.65rem; }
+  .booking-financial-summary .financial-stat strong { font-size: 0.98rem; }
+}
+
 /* --- Stable Flatpickr Theme (keeps month/year visible and grid intact) --- */
 .flatpickr-calendar {
   box-sizing: border-box;
