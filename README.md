@@ -127,7 +127,17 @@
 └─────────────────────────────────────────────────────────┘
 ```
 
-Nginx handles all incoming traffic — it serves the Angular SPA and proxies `/api/*` requests to the Express backend. The database persists in a named Docker volume, surviving container restarts.
+Nginx handles all incoming traffic — it serves the Angular SPA and proxies `/api/*` requests to the Express backend. The database persists in a named Docker volume, surviving container restarts. Uploaded gallery images are shared between the backend and frontend through the host `./uploads` directory; the frontend mounts it read-only.
+
+### Docker Compose services
+
+| Service | Image | Host port | Purpose |
+|---|---|---:|---|
+| `db` | `mariadb:11.4` | `3306` | Persistent application database |
+| `backend` | `bluequartzapartment-project-backend:amd64` | `3000` | Node.js / Express API |
+| `frontend` | `bluequartzapartment-project-frontend:amd64` | `4200` | Angular application served by Nginx |
+
+The backend starts after the database container, and the frontend depends on the backend. The Compose file uses prebuilt `linux/amd64` images rather than local `build` contexts, which is suitable for the production VPS deployment described below.
 
 ---
 
@@ -137,6 +147,7 @@ Nginx handles all incoming traffic — it serves the Angular SPA and proxies `/a
 BlueQuartzApartment-project/
 ├── docker-compose.yml          # Full service orchestration
 ├── .env.example                # Environment variable template
+├── uploads/                    # Shared persistent storage for uploaded images
 │
 ├── frontend/                   # Angular 21 application
 │   ├── src/
@@ -326,10 +337,36 @@ ADMIN_PASSWORD=your_admin_password
 CORS_ORIGINS=https://yourdomain.com
 ```
 
-### 3. Build and run
+### 3. Prepare shared uploads storage
+
+Create the directory used by Docker to share uploaded images between the backend and frontend:
 
 ```bash
-docker-compose up --build
+mkdir -p uploads
+```
+
+### 4. Build the application images
+
+The Compose file expects the application images to already exist locally. Build them with the tags used by the Compose configuration:
+
+```bash
+docker build --platform linux/amd64 -t bluequartzapartment-project-backend:amd64 ./backend
+docker build --platform linux/amd64 -t bluequartzapartment-project-frontend:amd64 ./frontend
+```
+
+If the images were exported from another machine, load them instead:
+
+```bash
+docker load -i backend_FINAL.tar
+docker load -i frontend_FINAL.tar
+```
+
+### 5. Start the Compose stack
+
+The provided `docker-compose.yml` starts the prebuilt images referenced by the stack:
+
+```bash
+docker compose up -d
 ```
 
 | Service | URL |
@@ -339,6 +376,21 @@ docker-compose up --build
 | Admin Panel | http://localhost:4200/admin/login |
 
 > The database schema is created automatically by Sequelize on first startup, and the bootstrap admin account is seeded from the values in `.env`.
+
+Useful commands:
+
+```bash
+# Follow logs for all services
+docker compose logs -f
+
+# Stop the containers without removing the database volume
+docker compose down
+
+# Stop the containers and remove the persisted database volume
+docker compose down -v
+```
+
+> `docker compose down -v` permanently deletes the `mariadb_data` volume and all database data. Uploaded files in `./uploads` are not removed by this command.
 
 ---
 
@@ -364,10 +416,13 @@ docker save -o frontend_FINAL.tar bluequartzapartment-project-frontend:amd64
 ```bash
 docker load -i backend_FINAL.tar
 docker load -i frontend_FINAL.tar
+mkdir -p uploads
 docker compose up -d
 ```
 
-> On the server, `docker-compose.yml` should use `image: bluequartzapartment-project-backend:amd64` instead of `build:` context. A detailed step-by-step guide is available locally in `DEPLOY_GUIDE.md` (not tracked by git).
+The server must also contain the `.env` file and the `uploads/` directory next to `docker-compose.yml`. The Compose file loads configuration from `.env`, mounts `uploads/` into both application containers, and stores MariaDB data in the `mariadb_data` named volume.
+
+> The images are tagged for `linux/amd64` and are loaded locally from the exported archives; no container registry is required. A detailed step-by-step guide is available locally in `DEPLOY_GUIDE.md` (not tracked by git).
 
 ---
 
