@@ -35,3 +35,7 @@ mariadb_data/
 backup.sql
 default
 
+# Local deployment Compose files
+docker-compose*.yml
+docker-compose*.yaml
+
