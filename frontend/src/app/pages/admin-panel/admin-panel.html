@@ -267,12 +267,6 @@
     <section class="tab-panel inquiries-panel" [class.hidden-panel]="activeTab !== 'inquiries'" [attr.aria-hidden]="activeTab !== 'inquiries'">
 
       <div class="inquiry-toolbar">
-        <div class="season-filter">
-          <label for="inquirySeasonYear">{{ 'adminPanel.season' | t : undefined : 'Season' }}</label>
-          <select id="inquirySeasonYear" (change)="onSeasonYearChange($event)">
-            @for (year of seasonYears; track year) { <option [value]="year" [selected]="year === selectedSeasonYear">{{ year }}</option> }
-          </select>
-        </div>
         <div class="search-wrapper">
           <span class="material-icons search-icon">search</span>
           <input

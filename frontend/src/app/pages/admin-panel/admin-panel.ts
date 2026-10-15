@@ -1725,7 +1725,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.cdr.detectChanges();
     const requestToken = ++this.inquiryRequestToken;
 
-    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir, this.selectedSeasonYear).pipe(
+    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir).pipe(
       finalize(() => {
         if (requestToken === this.inquiryRequestToken) {
           this.isInquiriesLoading = false;
@@ -1773,7 +1773,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     if (this.inquiryTotalPagesCache && page > this.inquiryTotalPagesCache) return;
     if (this.inquiryPageCache.has(page)) return;
 
-    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir, this.selectedSeasonYear).subscribe({
+    this.inquiryService.getInquiries(page, this.inquiryPageSize, this.searchTerm || undefined, this.sortField, this.sortDir).subscribe({
       next: (response) => {
         if (!response?.success) return;
         const rows = Array.isArray(response.data) ? response.data : [];
