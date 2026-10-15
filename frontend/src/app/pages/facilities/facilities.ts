@@ -96,7 +96,13 @@ export class Facilities implements OnInit {
       next: (data) => {
         const categorizedImages = data.filter((img) => !!img.category);
         this.viewerImages = categorizedImages;
-        this.roomGroups = this.imageService.groupByCategory(categorizedImages);
+        const imageGroups = this.imageService.groupByCategory(categorizedImages);
+        const standardCategories = ['bedroom', 'living-room', 'kitchen', 'bathroom', 'veranda'];
+        const knownGroups = standardCategories.map((category) => (
+          imageGroups.find((group) => group.category === category) || { category, images: [] }
+        ));
+        const additionalGroups = imageGroups.filter((group) => !standardCategories.includes(group.category));
+        this.roomGroups = [...knownGroups, ...additionalGroups];
 
         this.cdr.detectChanges();
       },
@@ -154,7 +160,7 @@ export class Facilities implements OnInit {
       'bedroom': ['king_bed', 'curtains', 'ac_unit', 'checkroom', 'local_laundry_service', 'bed'],
       'living-room': ['weekend', 'ac_unit', 'bed', 'tv', 'wifi'],
       'kitchen': ['kitchen', 'soup_kitchen', 'wine_bar', 'coffee_maker', 'local_dining'],
-      'bathroom': ['shower', 'soap', 'mode_fan', 'cleaning_services'],
+      'bathroom': ['shower', 'soap', 'local_laundry_service', 'air', 'wb_sunny', 'water_drop', 'shower', 'cleaning_services'],
       'veranda': ['table_restaurant', 'wb_twilight', 'air']
     };
 

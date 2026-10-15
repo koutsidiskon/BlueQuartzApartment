@@ -159,8 +159,12 @@
       ],
       "bathroom": [
         "Șampon, balsam și gel de duș",
-        "Săpun de mâini și hârtie igienică proaspătă",
+        "Săpun de mâini, hârtie igienică și articole de toaletă",
+        "Prosoape",
         "Uscător de păr pentru utilizare zilnică",
+        "Boiler solar",
+        "Apă caldă permanentă, disponibilă 24/7",
+        "Duș walk-in tip ploaie",
         "Produse de curățenie disponibile la nevoie"
       ],
       "veranda": [
@@ -314,6 +318,13 @@
     "inquiriesTab": "Cereri",
     "bookingsTab": "Rezervări",
     "statisticsTab": "Statistici",
+    "galleryTab": "Galerie",
+    "galleryTitle": "Gestionarea galeriei",
+    "galleryFilterCategory": "Filtrează după categorie",
+    "galleryAllCategories": "Toate categoriile",
+    "gallerySortOrder": "Ordine",
+    "galleryImagesCount": "fotografii",
+    "gallery": { "kicker": "Gestionarea conținutului", "title": "Galeria proprietății", "description": "Adaugă, înlocuiește și reordonează fotografiile afișate pe site.", "addImage": "Adaugă o fotografie", "editImage": "Editează fotografia", "cancel": "Anulează", "fileHint": "JPG, PNG sau WebP · maximum 10 MB", "category": "Categorie", "displayOrder": "Ordinea afișării", "caption": "Legendă / text alternativ", "captionPlaceholder": "Interiorul bucătăriei", "upload": "Încarcă fotografia", "uploading": "Se încarcă...", "saveChanges": "Salvează modificările", "saving": "Se salvează...", "loading": "Se încarcă galeria...", "empty": "Nu există încă fotografii în galerie.", "delete": "Șterge fotografia", "deleteTitle": "Ștergi fotografia?", "deleteMessage": "Această fotografie va fi eliminată din galerie.", "deleteConfirm": "Șterge fotografia", "deleteSuccess": "Fotografia a fost ștearsă.", "deleteError": "Fotografia nu a putut fi ștearsă." },
     "statisticsTitle": "Statistici sezon",
     "statisticsComparison": "Comparație între sezoane",
     "statisticsLoading": "Se încarcă statisticile...",

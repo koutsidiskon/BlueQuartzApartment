@@ -3,3 +3,4 @@ dist
 .angular
 .git
 .DS_Store
+public/uploads

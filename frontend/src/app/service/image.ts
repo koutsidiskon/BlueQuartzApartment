@@ -25,7 +25,24 @@ export class ImageService {
 
   // Creates a new image entry in the backend for admin purposes (not currently used in the UI)
   createImage(image: HouseImage): Observable<HouseImage> {
-    return this.http.post<HouseImage>(this.apiUrl, image);
+    return this.http.post<HouseImage>(this.apiUrl, image, { withCredentials: true });
+  }
+
+  updateImage(image: HouseImage): Observable<HouseImage> {
+    return this.http.put<HouseImage>(`${this.apiUrl}/${image.id}`, image, { withCredentials: true });
+  }
+
+  uploadImage(file: File, metadata: Omit<HouseImage, 'id' | 'url'>): Observable<HouseImage> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('category', metadata.category);
+    formData.append('sortOrder', String(metadata.sortOrder));
+    formData.append('caption', metadata.caption || '');
+    return this.http.post<HouseImage>(`${this.apiUrl}/upload`, formData, { withCredentials: true });
+  }
+
+  deleteImage(id: number): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
 
   // fetches images and normalizes them for use in the application
@@ -52,10 +69,17 @@ export class ImageService {
       return acc;
     }, {} as Record<string, HouseImage[]>);
 
-    return Object.keys(grouped).map((category) => ({
+    const categoryOrder = ['bedroom', 'living-room', 'kitchen', 'bathroom', 'veranda'];
+    return Object.keys(grouped)
+      .sort((a, b) => {
+        const indexA = categoryOrder.indexOf(a);
+        const indexB = categoryOrder.indexOf(b);
+        return (indexA < 0 ? categoryOrder.length : indexA) - (indexB < 0 ? categoryOrder.length : indexB);
+      })
+      .map((category) => ({
       category,
       images: grouped[category]
-    }));
+      }));
   }
 
   // Normalizes the image data by ensuring required fields are present,

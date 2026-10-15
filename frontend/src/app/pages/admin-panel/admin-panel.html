@@ -44,6 +44,14 @@
             (click)="switchTab('statistics')">
             {{ 'adminPanel.statisticsTab' | t : undefined : 'Statistics' }}
           </button>
+          <button
+            type="button"
+            class="nav-tab"
+            [class.active]="activeTab === 'images'"
+            (click)="switchTab('images')">
+            <span class="material-icons nav-tab-icon">collections</span>
+            {{ 'adminPanel.galleryTab' | t : undefined : 'Gallery' }}
+          </button>
         </div>
 
         <div class="lang-switcher" [attr.aria-label]="'language.switcherAria' | t">
@@ -615,6 +623,115 @@
       }
     </section>
 
+    <section class="tab-panel images-panel" [class.hidden-panel]="activeTab !== 'images'" [attr.aria-hidden]="activeTab !== 'images'">
+      <div class="images-toolbar">
+        <div>
+          <span class="images-kicker">{{ 'adminPanel.gallery.kicker' | t : undefined : 'Content management' }}</span>
+          <h2>{{ 'adminPanel.gallery.title' | t : undefined : 'Property gallery' }}</h2>
+          <p>{{ 'adminPanel.gallery.description' | t : undefined : 'Add, replace and reorder the photos shown across the website.' }}</p>
+        </div>
+      </div>
+
+      <div class="image-editor-card">
+        <div class="image-editor-heading">
+          <h3>{{ editingImageId ? ('adminPanel.gallery.editImage' | t : undefined : 'Edit image') : ('adminPanel.gallery.addImage' | t : undefined : 'Add new image') }}</h3>
+          @if (editingImageId || selectedImageFile) {
+            <button type="button" class="image-cancel-btn" (click)="cancelImageEdit()">{{ 'adminPanel.gallery.cancel' | t : undefined : 'Cancel' }}</button>
+          }
+        </div>
+        <label class="image-drop-zone" (dragover)="$event.preventDefault()" (drop)="onImageFileDropped($event)">
+          <input type="file" accept="image/*" (change)="onImageFileSelected($event)">
+          <span class="material-icons">cloud_upload</span>
+          <strong>{{ selectedImageFile ? selectedImageFile.name : 'Drop an image here or choose a file' }}</strong>
+          <small>{{ 'adminPanel.gallery.fileHint' | t : undefined : 'JPG, PNG or WebP · maximum 10 MB' }}</small>
+        </label>
+        <div class="image-form-grid">
+          <label class="image-field">
+            <span>{{ 'adminPanel.gallery.category' | t : undefined : 'Category' }} <b>*</b></span>
+            <select [ngModel]="imageForm.category" (ngModelChange)="onImageCategoryChange($event)">
+              @for (category of imageCategories; track category) {
+                <option [value]="category">{{ category }}</option>
+              }
+            </select>
+          </label>
+          <label class="image-field image-field-order">
+            <span>{{ 'adminPanel.gallery.displayOrder' | t : undefined : 'Display order' }}</span>
+            <input type="number" [(ngModel)]="imageForm.sortOrder" (ngModelChange)="onImageOrderChange($event)" min="0" step="1">
+          </label>
+          <label class="image-field image-field-caption">
+            <span>{{ 'adminPanel.gallery.caption' | t : undefined : 'Caption / alt text' }}</span>
+            <input type="text" [(ngModel)]="imageForm.caption" [placeholder]="'adminPanel.gallery.captionPlaceholder' | t : undefined : 'Kitchen interior'" autocomplete="off">
+          </label>
+          @if (imagePreviewUrl || imageForm.url) {
+            <div class="image-live-preview">
+              <img [src]="imagePreviewUrl || imageForm.url" alt="Preview">
+            </div>
+          }
+        </div>
+        @if (selectedImageFile) {
+          <button type="button" class="image-upload-btn" [disabled]="isImageSaving || !imageForm.category || !!imageUrlError" (click)="uploadSelectedImage()">
+            <span class="material-icons">upload</span>
+            {{ isImageSaving ? ('adminPanel.gallery.uploading' | t : undefined : 'Uploading...') : ('adminPanel.gallery.upload' | t : undefined : 'Upload image') }}
+          </button>
+        }
+        @if (editingImageId) {
+          <button type="button" class="image-save-btn" [disabled]="isImageSaving || !imageForm.category" (click)="saveImage()">
+            <span class="material-icons">save</span>
+            {{ isImageSaving ? ('adminPanel.gallery.saving' | t : undefined : 'Saving...') : ('adminPanel.gallery.saveChanges' | t : undefined : 'Save changes') }}
+          </button>
+        }
+      </div>
+
+      @if (imageMessage) { <p class="status ok">{{ imageMessage }}</p> }
+      @if (imageError) { <p class="status error">{{ imageError }}</p> }
+      @if (isImagesLoading) { <p class="status loading">{{ 'adminPanel.gallery.loading' | t : undefined : 'Loading gallery...' }}</p> }
+      @if (!isImagesLoading && images.length) {
+        <div class="gallery-filters">
+          <label>
+            <span>{{ 'adminPanel.galleryFilterCategory' | t : undefined : 'Filter by category' }}</span>
+            <select [(ngModel)]="imageFilterCategory">
+              <option value="all">{{ 'adminPanel.galleryAllCategories' | t : undefined : 'All categories' }}</option>
+              @for (category of imageCategories; track category) {
+                <option [value]="category">{{ category }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            <span>{{ 'adminPanel.gallerySortOrder' | t : undefined : 'Order' }}</span>
+            <select [(ngModel)]="imageSortDirection">
+              <option value="asc">{{ 'adminPanel.gallery.orderAscending' | t : undefined : '0 → 9' }}</option>
+              <option value="desc">{{ 'adminPanel.gallery.orderDescending' | t : undefined : '9 → 0' }}</option>
+            </select>
+          </label>
+          <span class="gallery-filter-count">{{ filteredImages.length }} {{ 'adminPanel.galleryImagesCount' | t : undefined : 'images' }}</span>
+        </div>
+      }
+      @if (!isImagesLoading && !images.length) { <p class="status empty">{{ 'adminPanel.gallery.empty' | t : undefined : 'No gallery images yet.' }}</p> }
+
+      @if (filteredImages.length) {
+        <div class="managed-image-grid">
+          @for (image of filteredImages; track image.id || image.url) {
+            <article class="managed-image-card">
+              <div class="managed-image-preview">
+                <img [src]="image.url" [alt]="image.caption || image.category">
+                <span class="managed-image-order">#{{ image.sortOrder }}</span>
+              </div>
+              <div class="managed-image-details">
+                <div>
+                  <strong>{{ image.category }}</strong>
+                  <span>{{ image.caption || 'No caption' }}</span>
+                </div>
+                <div class="managed-image-actions">
+                  <button type="button" title="Edit image" (click)="editImage(image)"><span class="material-icons">edit</span></button>
+                  <button type="button" [attr.title]="'adminPanel.gallery.delete' | t : undefined : 'Delete image'" class="danger" (click)="openImageDeleteConfirm(image)"><span class="material-icons">delete</span></button>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+
     <section class="tab-panel statistics-panel" [class.hidden-panel]="activeTab !== 'statistics'" [attr.aria-hidden]="activeTab !== 'statistics'">
       <div class="statistics-toolbar">
         <div>
@@ -852,6 +969,32 @@
         <button type="button" class="bm-delete-btn" (click)="confirmDeleteBooking()">
           <span class="material-icons">delete</span>
           {{ 'adminPanel.bookings.deleteYes' | t : undefined : 'Yes, delete' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (isImageDeleteConfirmOpen && deletingImage) {
+  <div class="booking-modal-overlay" (click)="cancelImageDelete()">
+    <div class="booking-modal-card delete-confirm-card" (click)="$event.stopPropagation()">
+      <div class="booking-modal-header">
+        <h2>{{ 'adminPanel.gallery.deleteTitle' | t : undefined : 'Delete image?' }}</h2>
+        <button type="button" class="modal-close-btn" (click)="cancelImageDelete()" [attr.aria-label]="'adminPanel.gallery.cancel' | t : undefined : 'Cancel'">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="booking-modal-body">
+        <p class="delete-confirm-text">
+          {{ 'adminPanel.gallery.deleteMessage' | t : undefined : 'This image will be removed from the gallery.' }}
+        </p>
+        <img class="image-delete-preview" [src]="deletingImage.url" [alt]="deletingImage.caption || deletingImage.category">
+      </div>
+      <div class="booking-modal-footer">
+        <button type="button" class="bm-cancel-btn" (click)="cancelImageDelete()">{{ 'adminPanel.gallery.cancel' | t : undefined : 'Cancel' }}</button>
+        <button type="button" class="bm-delete-btn" (click)="confirmImageDelete()">
+          <span class="material-icons">delete</span>
+          {{ 'adminPanel.gallery.deleteConfirm' | t : undefined : 'Delete image' }}
         </button>
       </div>
     </div>

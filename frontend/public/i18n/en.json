@@ -159,8 +159,12 @@
       ],
       "bathroom": [
         "Shampoo, conditioner, and body wash",
-        "Hand soap and fresh toilet paper",
+        "Hand soap, toilet paper, and toiletries",
+        "Towels",
         "Hair dryer available for daily use",
+        "Solar water heater",
+        "Continuous hot water, available 24/7",
+        "Walk-in rainfall shower",
         "Cleaning products available if needed"
       ],
       "veranda": [
@@ -314,6 +318,13 @@
     "inquiriesTab": "Inquiries",
     "bookingsTab": "Bookings",
     "statisticsTab": "Statistics",
+    "galleryTab": "Gallery",
+    "galleryTitle": "Gallery management",
+    "galleryFilterCategory": "Filter by category",
+    "galleryAllCategories": "All categories",
+    "gallerySortOrder": "Order",
+    "galleryImagesCount": "images",
+    "gallery": { "kicker": "Content management", "title": "Property gallery", "description": "Add, replace and reorder the photos shown across the website.", "addImage": "Add new image", "editImage": "Edit image", "cancel": "Cancel", "fileHint": "JPG, PNG or WebP · maximum 10 MB", "category": "Category", "displayOrder": "Display order", "caption": "Caption / alt text", "captionPlaceholder": "Kitchen interior", "upload": "Upload image", "uploading": "Uploading...", "saveChanges": "Save changes", "saving": "Saving...", "loading": "Loading gallery...", "empty": "No gallery images yet.", "delete": "Delete image", "deleteTitle": "Delete image?", "deleteMessage": "This image will be removed from the gallery.", "deleteConfirm": "Delete image", "deleteSuccess": "Image deleted.", "deleteError": "Could not delete image." },
     "statisticsTitle": "Season Statistics",
     "statisticsComparison": "Season comparison",
     "statisticsLoading": "Loading statistics...",

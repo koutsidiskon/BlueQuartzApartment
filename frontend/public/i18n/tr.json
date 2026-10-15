@@ -158,8 +158,12 @@
       ],
       "bathroom": [
         "Şampuan, saç kremi ve duş jeli",
-        "El sabunu ve temiz tuvalet kağıdı",
+        "El sabunu, tuvalet kağıdı ve kişisel bakım ürünleri",
+        "Havlular",
         "Günlük kullanım için saç kurutma makinesi",
+        "Güneş enerjili su ısıtıcısı",
+        "7/24 kesintisiz sıcak su",
+        "Walk-in yağmur duşu",
         "Gerektiğinde temizlik ürünleri"
       ],
       "veranda": [
@@ -313,6 +317,13 @@
     "inquiriesTab": "Talepler",
     "bookingsTab": "Rezervasyonlar",
     "statisticsTab": "İstatistikler",
+    "galleryTab": "Galeri",
+    "galleryTitle": "Galeri yönetimi",
+    "galleryFilterCategory": "Kategoriye göre filtrele",
+    "galleryAllCategories": "Tüm kategoriler",
+    "gallerySortOrder": "Sıra",
+    "galleryImagesCount": "fotoğraf",
+    "gallery": { "kicker": "İçerik yönetimi", "title": "Tesis galerisi", "description": "Web sitesinde gösterilen fotoğrafları ekleyin, değiştirin ve sıralayın.", "addImage": "Yeni fotoğraf ekle", "editImage": "Fotoğrafı düzenle", "cancel": "İptal", "fileHint": "JPG, PNG veya WebP · maksimum 10 MB", "category": "Kategori", "displayOrder": "Görüntüleme sırası", "caption": "Başlık / alternatif metin", "captionPlaceholder": "Mutfak içi", "upload": "Fotoğraf yükle", "uploading": "Yükleniyor...", "saveChanges": "Değişiklikleri kaydet", "saving": "Kaydediliyor...", "loading": "Galeri yükleniyor...", "empty": "Galeride henüz fotoğraf yok.", "delete": "Fotoğrafı sil", "deleteTitle": "Fotoğraf silinsin mi?", "deleteMessage": "Bu fotoğraf galeriden kaldırılacaktır.", "deleteConfirm": "Fotoğrafı sil", "deleteSuccess": "Fotoğraf silindi.", "deleteError": "Fotoğraf silinemedi." },
     "statisticsTitle": "Sezon İstatistikleri",
     "statisticsComparison": "Sezon karşılaştırması",
     "statisticsLoading": "İstatistikler yükleniyor...",

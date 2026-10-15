@@ -158,8 +158,12 @@
       ],
       "bathroom": [
         "Šampon, regenerator i gel za tuširanje",
-        "Sapun za ruke i svež toalet papir",
+        "Sapun za ruke, toalet papir i higijenske potrepštine",
+        "Peškiri",
         "Fen za kosu za svakodnevnu upotrebu",
+        "Solarni bojler",
+        "Stalna topla voda, dostupna 24/7",
+        "Walk-in kišni tuš",
         "Sredstva za čišćenje dostupna po potrebi"
       ],
       "veranda": [
@@ -313,6 +317,13 @@
     "inquiriesTab": "Upiti",
     "bookingsTab": "Rezervacije",
     "statisticsTab": "Statistika",
+    "galleryTab": "Galerija",
+    "galleryTitle": "Upravljanje galerijom",
+    "galleryFilterCategory": "Filtriraj po kategoriji",
+    "galleryAllCategories": "Sve kategorije",
+    "gallerySortOrder": "Redosled",
+    "galleryImagesCount": "fotografija",
+    "gallery": { "kicker": "Upravljanje sadržajem", "title": "Galerija objekta", "description": "Dodajte, zamenite i promenite redosled fotografija na sajtu.", "addImage": "Dodaj novu fotografiju", "editImage": "Uredi fotografiju", "cancel": "Otkaži", "fileHint": "JPG, PNG ili WebP · najviše 10 MB", "category": "Kategorija", "displayOrder": "Redosled prikaza", "caption": "Natpis / alternativni tekst", "captionPlaceholder": "Enterijer kuhinje", "upload": "Otpremi fotografiju", "uploading": "Otpremanje...", "saveChanges": "Sačuvaj izmene", "saving": "Čuvanje...", "loading": "Učitavanje galerije...", "empty": "U galeriji još nema fotografija.", "delete": "Obriši fotografiju", "deleteTitle": "Obrisati fotografiju?", "deleteMessage": "Ova fotografija će biti uklonjena iz galerije.", "deleteConfirm": "Obriši fotografiju", "deleteSuccess": "Fotografija je obrisana.", "deleteError": "Fotografija nije mogla biti obrisana." },
     "statisticsTitle": "Statistika sezone",
     "statisticsComparison": "Poređenje sezona",
     "statisticsLoading": "Učitavanje statistike...",

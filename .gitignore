@@ -25,6 +25,11 @@ yarn-debug.log*
 yarn-error.log*
 mariadb_data/
 
+# Uploaded media and local database exports
+/uploads/
+/frontend/public/uploads/
+/images_data.sql
+
 # Backup / archive files
 *.tar
 backup.sql

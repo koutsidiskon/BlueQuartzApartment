@@ -137,6 +137,8 @@ services:
     env_file: .env
     ports:
       - "3000:3000"
+    volumes:
+      - ./uploads:/usr/src/app/uploads
     depends_on:
       - db
 
@@ -146,12 +148,16 @@ services:
     restart: always
     ports:
       - "4200:80"
+    volumes:
+      - ./uploads:/usr/share/nginx/html/uploads:ro
     depends_on:
       - backend
 
 volumes:
   mariadb_data:
 ```
+
+The `uploads` directory must exist beside `docker-compose.yml` on the server. It is shared by the backend, which writes uploaded images, and the frontend Nginx container, which serves them. Back it up together with the database.
 
 ---
 

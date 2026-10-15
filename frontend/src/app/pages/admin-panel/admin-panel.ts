@@ -17,6 +17,7 @@ import { LanguageFacadeService } from '../../service/language-option';
 import { AvailabilityCalendarService, MinimumStayDateItem } from '../../service/availability-calendar';
 import { InquiryListItem, InquiryService } from '../../service/inquiry';
 import { BookingService, BookingListItem, BookingCalendarItem, BookingSource, CreateBookingData, BookingFinancialSummary, BookingYearStatistic } from '../../service/booking';
+import { HouseImage, ImageService } from '../../service/image';
 import { PhoneCountrySelectComponent } from '../../shared/phone-country-select.component';
 import { COUNTRY_CODES } from '../../shared/phone-country-codes';
 
@@ -53,7 +54,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
   @ViewChild('adminRangeFromInput') adminRangeFromInput!: ElementRef<HTMLInputElement>;
   @ViewChild('adminRangeToInput') adminRangeToInput!: ElementRef<HTMLInputElement>;
 
-  activeTab: 'calendar' | 'inquiries' | 'bookings' | 'statistics' = 'calendar';
+  activeTab: 'calendar' | 'inquiries' | 'bookings' | 'statistics' | 'images' = 'calendar';
   selectedSeasonYear = new Date().getFullYear();
   seasonYears = [new Date().getFullYear()];
   statistics: BookingYearStatistic[] = [];
@@ -202,6 +203,24 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
   private deferredCheckInMap = new Map<string, BookingCalendarItem>();
 
+  images: HouseImage[] = [];
+  isImagesLoading = false;
+  isImageSaving = false;
+  imageMessage = '';
+  imageError = '';
+  imageUrlError = '';
+  editingImageId: number | null = null;
+  imageForm: HouseImage = this.createEmptyImage();
+  imageCategories = ['bedroom', 'living-room', 'kitchen', 'bathroom', 'veranda'];
+  imageFilterCategory = 'all';
+  imageSortDirection: 'asc' | 'desc' = 'asc';
+  imageOrderManuallySet = false;
+  selectedImageFile: File | null = null;
+  imagePreviewUrl = '';
+  isImageDeleteConfirmOpen = false;
+  deletingImage: HouseImage | null = null;
+  private imageFeedbackTimer: ReturnType<typeof setTimeout> | null = null;
+
   constructor(
     private adminAuth: AdminAuthService,
     private router: Router,
@@ -212,6 +231,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     private availabilityCalendar: AvailabilityCalendarService,
     private inquiryService: InquiryService,
     private bookingService: BookingService,
+    private imageService: ImageService,
     private sanitizer: DomSanitizer
   ) {
     this.currentLanguage = this.languageFacade.getCurrentLanguage();
@@ -227,6 +247,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.loadBookings(1);
     this.loadIcalUrl();
     this.loadStatistics();
+    this.loadImages();
     this.lastRenderedLanguage = this.i18n.getLanguage();
     this.updateCalendarLocale();
   }
@@ -275,7 +296,7 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     this.updateCalendarLocale();
   }
 
-  switchTab(tab: 'calendar' | 'inquiries' | 'bookings' | 'statistics'): void {
+  switchTab(tab: 'calendar' | 'inquiries' | 'bookings' | 'statistics' | 'images'): void {
     this.activeTab = tab;
     this.menuOpen = false;
     this.desktopLanguageMenuOpen = false;
@@ -292,6 +313,11 @@ export class AdminPanel implements AfterViewInit, DoCheck {
 
     if (tab === 'statistics') {
       this.loadStatistics();
+      return;
+    }
+
+    if (tab === 'images') {
+      this.loadImages();
       return;
     }
 
@@ -314,7 +340,244 @@ export class AdminPanel implements AfterViewInit, DoCheck {
     if (this.activeTab === 'bookings') {
       return this.i18n.t('adminPanel.bookingsTab', undefined, 'Bookings');
     }
+    if (this.activeTab === 'images') {
+      return this.i18n.t('adminPanel.galleryTitle', undefined, 'Gallery management');
+    }
     return this.i18n.t('adminPanel.calendarTitle', undefined, 'Calendar Availability');
+  }
+
+  private createEmptyImage(): HouseImage {
+    return { url: '', category: 'bedroom', sortOrder: 0, caption: '' };
+  }
+
+  private nextImageOrder(category: string): number {
+    const categoryImages = this.images.filter((image) => image.category === category);
+    return categoryImages.length ? Math.max(...categoryImages.map((image) => image.sortOrder)) + 1 : 0;
+  }
+
+  onImageCategoryChange(category: string): void {
+    this.imageForm.category = category;
+    if (!this.editingImageId) {
+      this.imageOrderManuallySet = false;
+      this.imageForm.sortOrder = this.nextImageOrder(category);
+    }
+  }
+
+  onImageOrderChange(value: number | string): void {
+    this.imageForm.sortOrder = Number(value) || 0;
+    this.imageOrderManuallySet = true;
+  }
+
+  private showImageFeedback(message: string, type: 'success' | 'error'): void {
+    if (this.imageFeedbackTimer) clearTimeout(this.imageFeedbackTimer);
+    this.imageMessage = type === 'success' ? message : '';
+    this.imageError = type === 'error' ? message : '';
+    this.cdr.detectChanges();
+    this.imageFeedbackTimer = setTimeout(() => {
+      this.ngZone.run(() => {
+        this.imageMessage = '';
+        this.imageError = '';
+        this.imageFeedbackTimer = null;
+        this.cdr.detectChanges();
+      });
+    }, 4000);
+  }
+
+  loadImages(): void {
+    this.isImagesLoading = true;
+    this.imageError = '';
+    this.imageService.getPreparedImages().pipe(
+      finalize(() => this.isImagesLoading = false)
+    ).subscribe({
+      next: (images) => {
+        this.images = images;
+        this.imageCategories = Array.from(new Set([
+          ...this.imageCategories,
+          ...images.map((image) => image.category).filter(Boolean)
+        ]));
+        if (!this.editingImageId && !this.selectedImageFile && !this.imageOrderManuallySet) {
+          this.imageForm.sortOrder = this.nextImageOrder(this.imageForm.category);
+        }
+      },
+      error: (error) => this.imageError = error?.error?.message || 'Could not load images.'
+    });
+  }
+
+  get filteredImages(): HouseImage[] {
+    return this.images
+      .filter((image) => this.imageFilterCategory === 'all' || image.category === this.imageFilterCategory)
+      .sort((a, b) => {
+        const difference = a.sortOrder - b.sortOrder;
+        return this.imageSortDirection === 'asc' ? difference : -difference;
+      });
+  }
+
+  startNewImage(): void {
+    this.editingImageId = null;
+    this.imageForm = this.createEmptyImage();
+    this.imageOrderManuallySet = false;
+    this.imageForm.sortOrder = this.nextImageOrder(this.imageForm.category);
+    this.imageMessage = '';
+    this.imageError = '';
+    this.imageUrlError = '';
+    this.selectedImageFile = null;
+    this.imagePreviewUrl = '';
+  }
+
+  editImage(image: HouseImage): void {
+    this.editingImageId = image.id ?? null;
+    this.imageForm = { ...image };
+    this.imageMessage = '';
+    this.imageError = '';
+    this.imageUrlError = '';
+    this.selectedImageFile = null;
+    this.imagePreviewUrl = image.url;
+    this.checkImageUrl(image.url);
+  }
+
+  cancelImageEdit(): void {
+    this.startNewImage();
+  }
+
+  saveImage(): void {
+    const image = {
+      ...this.imageForm,
+      url: this.imageForm.url.trim(),
+      category: this.imageForm.category.trim().toLowerCase(),
+      caption: this.imageForm.caption?.trim() || '',
+      sortOrder: Number(this.imageForm.sortOrder) || 0
+    };
+    if (!image.url || !image.category || this.imageUrlError || this.isImageSaving) return;
+
+    this.isImageSaving = true;
+    this.imageMessage = '';
+    this.imageError = '';
+    const request = this.editingImageId
+      ? this.imageService.updateImage({ ...image, id: this.editingImageId })
+      : this.imageService.createImage(image);
+
+    request.pipe(finalize(() => this.isImageSaving = false)).subscribe({
+      next: (savedImage) => {
+        const successMessage = this.editingImageId ? 'Image updated.' : 'Image added.';
+        const imageIndex = this.images.findIndex((image) => image.id === savedImage.id);
+        if (imageIndex >= 0) {
+          this.images[imageIndex] = savedImage;
+        } else {
+          this.images = [...this.images, savedImage];
+        }
+        this.startNewImage();
+        this.showImageFeedback(successMessage, 'success');
+      },
+      error: (error) => this.showImageFeedback(error?.error?.message || 'Could not save image.', 'error')
+    });
+  }
+
+  onImageFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.setSelectedImageFile(input.files?.[0] || null);
+  }
+
+  onImageFileDropped(event: DragEvent): void {
+    event.preventDefault();
+    this.setSelectedImageFile(event.dataTransfer?.files?.[0] || null);
+  }
+
+  setSelectedImageFile(file: File | null): void {
+    this.imageUrlError = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.imageUrlError = 'Select an image file.';
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      this.imageUrlError = 'The image must be smaller than 10 MB.';
+      return;
+    }
+
+    if (this.editingImageId) {
+      this.editingImageId = null;
+      this.imageForm = this.createEmptyImage();
+    }
+
+    this.selectedImageFile = file;
+    this.imageOrderManuallySet = false;
+    this.imageForm.sortOrder = this.nextImageOrder(this.imageForm.category);
+    this.imagePreviewUrl = URL.createObjectURL(file);
+  }
+
+  uploadSelectedImage(): void {
+    if (!this.selectedImageFile || !this.imageForm.category || this.isImageSaving) return;
+
+    this.isImageSaving = true;
+    this.imageMessage = '';
+    this.imageError = '';
+    this.imageService.uploadImage(this.selectedImageFile, {
+      category: this.imageForm.category.trim().toLowerCase(),
+      sortOrder: Number(this.imageForm.sortOrder) || 0,
+      caption: this.imageForm.caption?.trim() || ''
+    }).pipe(finalize(() => this.isImageSaving = false)).subscribe({
+      next: (uploadedImage) => {
+        this.startNewImage();
+        this.images = [...this.images, uploadedImage];
+        this.showImageFeedback('Image uploaded.', 'success');
+      },
+      error: (error) => {
+        const message = error?.status === 413
+          ? 'The image is too large. Maximum size is 10 MB.'
+          : error?.error?.message || 'Could not upload image.';
+        this.showImageFeedback(message, 'error');
+      }
+    });
+  }
+
+  checkImageUrl(url: string): void {
+    const trimmedUrl = url.trim();
+    this.imageUrlError = '';
+    if (!trimmedUrl) return;
+    if (/^uploads\/images\//i.test(trimmedUrl)) return;
+
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(trimmedUrl, document.baseURI);
+    } catch {
+      this.imageUrlError = 'Enter a valid image URL.';
+      return;
+    }
+
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      this.imageUrlError = 'Use an https:// URL or a local uploads/... path.';
+      return;
+    }
+
+    const preview = new Image();
+    preview.onload = () => this.imageUrlError = '';
+    preview.onerror = () => this.imageUrlError = 'This image link could not be loaded.';
+    preview.src = parsedUrl.href;
+  }
+
+  openImageDeleteConfirm(image: HouseImage): void {
+    this.deletingImage = image;
+    this.isImageDeleteConfirmOpen = true;
+  }
+
+  cancelImageDelete(): void {
+    this.isImageDeleteConfirmOpen = false;
+    this.deletingImage = null;
+  }
+
+  confirmImageDelete(): void {
+    if (!this.deletingImage?.id) return;
+
+    const imageId = this.deletingImage.id;
+    this.isImageDeleteConfirmOpen = false;
+    this.deletingImage = null;
+    this.imageService.deleteImage(imageId).subscribe({
+      next: () => {
+        this.images = this.images.filter((image) => image.id !== imageId);
+        this.showImageFeedback(this.i18n.t('adminPanel.gallery.deleteSuccess', undefined, 'Image deleted.'), 'success');
+      },
+      error: (error) => this.showImageFeedback(error?.error?.message || this.i18n.t('adminPanel.gallery.deleteError', undefined, 'Could not delete image.'), 'error')
+    });
   }
 
   blockSelectedDates(): void {

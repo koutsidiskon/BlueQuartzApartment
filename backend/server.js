@@ -10,10 +10,13 @@ import adminAuthRoutes from './src/routes/adminAuthRoutes.js';
 import bookingRoutes from './src/routes/bookingRoutes.js';
 import { ensureInitialAdminUser } from './src/config/bootstrapAdmin.js';
 import dotenv from 'dotenv';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 dotenv.config();
 
 
 const app = express();
+const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 app.set('trust proxy', 1);
 
@@ -33,6 +36,7 @@ app.use(cors({
 }));
 app.use(cookieParser());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(currentDirectory, 'uploads')));
 
 app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/images', imageRoutes);

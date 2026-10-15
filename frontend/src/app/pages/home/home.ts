@@ -18,6 +18,7 @@ export class Home implements OnInit {
   menuOpen = false;
   isGalleryLoading = true;
   galleryPreview: HouseImage[] = [];
+  allGalleryImages: HouseImage[] = [];
   isViewerOpen = false;
   viewerIndex = 0;
 
@@ -31,13 +32,15 @@ export class Home implements OnInit {
 
     this.isGalleryLoading = true;
 
-    this.imageService.getGalleryPreviewImages(11).subscribe({
+    this.imageService.getPreparedImages().subscribe({
       next: (images) => {
-        this.galleryPreview = images;
+        this.allGalleryImages = images;
+        this.galleryPreview = images.slice(0, 11);
         this.isGalleryLoading = false;
       },
       error: () => {
         this.galleryPreview = [];
+        this.allGalleryImages = [];
         this.isGalleryLoading = false;
       }
     });
