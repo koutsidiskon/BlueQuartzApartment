@@ -4,27 +4,28 @@
       <button class="viewer-close" type="button" [attr.aria-label]="'gallery.closeAria' | t" (click)="closeViewer()">
         <span class="material-icons">close</span>
       </button>
-
       <button class="viewer-nav prev" type="button" [attr.aria-label]="'gallery.previousAria' | t" (click)="showPrev()">
         <span class="material-icons">chevron_left</span>
       </button>
-
       <div class="viewer-stage">
-        <img [src]="images[activeIndex].url" [alt]="getAltText(images[activeIndex], activeIndex)">
+        <img
+          [src]="images[activeIndex].url"
+          [alt]="getAltText(images[activeIndex], activeIndex)"
+          [class.loaded]="imageLoaded"
+          fetchpriority="high"
+          decoding="async"
+          (load)="onImageLoaded()">
       </div>
-
       <button class="viewer-nav next" type="button" [attr.aria-label]="'gallery.nextAria' | t" (click)="showNext()">
         <span class="material-icons">chevron_right</span>
       </button>
-
       <div class="viewer-info">
         <span class="viewer-counter">{{ activeIndex + 1 }} / {{ images.length }}</span>
       </div>
-
       <div class="viewer-thumbs">
         @for (photo of images; track photo.url; let i = $index) {
           <button class="thumb-btn" type="button" [class.active]="i === activeIndex" (click)="goToSlide(i)" [attr.aria-label]="'gallery.goToPhotoAria' | t : { index: i + 1 }">
-            <img [src]="photo.url" [alt]="getAltText(photo, i)">
+            <img [src]="photo.url" [alt]="getAltText(photo, i)" loading="lazy" decoding="async">
           </button>
         }
       </div>

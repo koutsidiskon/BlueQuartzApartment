@@ -111,7 +111,12 @@
               [class.wide]="i === 4"
               [class.shift-right]="i === 2"
               (click)="openViewer(i, $event)">
-              <img [src]="photo.url" [alt]="photo.caption || ('home.facilities.photoAltFallback' | t)">
+              <img
+                [src]="photo.url"
+                [alt]="photo.caption || ('home.facilities.photoAltFallback' | t)"
+                [attr.loading]="i < 2 ? 'eager' : 'lazy'"
+                [attr.fetchpriority]="i === 0 ? 'high' : 'low'"
+                decoding="async">
             </button>
           }
         </div>

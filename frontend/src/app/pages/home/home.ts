@@ -32,10 +32,10 @@ export class Home implements OnInit {
 
     this.isGalleryLoading = true;
 
-    this.imageService.getPreparedImages().subscribe({
+    this.imageService.getPublicGalleryImages().subscribe({
       next: (images) => {
+        this.galleryPreview = images;
         this.allGalleryImages = images;
-        this.galleryPreview = images.slice(0, 11);
         this.isGalleryLoading = false;
       },
       error: () => {

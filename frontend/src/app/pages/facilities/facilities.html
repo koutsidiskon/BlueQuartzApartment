@@ -63,7 +63,7 @@
                     'img-sub-2': i === 2
                   }"
                   (click)="openViewerByUrl(photo.url, $event)">
-                  <img [src]="photo.url" [alt]="photo.caption || room.category">
+                  <img [src]="photo.url" [alt]="photo.caption || room.category" loading="lazy" decoding="async">
                 </button>
               }
             </div>
@@ -72,7 +72,7 @@
 
             <div class="single-image-layout">
               <button type="button" class="gallery-photo-trigger" (click)="openViewerByUrl(room.images[0].url, $event)">
-                <img [src]="room.images[0].url" [alt]="room.images[0].caption || room.category">
+                <img [src]="room.images[0].url" [alt]="room.images[0].caption || room.category" loading="lazy" decoding="async">
               </button>
             </div>
 

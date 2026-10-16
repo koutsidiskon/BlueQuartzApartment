@@ -327,6 +327,7 @@ $font-logo: 'Playfair Display', serif;
   cursor: zoom-in;
   box-shadow: 0 12px 30px rgba($blue-quartz, 0.1);
   isolation: isolate;
+  contain: layout paint;
 
   &.hero {
     grid-column: span 6;
@@ -361,13 +362,15 @@ $font-logo: 'Playfair Display', serif;
     transition: transform 0.6s ease;
   }
 
-  &:hover {
-    img {
-      transform: scale(1.06);
-    }
+  @media (hover: hover) {
+    &:hover {
+      img {
+        transform: scale(1.06);
+      }
 
-    &::after {
-      opacity: 0.75;
+      &::after {
+        opacity: 0.75;
+      }
     }
   }
 }
@@ -699,6 +702,8 @@ $font-logo: 'Playfair Display', serif;
     max-width: none;
     padding: 0 1rem 0.45rem;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     scrollbar-width: thin;
     scrollbar-color: rgba($blue-quartz, 0.45) rgba($blue-quartz, 0.1);
@@ -722,6 +727,7 @@ $font-logo: 'Playfair Display', serif;
     flex: 0 0 80vw;
     aspect-ratio: 10 / 13;
     scroll-snap-align: start;
+    contain: layout paint;
 
     &.hero,
     &.wide {

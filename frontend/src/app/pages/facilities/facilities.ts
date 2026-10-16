@@ -27,6 +27,7 @@ interface HouseRule {
 export class Facilities implements OnInit {
   roomGroups: { category: string, images: HouseImage[] }[] = [];
   viewerImages: HouseImage[] = [];
+  private allViewerImages: HouseImage[] = [];
   isLoading = false;
   loadError = '';
   isViewerOpen = false;
@@ -82,7 +83,7 @@ export class Facilities implements OnInit {
     this.loadError = '';
     this.cdr.detectChanges(); // Ensure the loader UI gets rendered immediately
 
-    this.imageService.getPreparedImages().pipe(
+    this.imageService.getPublicGalleryImages().pipe(
       timeout(10000),
       retry({
         count: 2,
@@ -95,6 +96,7 @@ export class Facilities implements OnInit {
     ).subscribe({
       next: (data) => {
         const categorizedImages = data.filter((img) => !!img.category);
+        this.allViewerImages = categorizedImages;
         this.viewerImages = categorizedImages;
         const imageGroups = this.imageService.groupByCategory(categorizedImages);
         const standardCategories = ['bedroom', 'living-room', 'kitchen', 'bathroom', 'veranda'];
@@ -107,6 +109,8 @@ export class Facilities implements OnInit {
         this.cdr.detectChanges();
       },
       error: (err) => {
+        this.allViewerImages = [];
+        this.viewerImages = [];
         this.loadError = this.i18n.t('facilitiesPage.status.loadError');
         console.error('Failed to load images from API.', err);
       }
@@ -122,8 +126,14 @@ export class Facilities implements OnInit {
   // Method to open the gallery viewer based on the clicked image URL
   openViewerByUrl(photoUrl: string, event: Event): void {
     event.preventDefault();
-    if (!this.viewerImages.length) return;
+    if (!this.allViewerImages.length) return;
 
+    const selectedImage = this.allViewerImages.find((img) => img.url === photoUrl);
+    if (!selectedImage) return;
+
+    this.viewerImages = this.allViewerImages.filter(
+      (img) => img.category === selectedImage.category
+    );
     const idx = this.viewerImages.findIndex((img) => img.url === photoUrl);
     this.viewerIndex = idx >= 0 ? idx : 0;
     this.isViewerOpen = true;

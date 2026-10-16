@@ -56,8 +56,25 @@ export class ImageService {
   // Fetches a limited number of images for the gallery preview
   //  using the prepared images method in home page 
   getGalleryPreviewImages(limit = 11): Observable<HouseImage[]> {
-    return this.getPreparedImages().pipe(
+    return this.getPublicGalleryImages().pipe(
       map((images) => images.slice(0, limit))
+    );
+  }
+
+  // Keeps the public gallery in the same room order as the facilities page.
+  getPublicGalleryImages(): Observable<HouseImage[]> {
+    return this.getPreparedImages().pipe(
+      map((images) => {
+        const categoryOrder = ['bedroom', 'living-room', 'kitchen', 'bathroom', 'veranda'];
+        const categoryIndex = (category: string) => {
+          const index = categoryOrder.indexOf(category);
+          return index === -1 ? categoryOrder.length : index;
+        };
+
+        return [...images].sort((a, b) =>
+          categoryIndex(a.category) - categoryIndex(b.category) || a.sortOrder - b.sortOrder
+        );
+      })
     );
   }
 
